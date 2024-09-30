@@ -29,6 +29,8 @@ public class AuthenticationController {
         return ApiResponse.<AuthenticationResponse>builder().result(result).build();
     }
 
+
+
     @PostMapping("/introspect")
     ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) {
         return ApiResponse.<IntrospectResponse>builder()
