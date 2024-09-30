@@ -1,0 +1,35 @@
+server:
+  servlet:
+    context-path: /wordwaves
+    encoding:
+      charset: UTF-8
+  port: 8080
+
+
+spring:
+  application:
+    name: job-search
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://ugy3xdlg4yzsgnbc:AJMQxWffY78sikU7JJjx@bv50k19rodxkhj0lbdvb-mysql.services.clever-cloud.com:3306/bv50k19rodxkhj0lbdvb
+    username: ugy3xdlg4yzsgnbc
+    password: AJMQxWffY78sikU7JJjx
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+
+
+jwt:
+  signerKey: "6FvxQMx9pcbEFqKFFP4XH748Kg//XkcCtf68+/P7ZRvIXnba3dG7POT/cUCAWV5Q"
+  valid-duration: 3600 # in seconds
+  refreshable-duration: 36000 # in seconds
+
+app:
+  email-client:
+    brevo-url: https://api.brevo.com
+    brevo-apikey: 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
+    sender:
+      email: kaitoukido0204@gmail.com
+      name: WordWaves
