@@ -4,15 +4,15 @@ on:
   push:
     branches:
       - main
-    paths:
-      - src/main/java/com/server/wordwaves/**
-      - Dockerfile
+#    paths:
+#      - src/main/java/com/server/wordwaves/**
+#      - Dockerfile
   pull_request:
     branches:
       - main
-    paths:
-      - src/main/java/com/server/wordwaves/**
-      - Dockerfile
+#    paths:
+#      - src/main/java/com/server/wordwaves/**
+#      - Dockerfile
 
 jobs:
   build:
@@ -27,6 +27,9 @@ jobs:
         with:
           java-version: '21'
           distribution: 'corretto'
+
+      - name: Give execute permission to mvnw
+        run: chmod +x mvnw  # Thiết lập quyền thực thi cho mvnw
 
       - name: Build with Maven
         run: ./mvnw clean package -DskipTests
