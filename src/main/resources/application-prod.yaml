@@ -1,0 +1,53 @@
+name: WordWaves Backend Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - src/main/java/com/server/wordwaves/**
+      - Dockerfile
+  pull_request:
+    branches:
+      - main
+    paths:
+      - src/main/java/com/server/wordwaves/**
+      - Dockerfile
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Sử dụng runner mặc định của GitHub
+    name: Build and Deploy
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Build with Maven
+        run: ./mvnw clean package -DskipTests
+
+      - name: Build Docker image
+        run: |
+          docker build -t wordwaves .
+
+      - name: Run Docker container
+        run: |
+          docker run -d -p 8080:8080 --name wordwaves-app \
+          -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+          -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
+          -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+          -e JWT_SIGNER_KEY=${{ secrets.JWT_SIGNER_KEY }} \
+          -e BREVO_APIKEY=${{ secrets.BREVO_APIKEY }} \
+          -e BREVO_SENDER_EMAIL=${{ secrets.BREVO_SENDER_EMAIL }} \
+          wordwaves
+
+      - name: Clean up
+        if: always()  # Luôn thực hiện dù job trước đó có thành công hay không
+        run: |
+          docker stop wordwaves-app || true
+          docker rm wordwaves-app || true

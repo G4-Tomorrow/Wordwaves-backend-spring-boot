@@ -1,0 +1,33 @@
+name: WordWaves Backend Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - src/main/java/com/server/wordwaves/**
+      - Dockerfile
+  pull_request:
+    branches:
+      - main
+    paths:
+      - src/main/java/com/server/wordwaves/**
+      - Dockerfile
+
+jobs:
+  build:
+    runs-on: self-hosted
+    name: Compile project
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-jdk@v4
+        with:
+          java-version: '21'
+          distribution: 'correctto'
+
+      - name: Build with Maven
+        run: ./mvnw clean compile
+
