@@ -1,53 +1,43 @@
-name: WordWaves Backend Pipeline
+server:
+  servlet:
+    context-path: /wordwaves
+    encoding:
+      charset: UTF-8
+  port: 8080
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - src/main/java/com/server/wordwaves/**
-      - Dockerfile
-  pull_request:
-    branches:
-      - main
-    paths:
-      - src/main/java/com/server/wordwaves/**
-      - Dockerfile
+spring:
+  application:
+    name: job-search
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 
-jobs:
-  build:
-    runs-on: ubuntu-latest  # Sử dụng runner mặc định của GitHub
-    name: Build and Deploy
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+jwt:
+  signerKey: ${JWT_SIGNER_KEY}
+  valid-duration: ${JWT_VALID_DURATION:3600} # Default value is 3600 seconds if not provided
+  refreshable-duration: ${JWT_REFRESHABLE_DURATION:36000} # Default value is 36000 seconds if not provided
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'corretto'
+app:
+  email-client:
+    brevo-url: https://api.brevo.com
+    brevo-apikey: ${BREVO_APIKEY}
+    sender:
+      email: ${BREVO_SENDER_EMAIL}
+      name: ${SENDER_NAME:WordWaves Support}
 
-      - name: Build with Maven
-        run: ./mvnw clean package -DskipTests
+logging:
+  file:
+    name: logs/wordwaves.log # Đường dẫn và tên file log
+  level:
+    root: INFO # Mức log chung
+    com.yourpackage: DEBUG # Mức log cụ thể cho package của bạn (tùy chỉnh cho phù hợp)
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-      - name: Build Docker image
-        run: |
-          docker build -t wordwaves .
-
-      - name: Run Docker container
-        run: |
-          docker run -d -p 8080:8080 --name wordwaves-app \
-          -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-          -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
-          -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
-          -e JWT_SIGNER_KEY=${{ secrets.JWT_SIGNER_KEY }} \
-          -e BREVO_APIKEY=${{ secrets.BREVO_APIKEY }} \
-          -e BREVO_SENDER_EMAIL=${{ secrets.BREVO_SENDER_EMAIL }} \
-          wordwaves
-
-      - name: Clean up
-        if: always()  # Luôn thực hiện dù job trước đó có thành công hay không
-        run: |
-          docker stop wordwaves-app || true
-          docker rm wordwaves-app || true
