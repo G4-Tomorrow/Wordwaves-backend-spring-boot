@@ -3,6 +3,8 @@ package com.server.wordwaves.controller;
 import com.server.wordwaves.dto.ApiResponse;
 import com.server.wordwaves.dto.request.UserCreationRequest;
 import com.server.wordwaves.dto.request.UserUpdateRequest;
+import com.server.wordwaves.dto.response.AuthenticationResponse;
+import com.server.wordwaves.dto.response.EmailResponse;
 import com.server.wordwaves.dto.response.UserResponse;
 import com.server.wordwaves.service.UserService;
 import jakarta.validation.Valid;
@@ -24,10 +26,24 @@ public class UserController {
     UserService userService;
 
     @PostMapping
-    ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
-        log.info("Controller: create User");
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.createUser(request))
+    ApiResponse<EmailResponse> register(@RequestBody @Valid UserCreationRequest request) {
+        return ApiResponse.<EmailResponse>builder()
+                .result(userService.register(request))
+                .build();
+    }
+
+    @GetMapping("/verify")
+    ApiResponse<AuthenticationResponse> verify(@RequestParam String token) {
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(userService.verify(token))
+                .build();
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestHeader("Authorization") String token) {
+        userService.logout(token.substring(7));
+        return ApiResponse.<Void>builder()
+                .message("Đăng xuất thành công")
                 .build();
     }
 
