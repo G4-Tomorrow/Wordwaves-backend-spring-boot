@@ -64,7 +64,7 @@ public class EmailServiceImp implements EmailService {
         EmailRequest emailRequest = EmailRequest.builder()
                 .sender(SenderModel.builder().email(senderMail).name(senderName).build())
                 .to(List.of(RecipientModel.builder().email(user.getEmail()).build()))
-                .subject("Job Search")
+                .subject("WordWaves")
                 .htmlContent(htmlContent)
                 .build();
 
