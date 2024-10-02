@@ -36,7 +36,6 @@ logging:
     name: logs/wordwaves.log # Đường dẫn và tên file log
   level:
     root: INFO # Mức log chung
-    com.yourpackage: DEBUG # Mức log cụ thể cho package của bạn (tùy chỉnh cho phù hợp)
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

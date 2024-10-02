@@ -12,6 +12,7 @@ FROM amazoncorretto:21.0.4
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
+
 ENV SPRING_PROFILES_ACTIVE=prod
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

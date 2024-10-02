@@ -7,14 +7,15 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
-@Builder
+
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Entity
-public class User {
+@Builder
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
@@ -24,9 +25,6 @@ public class User {
 
     String password;
     String fullName;
-
-    //    @Column(name = "email_verified", nullable = false, columnDefinition = "boolean default false")
-    //    boolean emailVerified = false;
 
     @ManyToMany
     @JoinTable(name = "user_roles")

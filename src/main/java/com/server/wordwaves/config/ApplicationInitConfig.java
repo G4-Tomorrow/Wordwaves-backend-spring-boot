@@ -5,6 +5,7 @@ import com.server.wordwaves.entity.Role;
 import com.server.wordwaves.entity.User;
 import com.server.wordwaves.repository.RoleRepository;
 import com.server.wordwaves.repository.UserRepository;
+import com.server.wordwaves.service.BaseRedisService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,10 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 @RequiredArgsConstructor
@@ -32,6 +36,7 @@ public class ApplicationInitConfig {
     ApplicationRunner applicationRunner(
             UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         log.info("Init application");
+
         return args -> {
             if (!userRepository.existsByEmail(ADMIN_EMAIL)) {
                 roleRepository.save(
