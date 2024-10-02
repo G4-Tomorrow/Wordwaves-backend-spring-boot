@@ -20,8 +20,8 @@ spring:
 
 jwt:
   signerKey: ${JWT_SIGNER_KEY}
-  valid-duration: ${JWT_VALID_DURATION:3600} # Default value is 3600 seconds if not provided
-  refreshable-duration: ${JWT_REFRESHABLE_DURATION:36000} # Default value is 36000 seconds if not provided
+  access-token-duration-in-seconds: ${JWT_accessTokenExpiration:3600} # Default value is 3600 seconds if not provided
+  refresh-token-duration-in-seconds: ${JWT_REFRESHABLE_DURATION:36000} # Default value is 36000 seconds if not provided
 
 app:
   email-client:

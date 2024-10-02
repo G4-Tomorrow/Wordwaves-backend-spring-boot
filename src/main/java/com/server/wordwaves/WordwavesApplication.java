@@ -11,5 +11,4 @@ public class WordwavesApplication {
     public static void main(String[] args) {
         SpringApplication.run(WordwavesApplication.class, args);
     }
-
 }

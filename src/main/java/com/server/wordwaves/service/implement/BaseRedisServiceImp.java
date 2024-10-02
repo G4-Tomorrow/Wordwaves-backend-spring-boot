@@ -1,17 +1,19 @@
 package com.server.wordwaves.service.implement;
 
-import com.server.wordwaves.service.BaseRedisService;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+
+import com.server.wordwaves.service.BaseRedisService;
+
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -19,12 +21,10 @@ public class BaseRedisServiceImp implements BaseRedisService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final HashOperations<String, String, Object> hashOperations;
 
-
     public BaseRedisServiceImp(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.hashOperations = redisTemplate.opsForHash();
     }
-
 
     @Override
     public void set(String key, String value) {
@@ -103,4 +103,3 @@ public class BaseRedisServiceImp implements BaseRedisService {
         }
     }
 }
-

@@ -1,19 +1,22 @@
 package com.server.wordwaves.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.server.wordwaves.dto.ApiResponse;
 import com.server.wordwaves.dto.request.AuthenticationRequest;
 import com.server.wordwaves.dto.request.IntrospectRequest;
 import com.server.wordwaves.dto.response.AuthenticationResponse;
 import com.server.wordwaves.dto.response.IntrospectResponse;
 import com.server.wordwaves.service.AuthenticationService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -23,10 +26,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
     AuthenticationService authenticationService;
 
-    @PostMapping("/token")
-    ApiResponse<AuthenticationResponse> token(@RequestBody AuthenticationRequest request) {
-        AuthenticationResponse result = authenticationService.authenticate(request);
-        return ApiResponse.<AuthenticationResponse>builder().result(result).build();
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> login(@RequestBody AuthenticationRequest request) {
+        ResponseEntity<AuthenticationResponse> responseEntity = authenticationService.authenticate(request);
+        AuthenticationResponse result = responseEntity.getBody();
+        ApiResponse<AuthenticationResponse> apiResponse =
+                ApiResponse.<AuthenticationResponse>builder().result(result).build();
+
+        return ResponseEntity.status(responseEntity.getStatusCode())
+                .headers(responseEntity.getHeaders())
+                .body(apiResponse);
     }
 
     @PostMapping("/introspect")

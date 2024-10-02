@@ -1,4 +1,3 @@
 package com.server.wordwaves.dto.request;
 
-public class UserUpdateRequest {
-}
+public class UserUpdateRequest {}

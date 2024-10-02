@@ -1,5 +1,16 @@
 package com.server.wordwaves.service.implement;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.stereotype.Service;
+
 import com.server.wordwaves.config.CustomJwtDecoder;
 import com.server.wordwaves.config.JwtTokenProvider;
 import com.server.wordwaves.constant.PredefinedRole;
@@ -18,21 +29,11 @@ import com.server.wordwaves.repository.UserRepository;
 import com.server.wordwaves.service.BaseRedisService;
 import com.server.wordwaves.service.EmailService;
 import com.server.wordwaves.service.UserService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.stereotype.Service;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -77,7 +78,7 @@ public class UserServiceImp implements UserService {
         userRepository.save(user);
 
         return AuthenticationResponse.builder()
-                .accessToken(jwtTokenProvider.generateToken(user))
+                .accessToken(jwtTokenProvider.generateAccessToken(user))
                 .build();
     }
 
@@ -97,19 +98,31 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    }
+
+    @Override
+    public void updateUserRefreshToken(String refreshToken, String email) {
+        User currentUser =
+                userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        currentUser.setRefreshToken(refreshToken);
+
+        userRepository.save(currentUser);
+    }
+
+    @Override
     public UserResponse updateUserById(String userId, UserUpdateRequest userUpdateRequest) {
         return null;
     }
 
     @Override
-    public void deleteUserById(String userId) {
-
-    }
+    public void deleteUserById(String userId) {}
 
     @Override
     public void logout(String token) {
-        if (token == null || token.isEmpty())
-            throw new AppException(ErrorCode.EMPTY_TOKEN);
+        if (token == null || token.isEmpty()) throw new AppException(ErrorCode.EMPTY_TOKEN);
         Jwt jwt = null;
         try {
             jwt = jwtDecoder.decode(token);
@@ -119,7 +132,7 @@ public class UserServiceImp implements UserService {
         Instant expiredDate = jwt.getExpiresAt();
         long timeRemaining = Duration.between(Instant.now(), expiredDate).toSeconds();
 
-        if(timeRemaining <= 0) return;
+        if (timeRemaining <= 0) return;
 
         baseRedisService.set(token, "jwttoken");
         baseRedisService.setTimeToLive(token, timeRemaining);

@@ -1,10 +1,15 @@
 package com.server.wordwaves.service.implement;
 
+import java.text.ParseException;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
 import com.server.wordwaves.config.JwtTokenProvider;
 import com.server.wordwaves.dto.request.AuthenticationRequest;
 import com.server.wordwaves.dto.request.IntrospectRequest;
@@ -13,55 +18,70 @@ import com.server.wordwaves.dto.response.IntrospectResponse;
 import com.server.wordwaves.entity.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
-import com.server.wordwaves.repository.UserRepository;
 import com.server.wordwaves.service.AuthenticationService;
-import com.server.wordwaves.service.BaseRedisService;
+import com.server.wordwaves.service.UserService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationServiceImp implements AuthenticationService {
-    UserRepository userRepository;
+    UserService userService;
     PasswordEncoder passwordEncoder;
     JwtTokenProvider jwtTokenProvider;
-    BaseRedisService baseRedisService;
 
     @NonFinal
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
 
     @NonFinal
-    @Value("${jwt.valid-duration}")
-    protected long VALID_DURATION;
+    @Value("${jwt.access-token-duration-in-seconds}")
+    protected long ACCESS_TOKEN_EXPIRATION;
+
+    @NonFinal
+    @Value("${jwt.refresh-token-duration-in-seconds}")
+    protected long REFRESH_TOKEN_EXPIRATION;
 
     @Override
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        User user = userRepository
-                .findByEmail(request.getEmail())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+    public ResponseEntity<AuthenticationResponse> authenticate(AuthenticationRequest request) {
+        User currentUser = userService.getUserByEmail(request.getEmail());
+
+        boolean authenticated = passwordEncoder.matches(request.getPassword(), currentUser.getPassword());
         if (!authenticated) throw new AppException(ErrorCode.WRONG_PASSWORD);
 
-        String accessToken = jwtTokenProvider.generateToken(user);
+        // Add information about current user login to response
+        AuthenticationResponse authResponse = new AuthenticationResponse();
+        if (currentUser != null) {
+            AuthenticationResponse.UserLogin userLogin = new AuthenticationResponse.UserLogin(
+                    currentUser.getId(), currentUser.getEmail(), currentUser.getFullName());
+            authResponse.setUser(userLogin);
+        }
 
-        return AuthenticationResponse.builder().accessToken(accessToken).build();
+        // Create access token
+        String accessToken = jwtTokenProvider.generateAccessToken(currentUser);
+        authResponse.setAccessToken(accessToken);
+
+        // Create refresh token and update refresh token to User entity
+        String refreshToken = jwtTokenProvider.generateRefreshToken(currentUser);
+        userService.updateUserRefreshToken(refreshToken, currentUser.getEmail());
+
+        // Set cookies
+        ResponseCookie resCookies = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(REFRESH_TOKEN_EXPIRATION)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, resCookies.toString())
+                .body(authResponse);
     }
 
     @Override
@@ -77,6 +97,4 @@ public class AuthenticationServiceImp implements AuthenticationService {
 
         return IntrospectResponse.builder().valid(isValid).build();
     }
-
-
 }
