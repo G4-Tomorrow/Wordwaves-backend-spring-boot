@@ -1,10 +1,11 @@
 package com.server.wordwaves.dto.response;
 
+import java.util.Set;
+
 import com.server.wordwaves.entity.Role;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
 
 @Data
 @Builder

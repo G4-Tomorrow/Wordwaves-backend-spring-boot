@@ -1,11 +1,12 @@
 package com.server.wordwaves.dto.request;
 
+import java.util.List;
+
 import com.server.wordwaves.dto.model.RecipientModel;
 import com.server.wordwaves.dto.model.SenderModel;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor

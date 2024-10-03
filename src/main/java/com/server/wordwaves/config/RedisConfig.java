@@ -13,6 +13,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
     @Value("17581")
     private int redisPort;
+
     @Value("redis-17581.c244.us-east-1-2.ec2.redns.redis-cloud.com")
     private String redisHost;
 
@@ -37,5 +38,4 @@ public class RedisConfig {
 
         return redisTemplate;
     }
-
 }

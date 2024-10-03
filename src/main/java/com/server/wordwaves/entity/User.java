@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,4 +28,7 @@ public class User extends BaseEntity {
     @ManyToMany
     @JoinTable(name = "user_roles")
     Set<Role> roles;
+
+    @Column(name = "refresh_token", columnDefinition = "TEXT")
+    String refreshToken;
 }

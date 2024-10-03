@@ -1,5 +1,12 @@
 package com.server.wordwaves.controller;
 
+import java.util.List;
+
+import jakarta.validation.Valid;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
 import com.server.wordwaves.dto.ApiResponse;
 import com.server.wordwaves.dto.request.UserCreationRequest;
 import com.server.wordwaves.dto.request.UserUpdateRequest;
@@ -7,15 +14,11 @@ import com.server.wordwaves.dto.response.AuthenticationResponse;
 import com.server.wordwaves.dto.response.EmailResponse;
 import com.server.wordwaves.dto.response.UserResponse;
 import com.server.wordwaves.service.UserService;
-import jakarta.validation.Valid;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -42,9 +45,7 @@ public class UserController {
     @PostMapping("/logout")
     ApiResponse<Void> logout(@RequestHeader("Authorization") String token) {
         userService.logout(token.substring(7));
-        return ApiResponse.<Void>builder()
-                .message("Đăng xuất thành công")
-                .build();
+        return ApiResponse.<Void>builder().message("Đăng xuất thành công").build();
     }
 
     @GetMapping

@@ -31,4 +31,3 @@ public interface BaseRedisService {
 
     void delete(String key, List<String> fields);
 }
-

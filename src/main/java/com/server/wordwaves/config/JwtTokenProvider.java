@@ -1,5 +1,16 @@
 package com.server.wordwaves.config;
 
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.StringJoiner;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -8,20 +19,11 @@ import com.nimbusds.jwt.SignedJWT;
 import com.server.wordwaves.entity.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
 
 @Component
 @NoArgsConstructor
@@ -34,18 +36,23 @@ public class JwtTokenProvider {
     protected String SIGNER_KEY;
 
     @NonFinal
-    @Value("${jwt.valid-duration}")
-    protected long VALID_DURATION;
+    @Value("${jwt.access-token-duration-in-seconds}")
+    protected long ACCESS_TOKEN_EXPIRATION;
 
-    public String generateToken(User user) {
+    @NonFinal
+    @Value("${jwt.refresh-token-duration-in-seconds}")
+    protected long REFRESH_TOKEN_EXPIRATION;
+
+    private String generateToken(User user, long expirationDuration) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getId())
                 .issuer("wordwaves")
                 .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
+                .expirationTime(new Date(Instant.now()
+                        .plus(expirationDuration, ChronoUnit.SECONDS)
+                        .toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
                 .build();
@@ -63,6 +70,14 @@ public class JwtTokenProvider {
         }
     }
 
+    public String generateAccessToken(User user) {
+        return generateToken(user, ACCESS_TOKEN_EXPIRATION);
+    }
+
+    public String generateRefreshToken(User user) {
+        return generateToken(user, REFRESH_TOKEN_EXPIRATION);
+    }
+
     public SignedJWT verifyToken(String token) throws JOSEException, ParseException {
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
 
@@ -74,8 +89,9 @@ public class JwtTokenProvider {
 
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        //        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
-        //            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        // if
+        // (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+        // throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         return signedJWT;
     }
