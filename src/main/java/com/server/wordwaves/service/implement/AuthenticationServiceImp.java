@@ -1,6 +1,7 @@
 package com.server.wordwaves.service.implement;
 
 import java.text.ParseException;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -9,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.nimbusds.jose.*;
+import com.nimbusds.jose.JOSEException;
 import com.server.wordwaves.config.JwtTokenProvider;
 import com.server.wordwaves.dto.request.AuthenticationRequest;
 import com.server.wordwaves.dto.request.IntrospectRequest;
@@ -18,6 +19,7 @@ import com.server.wordwaves.dto.response.IntrospectResponse;
 import com.server.wordwaves.entity.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
+import com.server.wordwaves.mapper.UserMapper;
 import com.server.wordwaves.service.AuthenticationService;
 import com.server.wordwaves.service.UserService;
 
@@ -35,9 +37,10 @@ public class AuthenticationServiceImp implements AuthenticationService {
     UserService userService;
     PasswordEncoder passwordEncoder;
     JwtTokenProvider jwtTokenProvider;
+    UserMapper userMapper;
 
     @NonFinal
-    @Value("${jwt.signerKey}")
+    @Value("${jwt.access-signer-key}")
     protected String SIGNER_KEY;
 
     @NonFinal
@@ -57,11 +60,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
 
         // Add information about current user login to response
         AuthenticationResponse authResponse = new AuthenticationResponse();
-        if (currentUser != null) {
-            AuthenticationResponse.UserLogin userLogin = new AuthenticationResponse.UserLogin(
-                    currentUser.getId(), currentUser.getEmail(), currentUser.getFullName());
-            authResponse.setUser(userLogin);
-        }
+        if (Objects.isNull(currentUser)) throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        authResponse.setUser(userMapper.toUserResponse(currentUser));
 
         // Create access token
         String accessToken = jwtTokenProvider.generateAccessToken(currentUser);

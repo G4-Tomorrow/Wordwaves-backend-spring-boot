@@ -49,7 +49,7 @@ public class EmailServiceImp implements EmailService {
     String senderName;
 
     @NonFinal
-    @Value("${jwt.signerKey}")
+    @Value("${jwt.access-signer-key}")
     protected String SIGNER_KEY;
 
     @NonFinal

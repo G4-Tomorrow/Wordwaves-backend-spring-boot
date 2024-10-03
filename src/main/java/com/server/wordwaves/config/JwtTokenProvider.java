@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -32,8 +33,12 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtTokenProvider {
 
     @NonFinal
-    @Value("${jwt.signerKey}")
-    protected String SIGNER_KEY;
+    @Value("${jwt.access-signer-key}")
+    protected String ACCESS_SIGNER_KEY;
+
+    @NonFinal
+    @Value("${jwt.refresh-signer-key}")
+    protected String REFRESH_SIGNER_KEY;
 
     @NonFinal
     @Value("${jwt.access-token-duration-in-seconds}")
@@ -43,7 +48,7 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh-token-duration-in-seconds}")
     protected long REFRESH_TOKEN_EXPIRATION;
 
-    private String generateToken(User user, long expirationDuration) {
+    private String generateToken(User user, String keyType) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
@@ -51,7 +56,9 @@ public class JwtTokenProvider {
                 .issuer("wordwaves")
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now()
-                        .plus(expirationDuration, ChronoUnit.SECONDS)
+                        .plus(
+                                Objects.equals(keyType, "access") ? ACCESS_TOKEN_EXPIRATION : REFRESH_TOKEN_EXPIRATION,
+                                ChronoUnit.SECONDS)
                         .toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
@@ -62,7 +69,8 @@ public class JwtTokenProvider {
         JWSObject jwsObject = new JWSObject(header, payload);
 
         try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+            jwsObject.sign(new MACSigner(
+                    (Objects.equals(keyType, "access") ? ACCESS_SIGNER_KEY : REFRESH_SIGNER_KEY).getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
             log.error("Cannot create token", e);
@@ -71,15 +79,15 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(User user) {
-        return generateToken(user, ACCESS_TOKEN_EXPIRATION);
+        return generateToken(user, "access");
     }
 
     public String generateRefreshToken(User user) {
-        return generateToken(user, REFRESH_TOKEN_EXPIRATION);
+        return generateToken(user, "refresh");
     }
 
     public SignedJWT verifyToken(String token) throws JOSEException, ParseException {
-        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+        JWSVerifier verifier = new MACVerifier(ACCESS_SIGNER_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
 

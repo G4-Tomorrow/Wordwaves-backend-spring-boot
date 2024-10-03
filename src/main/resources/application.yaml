@@ -21,7 +21,8 @@ spring:
 
 
 jwt:
-  signerKey: "6FvxQMx9pcbEFqKFFP4XH748Kg//XkcCtf68+/P7ZRvIXnba3dG7POT/cUCAWV5Q"
+  access-signer-key: "6FvxQMx9pcbEFqKFFP4XH748Kg//XkcCtf68+/P7ZRvIXnba3dG7POT/cUCAWV5Q"
+  refresh-signer-key: "CAqDB1w3mJFJEb3ifzhGVJou64rhlft96l8FSS+i+0XGHSKb+OMxXbzOeHoLxaFL"
   access-token-duration-in-seconds: 600 # 10 minutes (in seconds)
   refresh-token-duration-in-seconds: 604800 # 7 days (in seconds)
 
