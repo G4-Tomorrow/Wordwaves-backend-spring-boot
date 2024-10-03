@@ -43,20 +43,3 @@ jobs:
       - name: Push Docker image to Docker Hub
         run: docker push quan0204/wordwaves:latest
 
-      - name: Deploy to Render
-        run: |
-          curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
-          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -d '{
-                "serviceId": "${{ secrets.RENDER_SERVICE_ID }}",
-                "envVars": [
-                  {"key": "DATABASE_URL", "value": "${{ secrets.DATABASE_URL }}"},
-                  {"key": "DATABASE_USERNAME", "value": "${{ secrets.DATABASE_USERNAME }}"},
-                  {"key": "DATABASE_PASSWORD", "value": "${{ secrets.DATABASE_PASSWORD }}"},
-                  {"key": "JWT_SIGNER_KEY", "value": "${{ secrets.JWT_SIGNER_KEY }}"},
-                  {"key": "BREVO_APIKEY", "value": "${{ secrets.BREVO_APIKEY }}"},
-                  {"key": "BREVO_SENDER_EMAIL", "value": "${{ secrets.BREVO_SENDER_EMAIL }}"}
-                ]
-              }'

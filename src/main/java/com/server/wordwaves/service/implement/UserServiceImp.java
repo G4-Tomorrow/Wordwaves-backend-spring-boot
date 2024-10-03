@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -89,12 +91,18 @@ public class UserServiceImp implements UserService {
 
     @Override
     public UserResponse getMyInfo() {
-        return null;
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository
+                .findById(name)
+                .map(userMapper::toUserResponse)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
     }
 
     @Override
+    @PostAuthorize("returnObject.id == authentication.name || hasRole('ADMIN')")
     public UserResponse getUserById(String userId) {
-        return null;
+        return userMapper.toUserResponse(
+                userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found")));
     }
 
     @Override

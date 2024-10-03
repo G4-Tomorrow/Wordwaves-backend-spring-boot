@@ -16,20 +16,23 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class CustomJwtDecoder implements JwtDecoder {
     BaseRedisService baseRedisService;
 
     @NonFinal
-    @Value("${jwt.signerKey}")
+    @Value("${jwt.access-signer-key}")
     private String signerKey;
 
     @Override
     public Jwt decode(String token) throws JwtException {
         boolean checkedToken = baseRedisService.exist(token);
+        log.info("{}", checkedToken);
         if (checkedToken) throw new JwtException("Invalid Token");
 
         try {
