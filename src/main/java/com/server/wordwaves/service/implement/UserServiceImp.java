@@ -6,7 +6,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.server.wordwaves.dto.request.LogoutRequest;
+import com.server.wordwaves.dto.request.VerifyEmailRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,7 +68,8 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public AuthenticationResponse verify(String token) {
+    public AuthenticationResponse verify(VerifyEmailRequest request) {
+        String token = request.getToken();
         if (token.isEmpty()) throw new AppException(ErrorCode.EMPTY_TOKEN);
 
         Jwt jwt = jwtDecoder.decode(token);
@@ -85,9 +93,22 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public List<UserResponse> getUsers() {
-        return null;
+    public List<UserResponse> getUsers(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
+        pageNumber--;
+        Sort sort = sortDirection.equalsIgnoreCase("DESC") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<User> usersPage;
+
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            usersPage = userRepository.findByFullNameContainingOrEmailContaining(searchQuery, searchQuery, pageable);
+        } else {
+            usersPage = userRepository.findAll(pageable);
+        }
+
+        return usersPage.stream()
+                .map(userMapper::toUserResponse).toList();
     }
+
 
     @Override
     public UserResponse getMyInfo() {
@@ -129,9 +150,11 @@ public class UserServiceImp implements UserService {
     public void deleteUserById(String userId) {}
 
     @Override
-    public void logout(String token) {
+    public void logout(LogoutRequest request) {
+        String token = request.getToken();
         if (token == null || token.isEmpty()) throw new AppException(ErrorCode.EMPTY_TOKEN);
         Jwt jwt = null;
+        token = token.substring(7);
         try {
             jwt = jwtDecoder.decode(token);
         } catch (AppException e) {

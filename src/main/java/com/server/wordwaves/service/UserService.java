@@ -2,8 +2,10 @@ package com.server.wordwaves.service;
 
 import java.util.List;
 
+import com.server.wordwaves.dto.request.LogoutRequest;
 import com.server.wordwaves.dto.request.UserCreationRequest;
 import com.server.wordwaves.dto.request.UserUpdateRequest;
+import com.server.wordwaves.dto.request.VerifyEmailRequest;
 import com.server.wordwaves.dto.response.AuthenticationResponse;
 import com.server.wordwaves.dto.response.EmailResponse;
 import com.server.wordwaves.dto.response.UserResponse;
@@ -12,9 +14,9 @@ import com.server.wordwaves.entity.User;
 public interface UserService {
     EmailResponse register(UserCreationRequest request);
 
-    AuthenticationResponse verify(String token);
+    AuthenticationResponse verify(VerifyEmailRequest request);
 
-    List<UserResponse> getUsers();
+    List<UserResponse> getUsers(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery);
 
     UserResponse getMyInfo();
 
@@ -28,5 +30,5 @@ public interface UserService {
 
     void deleteUserById(String userId);
 
-    void logout(String token);
+    void logout(LogoutRequest request);
 }
