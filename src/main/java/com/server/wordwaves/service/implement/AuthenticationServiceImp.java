@@ -51,6 +51,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
     @Value("${jwt.refresh-token-duration-in-seconds}")
     protected long REFRESH_TOKEN_EXPIRATION;
 
+
+
     @Override
     public ResponseEntity<AuthenticationResponse> authenticate(AuthenticationRequest request) {
         User currentUser = userService.getUserByEmail(request.getEmail());
