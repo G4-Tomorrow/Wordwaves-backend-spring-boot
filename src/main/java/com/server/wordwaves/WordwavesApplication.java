@@ -8,7 +8,6 @@ import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
 @EnableFeignClients
-@PropertySource("application-prod.yaml")
 public class WordwavesApplication {
 
     public static void main(String[] args) {

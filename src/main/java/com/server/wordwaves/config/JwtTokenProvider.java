@@ -90,6 +90,8 @@ public class JwtTokenProvider {
     }
 
     public SignedJWT verifyToken(String token, String keyType) throws JOSEException, ParseException {
+        if (baseRedisService.exist(token)) throw new AppException(ErrorCode.UNAUTHENTICATED);
+
         JWSVerifier verifier = new MACVerifier(
                 (Objects.equals(keyType, "access") ? ACCESS_SIGNER_KEY : REFRESH_SIGNER_KEY).getBytes());
 
