@@ -2,6 +2,9 @@ package com.server.wordwaves.service;
 
 import java.text.ParseException;
 
+import com.nimbusds.jose.JOSEException;
+import com.server.wordwaves.dto.request.auth.LogoutRequest;
+import com.server.wordwaves.dto.request.auth.RefreshTokenRequest;
 import org.springframework.http.ResponseEntity;
 
 import com.server.wordwaves.dto.request.auth.AuthenticationRequest;
@@ -14,7 +17,7 @@ public interface AuthenticationService {
 
     IntrospectResponse introspect(IntrospectRequest request);
 
-    ResponseEntity<Void> logout(String token);
+    ResponseEntity<Void> logout(LogoutRequest request);
 
-    ResponseEntity<AuthenticationResponse> getRefreshToken(String refreshToken) throws ParseException, JOSEException;
+    ResponseEntity<AuthenticationResponse> getRefreshToken(RefreshTokenRequest request) throws ParseException, JOSEException, JOSEException;
 }

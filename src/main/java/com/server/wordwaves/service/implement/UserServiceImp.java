@@ -5,7 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.server.wordwaves.dto.request.user.*;
+import com.server.wordwaves.dto.response.user.UserResponse;
+import com.server.wordwaves.service.TokenService;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +24,6 @@ import com.server.wordwaves.config.CustomJwtDecoder;
 import com.server.wordwaves.config.JwtTokenProvider;
 import com.server.wordwaves.constant.PredefinedRole;
 
-import com.server.wordwaves.dto.request.auth.LogoutRequest;
-import com.server.wordwaves.dto.request.user.UserCreationRequest;
-import com.server.wordwaves.dto.request.user.UserUpdateRequest;
-import com.server.wordwaves.dto.request.user.VerifyEmailRequest;
 import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
 import com.server.wordwaves.dto.response.common.EmailResponse;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
@@ -55,10 +55,11 @@ public class UserServiceImp implements UserService {
     EmailService emailService;
     UserMapper userMapper;
     JwtTokenProvider jwtTokenProvider;
+    TokenService tokenService;
 
     @Override
-    public EmailResponse forgotPassword(String email) {
-        User user = getUserByEmail(email);
+    public EmailResponse forgotPassword(ForgotPasswordRequest request) {
+        User user = getUserByEmail(request.getEmail());
         return emailService.sendForgotPasswordEmail(user);
     }
 
@@ -86,7 +87,8 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public AuthenticationResponse verify(String token) {
+    public AuthenticationResponse verify(VerifyEmailRequest request) {
+        String token = request.getToken();
         User user = validateTokenAndGetUser(token);
 
         Set<Role> roles = new HashSet<>();
@@ -106,9 +108,7 @@ public class UserServiceImp implements UserService {
     }
 
     private User validateTokenAndGetUser(String token) {
-        if (token.isEmpty()) {
-            throw new AppException(ErrorCode.EMPTY_TOKEN);
-        }
+        tokenService.ensureTokenPresent(token);
 
         Jwt jwt;
         try {
@@ -161,7 +161,6 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    @PostAuthorize("returnObject.id == authentication.name || hasRole('ADMIN')")
     public UserResponse getUserById(String userId) {
         return userMapper.toUserResponse(
                 userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found")));
@@ -209,6 +208,8 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public void deleteUserById(String userId) {}
+    public void deleteUserById(String userId) {
+        userRepository.deleteById(userId);
+    }
 
 }

@@ -2,12 +2,10 @@ package com.server.wordwaves.service;
 
 import java.util.List;
 
+import com.server.wordwaves.dto.request.user.*;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import com.server.wordwaves.dto.request.auth.LogoutRequest;
-import com.server.wordwaves.dto.request.user.UserCreationRequest;
-import com.server.wordwaves.dto.request.user.UserUpdateRequest;
-import com.server.wordwaves.dto.request.user.VerifyEmailRequest;
 import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
 import com.server.wordwaves.dto.response.common.EmailResponse;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
@@ -16,7 +14,7 @@ import com.server.wordwaves.dto.response.user.UserResponse;
 import com.server.wordwaves.entity.User;
 
 public interface UserService {
-    EmailResponse forgotPassword(String email);
+    EmailResponse forgotPassword(ForgotPasswordRequest request);
 
     void resetPassword(String token, ResetPasswordRequest request);
 
@@ -30,6 +28,7 @@ public interface UserService {
 
     UserResponse getMyInfo();
 
+    @PostAuthorize("returnObject.id == authentication.name || hasRole('ADMIN')")
     UserResponse getUserById(String userId);
 
     UserResponse updateUserById(String userId, UserUpdateRequest userUpdateRequest);

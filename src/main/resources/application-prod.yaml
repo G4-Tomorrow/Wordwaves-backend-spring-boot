@@ -21,3 +21,12 @@ app:
       name: ${SENDER_NAME:WordWaves Support}
 
 
+logging:
+  file:
+    name: logs/wordwaves.log # Đường dẫn và tên file log
+  level:
+    root: INFO
+
+
+
+
