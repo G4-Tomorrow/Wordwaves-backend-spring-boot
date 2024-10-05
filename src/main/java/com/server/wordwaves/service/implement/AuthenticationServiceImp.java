@@ -17,11 +17,12 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import com.server.wordwaves.config.CustomJwtDecoder;
 import com.server.wordwaves.config.JwtTokenProvider;
-import com.server.wordwaves.dto.request.AuthenticationRequest;
-import com.server.wordwaves.dto.request.IntrospectRequest;
-import com.server.wordwaves.dto.response.AuthenticationResponse;
-import com.server.wordwaves.dto.response.IntrospectResponse;
-import com.server.wordwaves.dto.response.UserResponse;
+
+import com.server.wordwaves.dto.request.auth.AuthenticationRequest;
+import com.server.wordwaves.dto.request.auth.IntrospectRequest;
+import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
+import com.server.wordwaves.dto.response.auth.IntrospectResponse;
+
 import com.server.wordwaves.entity.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
@@ -56,6 +57,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
     @Value("${jwt.access-token-duration-in-seconds}")
     protected long ACCESS_TOKEN_EXPIRATION;
 
+
+
     @NonFinal
     @Value("${jwt.refresh-token-duration-in-seconds}")
     protected long REFRESH_TOKEN_EXPIRATION;
@@ -89,6 +92,9 @@ public class AuthenticationServiceImp implements AuthenticationService {
                 .header(HttpHeaders.SET_COOKIE, resCookies.toString())
                 .body(authResponse);
     }
+
+
+
 
     @Override
     public ResponseEntity<AuthenticationResponse> authenticate(AuthenticationRequest request) {

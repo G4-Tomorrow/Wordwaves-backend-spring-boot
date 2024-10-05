@@ -1,27 +1,16 @@
-server:
-  servlet:
-    context-path: /wordwaves
-    encoding:
-      charset: UTF-8
-  port: 8080
 
 spring:
   application:
-    name: job-search
+    name: wordwaves
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DATABASE_URL}
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
 
 jwt:
-  signerKey: ${JWT_SIGNER_KEY}
-  access-token-duration-in-seconds: ${JWT_accessTokenExpiration:3600} # Default value is 3600 seconds if not provided
-  refresh-token-duration-in-seconds: ${JWT_REFRESHABLE_DURATION:36000} # Default value is 36000 seconds if not provided
+  access-signer-key: ${ACCESS_SIGNER_KEY}
+  refresh-signer-key: ${REFRESH_SIGNER_KEY}
 
 app:
   email-client:
@@ -31,12 +20,4 @@ app:
       email: ${BREVO_SENDER_EMAIL}
       name: ${SENDER_NAME:WordWaves Support}
 
-logging:
-  file:
-    name: logs/wordwaves.log # Đường dẫn và tên file log
-  level:
-    root: INFO # Mức log chung
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 

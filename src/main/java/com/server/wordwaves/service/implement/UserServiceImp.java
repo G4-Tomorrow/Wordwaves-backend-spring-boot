@@ -5,6 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,12 +19,15 @@ import org.springframework.stereotype.Service;
 import com.server.wordwaves.config.CustomJwtDecoder;
 import com.server.wordwaves.config.JwtTokenProvider;
 import com.server.wordwaves.constant.PredefinedRole;
-import com.server.wordwaves.dto.request.ResetPasswordRequest;
-import com.server.wordwaves.dto.request.UserCreationRequest;
-import com.server.wordwaves.dto.request.UserUpdateRequest;
-import com.server.wordwaves.dto.response.AuthenticationResponse;
-import com.server.wordwaves.dto.response.EmailResponse;
-import com.server.wordwaves.dto.response.UserResponse;
+
+import com.server.wordwaves.dto.request.auth.LogoutRequest;
+import com.server.wordwaves.dto.request.user.UserCreationRequest;
+import com.server.wordwaves.dto.request.user.UserUpdateRequest;
+import com.server.wordwaves.dto.request.user.VerifyEmailRequest;
+import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
+import com.server.wordwaves.dto.response.common.EmailResponse;
+import com.server.wordwaves.dto.response.common.PaginationInfo;
+
 import com.server.wordwaves.entity.Role;
 import com.server.wordwaves.entity.User;
 import com.server.wordwaves.exception.AppException;
@@ -85,10 +93,15 @@ public class UserServiceImp implements UserService {
         roleRepository.findById(PredefinedRole.USER_ROLE.getName()).ifPresent(roles::add);
 
         user.setRoles(roles);
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException exception) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
 
         return AuthenticationResponse.builder()
                 .accessToken(jwtTokenProvider.generateAccessToken(user))
+                .user(userMapper.toUserResponse(user))
                 .build();
     }
 
@@ -114,8 +127,28 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public List<UserResponse> getUsers() {
-        return null;
+    public PaginationInfo<List<UserResponse>> getUsers(
+            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
+        pageNumber--;
+        Sort sort = sortDirection.equalsIgnoreCase("DESC")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<User> usersPage;
+
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            usersPage = userRepository.findByFullNameContainingOrEmailContaining(searchQuery, searchQuery, pageable);
+        } else {
+            usersPage = userRepository.findAll(pageable);
+        }
+
+        return PaginationInfo.<List<UserResponse>>builder()
+                .pageNumber(++pageNumber)
+                .pageSize(pageSize)
+                .sortBy(sortBy)
+                .sortDirection(sortDirection)
+                .data(usersPage.stream().map(userMapper::toUserResponse).toList())
+                .build();
     }
 
     @Override
@@ -151,9 +184,31 @@ public class UserServiceImp implements UserService {
 
     @Override
     public UserResponse updateUserById(String userId, UserUpdateRequest userUpdateRequest) {
-        return null;
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if (userUpdateRequest.getFullName() != null
+                && !userUpdateRequest.getFullName().isEmpty()) {
+            user.setFullName(userUpdateRequest.getFullName());
+        }
+
+        if (userUpdateRequest.getRole() != null && !userUpdateRequest.getRole().isEmpty()) {
+            Set<Role> roles = new HashSet<>();
+            roles.add(roleRepository
+                    .findById(userUpdateRequest.getRole())
+                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXIST)));
+            user.setRoles(roles);
+        }
+
+        userRepository.save(user);
+
+        return UserResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .roles(user.getRoles())
+                .build();
     }
 
     @Override
     public void deleteUserById(String userId) {}
+
 }

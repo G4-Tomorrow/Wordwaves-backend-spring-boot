@@ -5,12 +5,11 @@ import java.text.ParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.nimbusds.jose.JOSEException;
-import com.server.wordwaves.dto.ApiResponse;
-import com.server.wordwaves.dto.request.AuthenticationRequest;
-import com.server.wordwaves.dto.request.IntrospectRequest;
-import com.server.wordwaves.dto.response.AuthenticationResponse;
-import com.server.wordwaves.dto.response.IntrospectResponse;
+import com.server.wordwaves.dto.request.auth.AuthenticationRequest;
+import com.server.wordwaves.dto.request.auth.IntrospectRequest;
+import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
+import com.server.wordwaves.dto.response.auth.IntrospectResponse;
+import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.service.AuthenticationService;
 
 import lombok.AccessLevel;
