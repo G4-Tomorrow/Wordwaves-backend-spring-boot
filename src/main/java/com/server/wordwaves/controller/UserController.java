@@ -4,15 +4,17 @@ import java.util.List;
 
 import jakarta.validation.Valid;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import com.server.wordwaves.dto.ApiResponse;
-import com.server.wordwaves.dto.request.UserCreationRequest;
-import com.server.wordwaves.dto.request.UserUpdateRequest;
-import com.server.wordwaves.dto.response.AuthenticationResponse;
-import com.server.wordwaves.dto.response.EmailResponse;
-import com.server.wordwaves.dto.response.UserResponse;
+import com.server.wordwaves.dto.request.auth.LogoutRequest;
+import com.server.wordwaves.dto.request.user.UserCreationRequest;
+import com.server.wordwaves.dto.request.user.UserUpdateRequest;
+import com.server.wordwaves.dto.request.user.VerifyEmailRequest;
+import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
+import com.server.wordwaves.dto.response.common.ApiResponse;
+import com.server.wordwaves.dto.response.common.EmailResponse;
+import com.server.wordwaves.dto.response.common.PaginationInfo;
+import com.server.wordwaves.dto.response.user.UserResponse;
 import com.server.wordwaves.service.UserService;
 
 import lombok.AccessLevel;
@@ -36,52 +38,60 @@ public class UserController {
     }
 
     @GetMapping("/verify")
-    ApiResponse<AuthenticationResponse> verify(@RequestParam String token) {
+    ApiResponse<AuthenticationResponse> verify(@RequestParam("token") VerifyEmailRequest request) {
         return ApiResponse.<AuthenticationResponse>builder()
-                .result(userService.verify(token))
+                .message("Verify email successfully")
+                .result(userService.verify(request))
                 .build();
     }
 
     @PostMapping("/logout")
-    ApiResponse<Void> logout(@RequestHeader("Authorization") String token) {
-        userService.logout(token.substring(7));
+    ApiResponse<Void> logout(@RequestHeader("Authorization") LogoutRequest request) {
+        userService.logout(request);
         return ApiResponse.<Void>builder().message("Đăng xuất thành công").build();
     }
 
     @GetMapping
-    ApiResponse<List<UserResponse>> getUsers() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        log.info("Username: {}", authentication.getName());
-        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
-
-        return ApiResponse.<List<UserResponse>>builder()
-                .result(userService.getUsers())
+    ApiResponse<PaginationInfo<List<UserResponse>>> getUsers(
+            @RequestParam int pageNumber,
+            @RequestParam int pageSize,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortBy,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
+            @RequestParam(required = false) String searchQuery) {
+        return ApiResponse.<PaginationInfo<List<UserResponse>>>builder()
+                .message("Get all users")
+                .result(userService.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchQuery))
                 .build();
     }
 
     @GetMapping("/myinfo")
     ApiResponse<UserResponse> getMyInfo() {
         return ApiResponse.<UserResponse>builder()
+                .message("Get user info")
                 .result(userService.getMyInfo())
                 .build();
     }
 
     @GetMapping("/{userId}")
     ApiResponse<UserResponse> getUserById(@PathVariable String userId) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.getUserById(userId));
-        return apiResponse;
+        return ApiResponse.<UserResponse>builder()
+                .message("Get a user by id")
+                .result(userService.getUserById(userId))
+                .build();
     }
 
     @PutMapping("/{userId}")
-    UserResponse updateUserById(@PathVariable String userId, @RequestBody UserUpdateRequest userUpdateRequest) {
-        return userService.updateUserById(userId, userUpdateRequest);
+    ApiResponse<UserResponse> updateUserById(
+            @PathVariable String userId, @RequestBody UserUpdateRequest userUpdateRequest) {
+        return ApiResponse.<UserResponse>builder()
+                .message("Update user successfully")
+                .result(userService.updateUserById(userId, userUpdateRequest))
+                .build();
     }
 
     @DeleteMapping("/{userId}")
-    String deleteUserById(@PathVariable String userId) {
+    ApiResponse<Void> deleteUserById(@PathVariable String userId) {
         userService.deleteUserById(userId);
-        return "User has been deleted";
+        return ApiResponse.<Void>builder().message("Delete a user successfully").build();
     }
 }

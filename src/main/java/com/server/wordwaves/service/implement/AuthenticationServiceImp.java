@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.JOSEException;
 import com.server.wordwaves.config.JwtTokenProvider;
-import com.server.wordwaves.dto.request.AuthenticationRequest;
-import com.server.wordwaves.dto.request.IntrospectRequest;
-import com.server.wordwaves.dto.response.AuthenticationResponse;
-import com.server.wordwaves.dto.response.IntrospectResponse;
+import com.server.wordwaves.dto.request.auth.AuthenticationRequest;
+import com.server.wordwaves.dto.request.auth.IntrospectRequest;
+import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
+import com.server.wordwaves.dto.response.auth.IntrospectResponse;
 import com.server.wordwaves.entity.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;

@@ -31,8 +31,14 @@ public enum ErrorCode {
     // TOKEN
     EMPTY_TOKEN(2001, "Token rỗng", HttpStatus.BAD_REQUEST),
     EXPIRED_TOKEN(2002, "Token đã hết hạn", HttpStatus.BAD_REQUEST),
-    TOKEN_WAS_LOGOUT(2003, "Token đã đăng xuất, vui lòng đăng nhập lại", HttpStatus.BAD_REQUEST);
+    TOKEN_WAS_LOGOUT(2003, "Token đã đăng xuất, vui lòng đăng nhập lại", HttpStatus.BAD_REQUEST),
 
+    // API
+    LACK_OF_PARAMETER(3001, "Api còn thiếu tham số", HttpStatus.BAD_REQUEST),
+
+    // ROLE
+    ROLE_NOT_EXIST(4001, "Tác nhân không tồn tại", HttpStatus.BAD_REQUEST),
+    ;
     int code;
     String message;
     HttpStatusCode statusCode;

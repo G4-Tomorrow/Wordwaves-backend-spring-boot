@@ -11,7 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.wordwaves.dto.ApiResponse;
+import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.exception.ErrorCode;
 
 import lombok.extern.slf4j.Slf4j;

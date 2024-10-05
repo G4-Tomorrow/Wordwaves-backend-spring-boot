@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import com.server.wordwaves.dto.request.EmailRequest;
-import com.server.wordwaves.dto.response.EmailResponse;
+import com.server.wordwaves.dto.request.common.EmailRequest;
+import com.server.wordwaves.dto.response.common.EmailResponse;
 
 @FeignClient(name = "email-client", url = "${app.email-client.brevo-url}")
 public interface EmailClient {

@@ -20,17 +20,20 @@ import com.nimbusds.jwt.SignedJWT;
 import com.server.wordwaves.entity.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
+import com.server.wordwaves.service.BaseRedisService;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class JwtTokenProvider {
+    BaseRedisService baseRedisService;
 
     @NonFinal
     @Value("${jwt.access-signer-key}")
@@ -87,6 +90,8 @@ public class JwtTokenProvider {
     }
 
     public SignedJWT verifyToken(String token) throws JOSEException, ParseException {
+        if (baseRedisService.exist(token)) throw new AppException(ErrorCode.UNAUTHENTICATED);
+
         JWSVerifier verifier = new MACVerifier(ACCESS_SIGNER_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -96,10 +101,6 @@ public class JwtTokenProvider {
         var verified = signedJWT.verify(verifier);
 
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
-
-        // if
-        // (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
-        // throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         return signedJWT;
     }
