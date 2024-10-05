@@ -13,6 +13,6 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 
-ENV SPRING_PROFILES_ACTIVE=prod
+#ENV SPRING_PROFILES_ACTIVE=prod
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
