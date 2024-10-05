@@ -47,6 +47,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
     @Value("${jwt.access-token-duration-in-seconds}")
     protected long ACCESS_TOKEN_EXPIRATION;
 
+
+
     @NonFinal
     @Value("${jwt.refresh-token-duration-in-seconds}")
     protected long REFRESH_TOKEN_EXPIRATION;
