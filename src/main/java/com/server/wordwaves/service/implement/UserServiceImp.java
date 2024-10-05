@@ -108,6 +108,11 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
+    public User getUserByIdAndRefreshToken(String userId, String refreshToken) {
+        return userRepository.findByIdAndRefreshToken(userId, refreshToken).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    }
+
+    @Override
     public void updateUserRefreshToken(String refreshToken, String email) {
         User currentUser =
                 userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));

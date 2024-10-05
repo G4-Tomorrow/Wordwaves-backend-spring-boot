@@ -30,7 +30,7 @@ import lombok.experimental.FieldDefaults;
 public class SecurityConfig {
     CustomJwtDecoder customJwtDecoder;
 
-    private static final String[] PUBLIC_ENDPOINTS = {"/users", "/users/verify", "/auth/**"};
+    private static final String[] PUBLIC_ENDPOINTS = {"/users", "/users/verify", "/auth/login", "/auth/refresh", "/auth/introspect"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {

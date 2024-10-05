@@ -3,10 +3,14 @@ package com.server.wordwaves.service.implement;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Date;
 import java.util.Objects;
 
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import com.server.wordwaves.dto.ApiResponse;
 import com.server.wordwaves.dto.response.UserResponse;
+import com.server.wordwaves.entity.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -22,7 +26,6 @@ import com.server.wordwaves.dto.request.AuthenticationRequest;
 import com.server.wordwaves.dto.request.IntrospectRequest;
 import com.server.wordwaves.dto.response.AuthenticationResponse;
 import com.server.wordwaves.dto.response.IntrospectResponse;
-import com.server.wordwaves.entity.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.UserMapper;
@@ -60,16 +63,13 @@ public class AuthenticationServiceImp implements AuthenticationService {
     @Value("${jwt.refresh-token-duration-in-seconds}")
     protected long REFRESH_TOKEN_EXPIRATION;
 
-    @Override
-    public ResponseEntity<AuthenticationResponse> authenticate(AuthenticationRequest request) {
-        User currentUser = userService.getUserByEmail(request.getEmail());
-
-        boolean authenticated = passwordEncoder.matches(request.getPassword(), currentUser.getPassword());
-        if (!authenticated) throw new AppException(ErrorCode.WRONG_PASSWORD);
+    private ResponseEntity<AuthenticationResponse> createAuthResponse(User currentUser) {
+        if (Objects.isNull(currentUser)) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
 
         // Add information about current user login to response
         AuthenticationResponse authResponse = new AuthenticationResponse();
-        if (Objects.isNull(currentUser)) throw new AppException(ErrorCode.USER_NOT_EXISTED);
         authResponse.setUser(userMapper.toUserResponse(currentUser));
 
         // Create access token
@@ -94,11 +94,35 @@ public class AuthenticationServiceImp implements AuthenticationService {
     }
 
     @Override
+    public ResponseEntity<AuthenticationResponse> authenticate(AuthenticationRequest request) {
+        User currentUser = userService.getUserByEmail(request.getEmail());
+
+        boolean authenticated = passwordEncoder.matches(request.getPassword(), currentUser.getPassword());
+        if (!authenticated) {
+            throw new AppException(ErrorCode.WRONG_PASSWORD);
+        }
+
+        return createAuthResponse(currentUser);
+    }
+
+    @Override
+    public ResponseEntity<AuthenticationResponse> getRefreshToken(String refreshToken) throws ParseException, JOSEException {
+        // Check refresh token is valid
+        SignedJWT decodedToken = jwtTokenProvider.verifyRefreshToken(refreshToken);
+        String userId = decodedToken.getJWTClaimsSet().getSubject();
+
+        // Check user by refresh token and userId
+        User currentUser = this.userService.getUserByIdAndRefreshToken(userId, refreshToken);
+
+        return createAuthResponse(currentUser);
+    }
+
+    @Override
     public IntrospectResponse introspect(IntrospectRequest request) {
         String accessToken = request.getAccessToken();
         boolean isValid = true;
         try {
-            jwtTokenProvider.verifyToken(accessToken);
+            jwtTokenProvider.verifyAccessToken(accessToken);
         } catch (AppException | JOSEException | ParseException e) {
             isValid = false;
             log.error("Error introspect: {}", e);
@@ -108,7 +132,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<Void>> logout(String token) {
+    public ResponseEntity<Void> logout(String token) {
         if (token == null || token.isEmpty()) throw new AppException(ErrorCode.EMPTY_TOKEN);
         Jwt jwt = null;
         try {
@@ -119,8 +143,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
         Instant expiredDate = jwt.getExpiresAt();
         long timeRemaining = Duration.between(Instant.now(), expiredDate).toSeconds();
 
-        if (timeRemaining <= 0)
-            return ResponseEntity.ok().body(ApiResponse.<Void>builder().message("Token đã hết hạn").build());
+        if (timeRemaining <= 0) return ResponseEntity.ok().build();
 
         baseRedisService.set(token, "jwttoken");
         baseRedisService.setTimeToLive(token, timeRemaining);
@@ -136,8 +159,6 @@ public class AuthenticationServiceImp implements AuthenticationService {
                 .path("/")
                 .maxAge(0)
                 .build();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, resDeleteCookie.toString())
-                .body(ApiResponse.<Void>builder().message("Đăng xuất thành công").build());
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, resDeleteCookie.toString()).build();
     }
 }

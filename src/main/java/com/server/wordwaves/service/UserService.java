@@ -27,4 +27,6 @@ public interface UserService {
     void updateUserRefreshToken(String refreshToken, String email);
 
     void deleteUserById(String userId);
+
+    User getUserByIdAndRefreshToken(String userId, String refreshToken);
 }
