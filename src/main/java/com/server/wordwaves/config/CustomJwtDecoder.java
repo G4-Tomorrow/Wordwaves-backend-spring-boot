@@ -36,11 +36,6 @@ public class CustomJwtDecoder implements JwtDecoder {
 
         if (checkedToken) throw new JwtException("Invalid Token");
 
-
-
-
-
-
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();

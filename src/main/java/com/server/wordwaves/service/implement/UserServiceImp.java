@@ -89,7 +89,12 @@ public class UserServiceImp implements UserService {
     @Override
     public AuthenticationResponse verify(VerifyEmailRequest request) {
         String token = request.getToken();
-        User user = validateTokenAndGetUser(token);
+
+        Jwt parsedToken = jwtDecoder.decode(token);
+        User user = User.builder()
+                .email(parsedToken.getSubject())
+                .password(parsedToken.getClaim("ps"))
+                .build();
 
         Set<Role> roles = new HashSet<>();
         roleRepository.findById(PredefinedRole.USER_ROLE.getName()).ifPresent(roles::add);
@@ -147,6 +152,7 @@ public class UserServiceImp implements UserService {
                 .pageSize(pageSize)
                 .sortBy(sortBy)
                 .sortDirection(sortDirection)
+                .searchQuery(searchQuery)
                 .data(usersPage.stream().map(userMapper::toUserResponse).toList())
                 .build();
     }
