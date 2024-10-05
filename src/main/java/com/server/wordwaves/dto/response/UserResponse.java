@@ -1,5 +1,6 @@
 package com.server.wordwaves.dto.response;
 
+import java.time.Instant;
 import java.util.Set;
 
 import com.server.wordwaves.entity.Role;
@@ -16,5 +17,7 @@ public class UserResponse {
     String id;
     String email;
     String fullName;
+    Instant createdAt;
+    Instant updatedAt;
     Set<Role> roles;
 }

@@ -10,12 +10,14 @@ import com.server.wordwaves.dto.response.AuthenticationResponse;
 import com.server.wordwaves.dto.response.EmailResponse;
 import com.server.wordwaves.dto.response.UserResponse;
 import com.server.wordwaves.entity.User;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 public interface UserService {
     EmailResponse register(UserCreationRequest request);
 
     AuthenticationResponse verify(VerifyEmailRequest request);
 
+    @PreAuthorize("hasRole('ADMIN')")
     List<UserResponse> getUsers(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery);
 
     UserResponse getMyInfo();

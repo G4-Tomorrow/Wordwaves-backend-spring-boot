@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @GetMapping("/verify")
-    ApiResponse<AuthenticationResponse> verify(@RequestParam VerifyEmailRequest request) {
+    ApiResponse<AuthenticationResponse> verify(@RequestParam("token") VerifyEmailRequest request) {
         return ApiResponse.<AuthenticationResponse>builder()
                 .message("Verify email successfully")
                 .result(userService.verify(request))

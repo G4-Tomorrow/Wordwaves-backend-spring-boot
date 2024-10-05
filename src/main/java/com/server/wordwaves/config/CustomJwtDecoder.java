@@ -1,7 +1,11 @@
 package com.server.wordwaves.config;
 
 import java.text.ParseException;
+import java.time.Instant;
+import java.util.Date;
 
+import com.server.wordwaves.exception.AppException;
+import com.server.wordwaves.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -32,18 +36,25 @@ public class CustomJwtDecoder implements JwtDecoder {
     @Override
     public Jwt decode(String token) throws JwtException {
         boolean checkedToken = baseRedisService.exist(token);
-        log.info("{}", checkedToken);
+
         if (checkedToken) throw new JwtException("Invalid Token");
 
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
-            return new Jwt(
+            var jwt = new Jwt(
                     token,
                     jwtClaimsSet.getIssueTime().toInstant(),
                     jwtClaimsSet.getExpirationTime().toInstant(),
                     signedJWT.getHeader().toJSONObject(),
                     jwtClaimsSet.getClaims());
+            Instant expiryTime = jwt.getExpiresAt();
+
+            if (expiryTime != null && expiryTime.isBefore(Instant.now())) {
+                throw new JwtException("Token has expired");
+            }
+
+            return jwt;
         } catch (ParseException e) {
             throw new JwtException("Invalid token");
         }

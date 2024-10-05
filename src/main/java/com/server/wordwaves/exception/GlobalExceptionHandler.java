@@ -1,13 +1,17 @@
 package com.server.wordwaves.exception;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
 import jakarta.validation.ConstraintViolation;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -20,6 +24,30 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalExceptionHandler {
 
     private static final String MIN_ATTRIBUTE = "min";
+
+    @ExceptionHandler(value = Exception.class)
+    ResponseEntity<ApiResponse> handleAllExceptions(Exception exception) {
+        ApiResponse apiResponse = new ApiResponse();
+
+        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
+        apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+        log.error("Error: {}", exception);
+        return ResponseEntity.badRequest().body(apiResponse);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiResponse<ArrayList<String>>> handleMissingParams(MissingServletRequestParameterException ex) {
+        ErrorCode errorCode = ErrorCode.LACK_OF_PARAMETER;
+        String parameterName = ex.getParameterName();
+        String errorMessage = errorCode.getMessage()+ " " + parameterName;
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorMessage)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
+    }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<ApiResponse> handlingValidation(MethodArgumentNotValidException exception) {

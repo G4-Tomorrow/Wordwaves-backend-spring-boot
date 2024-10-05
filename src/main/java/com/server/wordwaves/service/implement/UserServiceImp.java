@@ -6,10 +6,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.server.wordwaves.dto.request.LogoutRequest;
 import com.server.wordwaves.dto.request.VerifyEmailRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -85,10 +85,15 @@ public class UserServiceImp implements UserService {
         roleRepository.findById(PredefinedRole.USER_ROLE.getName()).ifPresent(roles::add);
 
         user.setRoles(roles);
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException exception) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
 
         return AuthenticationResponse.builder()
                 .accessToken(jwtTokenProvider.generateAccessToken(user))
+                .user(userMapper.toUserResponse(user))
                 .build();
     }
 
@@ -143,7 +148,25 @@ public class UserServiceImp implements UserService {
 
     @Override
     public UserResponse updateUserById(String userId, UserUpdateRequest userUpdateRequest) {
-        return null;
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if (userUpdateRequest.getFullName() != null && !userUpdateRequest.getFullName().isEmpty()) {
+            user.setFullName(userUpdateRequest.getFullName());
+        }
+
+        if (userUpdateRequest.getRole() != null && !userUpdateRequest.getRole().isEmpty()) {
+            Set<Role> roles = new HashSet<>();
+            roles.add(roleRepository.findById(userUpdateRequest.getRole()).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXIST)));
+            user.setRoles(roles);
+        }
+
+        userRepository.save(user);
+
+        return UserResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .roles(user.getRoles())
+                .build();
     }
 
     @Override
