@@ -44,6 +44,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Push Docker image to Docker Hub
-        run: docker push quan0204/wordwaves:latest
+        run: docker push quan0204/wordwaves-server:latest
 
 
