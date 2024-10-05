@@ -86,6 +86,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
 
 
 
+
     @Override
     public IntrospectResponse introspect(IntrospectRequest request) {
         String accessToken = request.getAccessToken();

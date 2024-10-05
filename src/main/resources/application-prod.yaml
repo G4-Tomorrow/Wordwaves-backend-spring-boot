@@ -7,7 +7,7 @@ server:
 
 spring:
   application:
-    name: job-search
+    name: wordwaves
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DATABASE_URL}
@@ -32,12 +32,4 @@ app:
       email: ${BREVO_SENDER_EMAIL}
       name: ${SENDER_NAME:WordWaves Support}
 
-logging:
-  file:
-    name: logs/wordwaves.log # Đường dẫn và tên file log
-  level:
-    root: INFO # Mức log chung
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
