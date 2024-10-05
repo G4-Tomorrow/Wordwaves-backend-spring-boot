@@ -27,11 +27,14 @@ public enum ErrorCode {
     USER_NOT_EXISTED(1008, "Tài khoản không tồn tại", HttpStatus.BAD_REQUEST),
     WRONG_PASSWORD(1009, "Mật khẩu không chính xác", HttpStatus.BAD_REQUEST),
     USER_EXISTED(1010, "Tài khoản đã tồn tại", HttpStatus.BAD_REQUEST),
+    PASSWORD_MISMATCH(1011, "Mật khẩu không khớp với xác nhận mật khẩu", HttpStatus.BAD_REQUEST),
 
     // TOKEN
     EMPTY_TOKEN(2001, "Token rỗng", HttpStatus.BAD_REQUEST),
-    EXPIRED_TOKEN(2002, "Token đã hết hạn", HttpStatus.BAD_REQUEST),
-    TOKEN_WAS_LOGOUT(2003, "Token đã đăng xuất, vui lòng đăng nhập lại", HttpStatus.BAD_REQUEST),
+    INVALID_TOKEN(2002, "Token giải mã không chính xác", HttpStatus.BAD_REQUEST),
+    EXPIRED_TOKEN(2003, "Token đã hết hạn", HttpStatus.BAD_REQUEST),
+    TOKEN_WAS_LOGOUT(2004, "Token đã đăng xuất, vui lòng đăng nhập lại", HttpStatus.BAD_REQUEST);
+
 
     // API
     LACK_OF_PARAMETER(3001, "Api còn thiếu tham số", HttpStatus.BAD_REQUEST),

@@ -89,10 +89,9 @@ public class JwtTokenProvider {
         return generateToken(user, "refresh");
     }
 
-    public SignedJWT verifyToken(String token) throws JOSEException, ParseException {
-        if (baseRedisService.exist(token)) throw new AppException(ErrorCode.UNAUTHENTICATED);
-
-        JWSVerifier verifier = new MACVerifier(ACCESS_SIGNER_KEY.getBytes());
+    public SignedJWT verifyToken(String token, String keyType) throws JOSEException, ParseException {
+        JWSVerifier verifier = new MACVerifier(
+                (Objects.equals(keyType, "access") ? ACCESS_SIGNER_KEY : REFRESH_SIGNER_KEY).getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
 
@@ -103,6 +102,14 @@ public class JwtTokenProvider {
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         return signedJWT;
+    }
+
+    public SignedJWT verifyAccessToken(String token) throws ParseException, JOSEException {
+        return verifyToken(token, "access");
+    }
+
+    public SignedJWT verifyRefreshToken(String token) throws JOSEException, ParseException {
+        return verifyToken(token, "refresh");
     }
 
     private String buildScope(User user) {
