@@ -2,12 +2,12 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
-import com.server.wordwaves.dto.request.ForgotPasswordRequest;
+import com.server.wordwaves.dto.request.user.ForgotPasswordRequest;
+import com.server.wordwaves.dto.request.user.ResetPasswordRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.server.wordwaves.dto.request.auth.LogoutRequest;
 import com.server.wordwaves.dto.request.user.UserCreationRequest;
 import com.server.wordwaves.dto.request.user.UserUpdateRequest;
 import com.server.wordwaves.dto.request.user.VerifyEmailRequest;
@@ -35,6 +35,7 @@ public class UserController {
     @PostMapping
     ApiResponse<EmailResponse> register(@RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<EmailResponse>builder()
+                .message("Email xác thực đã được gửi thành công")
                 .result(userService.register(request))
                 .build();
     }
@@ -42,7 +43,7 @@ public class UserController {
     @PostMapping("/forgot-password")
     public ApiResponse<EmailResponse> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         return ApiResponse.<EmailResponse>builder()
-                .result(userService.forgotPassword(request.getEmail()))
+                .result(userService.forgotPassword(request))
                 .message("Yêu cầu đặt lại mật khẩu thành công.")
                 .build();
     }
@@ -59,11 +60,10 @@ public class UserController {
     @GetMapping("/verify")
     ApiResponse<AuthenticationResponse> verify(@RequestParam("token") VerifyEmailRequest request) {
         return ApiResponse.<AuthenticationResponse>builder()
-                .message("Verify email successfully")
+                .message("Xác thực email thành công")
                 .result(userService.verify(request))
                 .build();
     }
-
 
     @GetMapping
     ApiResponse<PaginationInfo<List<UserResponse>>> getUsers(
@@ -73,7 +73,7 @@ public class UserController {
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
             @RequestParam(required = false) String searchQuery) {
         return ApiResponse.<PaginationInfo<List<UserResponse>>>builder()
-                .message("Get all users")
+                .message("Lấy tất cả người dùng")
                 .result(userService.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchQuery))
                 .build();
     }
@@ -81,7 +81,7 @@ public class UserController {
     @GetMapping("/myinfo")
     ApiResponse<UserResponse> getMyInfo() {
         return ApiResponse.<UserResponse>builder()
-                .message("Get user info")
+                .message("Lấy thông tin người dùng")
                 .result(userService.getMyInfo())
                 .build();
     }
@@ -89,7 +89,7 @@ public class UserController {
     @GetMapping("/{userId}")
     ApiResponse<UserResponse> getUserById(@PathVariable String userId) {
         return ApiResponse.<UserResponse>builder()
-                .message("Get a user by id")
+                .message("Lấy thông tin người dùng qua id")
                 .result(userService.getUserById(userId))
                 .build();
     }
@@ -98,7 +98,7 @@ public class UserController {
     ApiResponse<UserResponse> updateUserById(
             @PathVariable String userId, @RequestBody UserUpdateRequest userUpdateRequest) {
         return ApiResponse.<UserResponse>builder()
-                .message("Update user successfully")
+                .message("Cập nhập người dùng thành công")
                 .result(userService.updateUserById(userId, userUpdateRequest))
                 .build();
     }
@@ -106,6 +106,6 @@ public class UserController {
     @DeleteMapping("/{userId}")
     ApiResponse<Void> deleteUserById(@PathVariable String userId) {
         userService.deleteUserById(userId);
-        return ApiResponse.<Void>builder().message("Delete a user successfully").build();
+        return ApiResponse.<Void>builder().message("Xóa người dùng thành công").build();
     }
 }

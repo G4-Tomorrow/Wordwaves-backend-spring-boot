@@ -5,6 +5,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 
+import com.server.wordwaves.dto.request.auth.LogoutRequest;
+import com.server.wordwaves.dto.request.auth.RefreshTokenRequest;
+import com.server.wordwaves.dto.response.user.UserResponse;
+import com.server.wordwaves.service.TokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -48,6 +52,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
     CustomJwtDecoder jwtDecoder;
     UserMapper userMapper;
     BaseRedisService baseRedisService;
+    TokenService tokenService;
 
     @NonFinal
     @Value("${jwt.access-signer-key}")
@@ -56,8 +61,6 @@ public class AuthenticationServiceImp implements AuthenticationService {
     @NonFinal
     @Value("${jwt.access-token-duration-in-seconds}")
     protected long ACCESS_TOKEN_EXPIRATION;
-
-
 
     @NonFinal
     @Value("${jwt.refresh-token-duration-in-seconds}")
@@ -93,9 +96,6 @@ public class AuthenticationServiceImp implements AuthenticationService {
                 .body(authResponse);
     }
 
-
-
-
     @Override
     public ResponseEntity<AuthenticationResponse> authenticate(AuthenticationRequest request) {
         User currentUser = userService.getUserByEmail(request.getEmail());
@@ -109,9 +109,12 @@ public class AuthenticationServiceImp implements AuthenticationService {
     }
 
     @Override
-    public ResponseEntity<AuthenticationResponse> getRefreshToken(String refreshToken)
+    public ResponseEntity<AuthenticationResponse> getRefreshToken(RefreshTokenRequest request)
             throws ParseException, JOSEException {
         // Check refresh token is valid
+        String refreshToken = request.getRefreshToken();
+        tokenService.ensureTokenPresent(refreshToken);
+
         SignedJWT decodedToken = jwtTokenProvider.verifyRefreshToken(refreshToken);
         String userId = decodedToken.getJWTClaimsSet().getSubject();
 
@@ -124,6 +127,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
     @Override
     public IntrospectResponse introspect(IntrospectRequest request) {
         String accessToken = request.getAccessToken();
+        tokenService.ensureTokenPresent(accessToken);
+
         boolean isValid = true;
         try {
             jwtTokenProvider.verifyAccessToken(accessToken);
@@ -136,14 +141,18 @@ public class AuthenticationServiceImp implements AuthenticationService {
     }
 
     @Override
-    public ResponseEntity<Void> logout(String token) {
-        if (token == null || token.isEmpty()) throw new AppException(ErrorCode.EMPTY_TOKEN);
+    public ResponseEntity<Void> logout(LogoutRequest request) {
+        String token = request.getToken();
+        tokenService.ensureTokenPresent(token);
+
+        token = token.substring(7);
         Jwt jwt = null;
         try {
             jwt = jwtDecoder.decode(token);
         } catch (AppException e) {
             throw new AppException(e.getErrorCode());
         }
+
         Instant expiredDate = jwt.getExpiresAt();
         long timeRemaining = Duration.between(Instant.now(), expiredDate).toSeconds();
 

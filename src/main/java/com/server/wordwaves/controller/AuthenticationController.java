@@ -2,6 +2,9 @@ package com.server.wordwaves.controller;
 
 import java.text.ParseException;
 
+import com.nimbusds.jose.JOSEException;
+import com.server.wordwaves.dto.request.auth.LogoutRequest;
+import com.server.wordwaves.dto.request.auth.RefreshTokenRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,8 +48,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") String token) {
-        ResponseEntity<Void> responseEntity = authenticationService.logout(token.substring(7));
+    ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") LogoutRequest request) {
+        ResponseEntity<Void> responseEntity = authenticationService.logout(request);
         ApiResponse<Void> apiResponse =
                 ApiResponse.<Void>builder().message("Đăng xuất thành công").build();
 
@@ -57,8 +60,8 @@ public class AuthenticationController {
 
     @GetMapping("/refresh")
     ResponseEntity<ApiResponse<AuthenticationResponse>> refresh(
-            @CookieValue(name = "refresh_token") String refreshToken) throws ParseException, JOSEException {
-        ResponseEntity<AuthenticationResponse> responseEntity = authenticationService.getRefreshToken(refreshToken);
+            @CookieValue(name = "refresh_token") RefreshTokenRequest request) throws ParseException, JOSEException {
+        ResponseEntity<AuthenticationResponse> responseEntity = authenticationService.getRefreshToken(request);
         ApiResponse<AuthenticationResponse> apiResponse = ApiResponse.<AuthenticationResponse>builder()
                 .result(responseEntity.getBody())
                 .build();
