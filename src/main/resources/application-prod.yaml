@@ -1,7 +1,5 @@
 
 spring:
-  application:
-    name: wordwaves
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DATABASE_URL}
@@ -14,11 +12,9 @@ jwt:
 
 app:
   email-client:
-    brevo-url: https://api.brevo.com
-    brevo-apikey: ${BREVO_APIKEY}
+    brevo-apikey: ${BREVO_API_KEY}
     sender:
       email: ${BREVO_SENDER_EMAIL}
-      name: ${SENDER_NAME:WordWaves Support}
 
 
 
