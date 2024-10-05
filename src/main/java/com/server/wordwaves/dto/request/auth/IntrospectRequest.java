@@ -1,4 +1,4 @@
-package com.server.wordwaves.dto.request;
+package com.server.wordwaves.dto.request.auth;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

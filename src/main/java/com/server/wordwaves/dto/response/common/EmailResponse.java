@@ -1,4 +1,4 @@
-package com.server.wordwaves.dto.request;
+package com.server.wordwaves.dto.response.common;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,7 +8,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AuthenticationRequest {
-    String email;
-    String password;
+public class EmailResponse {
+    String messageId;
 }

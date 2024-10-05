@@ -1,33 +1,30 @@
 package com.server.wordwaves.config;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.server.wordwaves.constant.PredefinedRole;
 import com.server.wordwaves.entity.Role;
 import com.server.wordwaves.entity.User;
 import com.server.wordwaves.repository.RoleRepository;
 import com.server.wordwaves.repository.UserRepository;
-import com.server.wordwaves.service.BaseRedisService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class ApplicationInitConfig {
-    PasswordEncoder passwordEncoder;
 
     @NonFinal
     static final String ADMIN_EMAIL = "wordwaves.admin@yopmail.com";

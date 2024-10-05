@@ -1,14 +1,19 @@
 package com.server.wordwaves.repository;
 
-import com.server.wordwaves.entity.User;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.server.wordwaves.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
     boolean existsByEmail(String email);
 
     Optional<User> findByEmail(String email);
+
+    Page<User> findByFullNameContainingOrEmailContaining(String searchQuery, String searchQuery1, Pageable pageable);
 }

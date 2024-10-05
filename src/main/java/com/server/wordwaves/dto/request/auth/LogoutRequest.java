@@ -1,13 +1,13 @@
-package com.server.wordwaves.dto.response;
+package com.server.wordwaves.dto.request.auth;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AuthenticationResponse {
-    String accessToken;
+public class LogoutRequest {
+    String token;
 }

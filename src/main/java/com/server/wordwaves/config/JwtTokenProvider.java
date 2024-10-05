@@ -1,5 +1,17 @@
 package com.server.wordwaves.config;
 
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -8,44 +20,49 @@ import com.nimbusds.jwt.SignedJWT;
 import com.server.wordwaves.entity.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import com.server.wordwaves.service.BaseRedisService;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
 
 @Component
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class JwtTokenProvider {
+    BaseRedisService baseRedisService;
 
     @NonFinal
-    @Value("${jwt.signerKey}")
-    protected String SIGNER_KEY;
+    @Value("${jwt.access-signer-key}")
+    protected String ACCESS_SIGNER_KEY;
 
     @NonFinal
-    @Value("${jwt.valid-duration}")
-    protected long VALID_DURATION;
+    @Value("${jwt.refresh-signer-key}")
+    protected String REFRESH_SIGNER_KEY;
 
-    public String generateToken(User user) {
+    @NonFinal
+    @Value("${jwt.access-token-duration-in-seconds}")
+    protected long ACCESS_TOKEN_EXPIRATION;
+
+    @NonFinal
+    @Value("${jwt.refresh-token-duration-in-seconds}")
+    protected long REFRESH_TOKEN_EXPIRATION;
+
+    private String generateToken(User user, String keyType) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getId())
                 .issuer("wordwaves")
                 .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
+                .expirationTime(new Date(Instant.now()
+                        .plus(
+                                Objects.equals(keyType, "access") ? ACCESS_TOKEN_EXPIRATION : REFRESH_TOKEN_EXPIRATION,
+                                ChronoUnit.SECONDS)
+                        .toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
                 .build();
@@ -55,7 +72,8 @@ public class JwtTokenProvider {
         JWSObject jwsObject = new JWSObject(header, payload);
 
         try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+            jwsObject.sign(new MACSigner(
+                    (Objects.equals(keyType, "access") ? ACCESS_SIGNER_KEY : REFRESH_SIGNER_KEY).getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
             log.error("Cannot create token", e);
@@ -63,8 +81,18 @@ public class JwtTokenProvider {
         }
     }
 
+    public String generateAccessToken(User user) {
+        return generateToken(user, "access");
+    }
+
+    public String generateRefreshToken(User user) {
+        return generateToken(user, "refresh");
+    }
+
     public SignedJWT verifyToken(String token) throws JOSEException, ParseException {
-        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+        if (baseRedisService.exist(token)) throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        JWSVerifier verifier = new MACVerifier(ACCESS_SIGNER_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
 
@@ -73,9 +101,6 @@ public class JwtTokenProvider {
         var verified = signedJWT.verify(verifier);
 
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
-
-        //        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
-        //            throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         return signedJWT;
     }

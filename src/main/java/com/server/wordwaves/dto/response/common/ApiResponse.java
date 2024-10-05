@@ -1,6 +1,7 @@
-package com.server.wordwaves.dto;
+package com.server.wordwaves.dto.response.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -16,4 +17,5 @@ public class ApiResponse<T> {
 
     private String message;
     private T result;
+    private T errors;
 }

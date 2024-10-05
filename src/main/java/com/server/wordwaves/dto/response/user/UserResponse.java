@@ -1,10 +1,12 @@
-package com.server.wordwaves.dto.response;
+package com.server.wordwaves.dto.response.user;
+
+import java.time.Instant;
+import java.util.Set;
 
 import com.server.wordwaves.entity.Role;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
 
 @Data
 @Builder
@@ -13,6 +15,9 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
     String id;
+    String email;
     String fullName;
+    Instant createdAt;
+    Instant updatedAt;
     Set<Role> roles;
 }

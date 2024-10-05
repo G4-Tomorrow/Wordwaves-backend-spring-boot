@@ -1,30 +1,32 @@
 package com.server.wordwaves.service.implement;
 
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.server.wordwaves.dto.model.RecipientModel;
-import com.server.wordwaves.dto.model.SenderModel;
-import com.server.wordwaves.dto.request.EmailRequest;
-import com.server.wordwaves.dto.response.EmailResponse;
-import com.server.wordwaves.entity.User;
-import com.server.wordwaves.repository.httpclient.EmailClient;
-import com.server.wordwaves.service.EmailService;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.server.wordwaves.dto.model.RecipientModel;
+import com.server.wordwaves.dto.model.SenderModel;
+import com.server.wordwaves.dto.request.common.EmailRequest;
+import com.server.wordwaves.dto.response.common.EmailResponse;
+import com.server.wordwaves.entity.User;
+import com.server.wordwaves.repository.httpclient.EmailClient;
+import com.server.wordwaves.service.EmailService;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -47,11 +49,11 @@ public class EmailServiceImp implements EmailService {
     String senderName;
 
     @NonFinal
-    @Value("${jwt.signerKey}")
+    @Value("${jwt.access-signer-key}")
     protected String SIGNER_KEY;
 
     @NonFinal
-    protected long VALID_DURATION = 120;
+    protected long accessTokenExpiration = 120;
 
     @Override
     public EmailResponse sendVerifyEmail(User user) {
@@ -77,8 +79,9 @@ public class EmailServiceImp implements EmailService {
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getEmail())
                 .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
+                .expirationTime(new Date(Instant.now()
+                        .plus(accessTokenExpiration, ChronoUnit.SECONDS)
+                        .toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("ps", user.getPassword())
                 .build();
