@@ -30,7 +30,15 @@ import lombok.experimental.FieldDefaults;
 public class SecurityConfig {
     CustomJwtDecoder customJwtDecoder;
 
-    private static final String[] PUBLIC_ENDPOINTS = {"/users", "/users/verify", "/auth/login", "/auth/refresh", "/auth/introspect"};
+    private static final String[] PUBLIC_ENDPOINTS = {
+        "/users",
+        "/users/verify",
+        "/users/forgot-password",
+        "/users/reset-password",
+        "/auth/login",
+        "/auth/refresh",
+        "/auth/introspect"
+    };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -38,6 +46,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS)
+                        .permitAll()
+                        .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINTS)
                         .permitAll()
                         .anyRequest()
                         .authenticated())

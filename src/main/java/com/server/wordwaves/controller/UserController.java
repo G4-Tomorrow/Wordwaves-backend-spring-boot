@@ -2,12 +2,14 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
+import com.server.wordwaves.dto.request.ForgotPasswordRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.server.wordwaves.dto.ApiResponse;
+import com.server.wordwaves.dto.request.ResetPasswordRequest;
 import com.server.wordwaves.dto.request.UserCreationRequest;
 import com.server.wordwaves.dto.request.UserUpdateRequest;
 import com.server.wordwaves.dto.response.AuthenticationResponse;
@@ -32,6 +34,23 @@ public class UserController {
     ApiResponse<EmailResponse> register(@RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<EmailResponse>builder()
                 .result(userService.register(request))
+                .build();
+    }
+
+    @PostMapping("/forgot-password")
+    public ApiResponse<EmailResponse> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        return ApiResponse.<EmailResponse>builder()
+                .result(userService.forgotPassword(request.getEmail()))
+                .message("Yêu cầu đặt lại mật khẩu thành công.")
+                .build();
+    }
+
+    @PutMapping("/reset-password")
+    public ApiResponse<String> resetPassword(
+            @RequestParam String token, @RequestBody @Valid ResetPasswordRequest request) {
+        userService.resetPassword(token, request);
+        return ApiResponse.<String>builder()
+                .message("Mật khẩu đã được cập nhật thành công.")
                 .build();
     }
 

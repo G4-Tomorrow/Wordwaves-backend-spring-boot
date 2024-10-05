@@ -5,4 +5,8 @@ import com.server.wordwaves.entity.User;
 
 public interface EmailService {
     EmailResponse sendVerifyEmail(User user);
+
+    EmailResponse sendForgotPasswordEmail(User user);
+
+    String generateEmailVerifyToken(User user);
 }

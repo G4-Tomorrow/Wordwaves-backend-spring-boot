@@ -3,14 +3,8 @@ package com.server.wordwaves.service.implement;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 import java.util.Objects;
 
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
-import com.server.wordwaves.dto.ApiResponse;
-import com.server.wordwaves.dto.response.UserResponse;
-import com.server.wordwaves.entity.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -20,12 +14,15 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jwt.SignedJWT;
 import com.server.wordwaves.config.CustomJwtDecoder;
 import com.server.wordwaves.config.JwtTokenProvider;
 import com.server.wordwaves.dto.request.AuthenticationRequest;
 import com.server.wordwaves.dto.request.IntrospectRequest;
 import com.server.wordwaves.dto.response.AuthenticationResponse;
 import com.server.wordwaves.dto.response.IntrospectResponse;
+import com.server.wordwaves.dto.response.UserResponse;
+import com.server.wordwaves.entity.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.UserMapper;
@@ -106,7 +103,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
     }
 
     @Override
-    public ResponseEntity<AuthenticationResponse> getRefreshToken(String refreshToken) throws ParseException, JOSEException {
+    public ResponseEntity<AuthenticationResponse> getRefreshToken(String refreshToken)
+            throws ParseException, JOSEException {
         // Check refresh token is valid
         SignedJWT decodedToken = jwtTokenProvider.verifyRefreshToken(refreshToken);
         String userId = decodedToken.getJWTClaimsSet().getSubject();
@@ -159,6 +157,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
                 .path("/")
                 .maxAge(0)
                 .build();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, resDeleteCookie.toString()).build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, resDeleteCookie.toString())
+                .build();
     }
 }

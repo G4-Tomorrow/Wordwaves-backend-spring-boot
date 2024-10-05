@@ -1,15 +1,14 @@
 package com.server.wordwaves.service;
 
-import com.nimbusds.jose.JOSEException;
-import com.server.wordwaves.dto.ApiResponse;
+import java.text.ParseException;
+
 import org.springframework.http.ResponseEntity;
 
+import com.nimbusds.jose.JOSEException;
 import com.server.wordwaves.dto.request.AuthenticationRequest;
 import com.server.wordwaves.dto.request.IntrospectRequest;
 import com.server.wordwaves.dto.response.AuthenticationResponse;
 import com.server.wordwaves.dto.response.IntrospectResponse;
-
-import java.text.ParseException;
 
 public interface AuthenticationService {
     ResponseEntity<AuthenticationResponse> authenticate(AuthenticationRequest request);

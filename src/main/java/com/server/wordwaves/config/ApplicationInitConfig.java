@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class ApplicationInitConfig {
-
     @NonFinal
     static final String ADMIN_EMAIL = "wordwaves.admin@yopmail.com";
 

@@ -1,7 +1,6 @@
 package com.server.wordwaves.service.implement;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.server.wordwaves.config.CustomJwtDecoder;
 import com.server.wordwaves.config.JwtTokenProvider;
 import com.server.wordwaves.constant.PredefinedRole;
+import com.server.wordwaves.dto.request.ResetPasswordRequest;
 import com.server.wordwaves.dto.request.UserCreationRequest;
 import com.server.wordwaves.dto.request.UserUpdateRequest;
 import com.server.wordwaves.dto.response.AuthenticationResponse;
@@ -49,9 +49,29 @@ public class UserServiceImp implements UserService {
     JwtTokenProvider jwtTokenProvider;
 
     @Override
+    public EmailResponse forgotPassword(String email) {
+        User user = getUserByEmail(email);
+        return emailService.sendForgotPasswordEmail(user);
+    }
+
+    @Override
+    public void resetPassword(String token, ResetPasswordRequest request) {
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) throw new AppException(ErrorCode.PASSWORD_MISMATCH);
+        User user = validateTokenAndGetUser(token);
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    }
+
+    @Override
     public EmailResponse register(UserCreationRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) throw new AppException(ErrorCode.EMAIL_EXISTED);
-
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         return emailService.sendVerifyEmail(user);
@@ -59,18 +79,9 @@ public class UserServiceImp implements UserService {
 
     @Override
     public AuthenticationResponse verify(String token) {
-        if (token.isEmpty()) throw new AppException(ErrorCode.EMPTY_TOKEN);
+        User user = validateTokenAndGetUser(token);
 
-        Jwt jwt = jwtDecoder.decode(token);
-        Instant expiredDate = jwt.getExpiresAt();
-        String email = jwt.getSubject();
-        String password = jwt.getClaim("ps");
-
-        if (expiredDate.isBefore(new Date().toInstant())) throw new AppException(ErrorCode.EXPIRED_TOKEN);
-
-        // tạo user
         Set<Role> roles = new HashSet<>();
-        User user = User.builder().email(email).password(password).build();
         roleRepository.findById(PredefinedRole.USER_ROLE.getName()).ifPresent(roles::add);
 
         user.setRoles(roles);
@@ -79,6 +90,27 @@ public class UserServiceImp implements UserService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtTokenProvider.generateAccessToken(user))
                 .build();
+    }
+
+    private User validateTokenAndGetUser(String token) {
+        if (token.isEmpty()) {
+            throw new AppException(ErrorCode.EMPTY_TOKEN);
+        }
+
+        Jwt jwt;
+        try {
+            jwt = jwtDecoder.decode(token);
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+
+        Instant expiredDate = jwt.getExpiresAt();
+        if (expiredDate.isBefore(Instant.now())) {
+            throw new AppException(ErrorCode.EXPIRED_TOKEN);
+        }
+
+        String email = jwt.getSubject();
+        return this.getUserByEmail(email);
     }
 
     @Override
@@ -103,22 +135,17 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-    }
-
-    @Override
     public User getUserByIdAndRefreshToken(String userId, String refreshToken) {
-        return userRepository.findByIdAndRefreshToken(userId, refreshToken).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return userRepository
+                .findByIdAndRefreshToken(userId, refreshToken)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
     }
 
     @Override
     public void updateUserRefreshToken(String refreshToken, String email) {
         User currentUser =
                 userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
         currentUser.setRefreshToken(refreshToken);
-
         userRepository.save(currentUser);
     }
 

@@ -55,25 +55,38 @@ public class EmailServiceImp implements EmailService {
     @NonFinal
     protected long accessTokenExpiration = 120;
 
-    @Override
-    public EmailResponse sendVerifyEmail(User user) {
+    private void sendEmail(User user, String token, String subject, String templateName) {
         Context context = new Context();
         context.setVariable("email", user.getEmail());
-        context.setVariable("token", generateEmailVerifyToken(user));
+        context.setVariable("token", token);
 
-        String htmlContent = templateEngine.process("register-template", context);
+        String htmlContent = templateEngine.process(templateName, context);
 
         EmailRequest emailRequest = EmailRequest.builder()
                 .sender(SenderModel.builder().email(senderMail).name(senderName).build())
                 .to(List.of(RecipientModel.builder().email(user.getEmail()).build()))
-                .subject("WordWaves")
+                .subject(subject)
                 .htmlContent(htmlContent)
                 .build();
 
-        return emailClient.sendEmail(apiKey, emailRequest);
+        emailClient.sendEmail(apiKey, emailRequest);
     }
 
-    private String generateEmailVerifyToken(User user) {
+    @Override
+    public EmailResponse sendVerifyEmail(User user) {
+        String token = generateEmailVerifyToken(user);
+        sendEmail(user, token, "Xác thực tài khoản", "register-template");
+        return EmailResponse.builder().messageId("Email đã được gửi thành công").build();
+    }
+
+    @Override
+    public EmailResponse sendForgotPasswordEmail(User user) {
+        String token = generateEmailVerifyToken(user);
+        sendEmail(user, token, "Yêu cầu đặt lại mật khẩu", "forgot-password-template");
+        return EmailResponse.builder().messageId("Email đã được gửi thành công").build();
+    }
+
+    public String generateEmailVerifyToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
@@ -94,7 +107,7 @@ public class EmailServiceImp implements EmailService {
             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
-            log.error("Cannot create token", e);
+            log.error("Không thể tạo token", e);
             throw new RuntimeException(e);
         }
     }

@@ -87,7 +87,8 @@ public class JwtTokenProvider {
     }
 
     public SignedJWT verifyToken(String token, String keyType) throws JOSEException, ParseException {
-        JWSVerifier verifier = new MACVerifier((Objects.equals(keyType, "access") ? ACCESS_SIGNER_KEY : REFRESH_SIGNER_KEY).getBytes());
+        JWSVerifier verifier = new MACVerifier(
+                (Objects.equals(keyType, "access") ? ACCESS_SIGNER_KEY : REFRESH_SIGNER_KEY).getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
 
@@ -108,7 +109,7 @@ public class JwtTokenProvider {
         return verifyToken(token, "access");
     }
 
-    public SignedJWT verifyRefreshToken(String token) throws JOSEException, ParseException{
+    public SignedJWT verifyRefreshToken(String token) throws JOSEException, ParseException {
         return verifyToken(token, "refresh");
     }
 
