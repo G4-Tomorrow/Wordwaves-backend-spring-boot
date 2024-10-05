@@ -1,16 +1,22 @@
 package com.server.wordwaves.service.implement;
 
 import java.text.ParseException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Objects;
 
+import com.server.wordwaves.dto.ApiResponse;
+import com.server.wordwaves.dto.response.UserResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.JOSEException;
+import com.server.wordwaves.config.CustomJwtDecoder;
 import com.server.wordwaves.config.JwtTokenProvider;
 import com.server.wordwaves.dto.request.AuthenticationRequest;
 import com.server.wordwaves.dto.request.IntrospectRequest;
@@ -21,6 +27,7 @@ import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.UserMapper;
 import com.server.wordwaves.service.AuthenticationService;
+import com.server.wordwaves.service.BaseRedisService;
 import com.server.wordwaves.service.UserService;
 
 import lombok.AccessLevel;
@@ -37,7 +44,9 @@ public class AuthenticationServiceImp implements AuthenticationService {
     UserService userService;
     PasswordEncoder passwordEncoder;
     JwtTokenProvider jwtTokenProvider;
+    CustomJwtDecoder jwtDecoder;
     UserMapper userMapper;
+    BaseRedisService baseRedisService;
 
     @NonFinal
     @Value("${jwt.access-signer-key}")
@@ -96,5 +105,39 @@ public class AuthenticationServiceImp implements AuthenticationService {
         }
 
         return IntrospectResponse.builder().valid(isValid).build();
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<Void>> logout(String token) {
+        if (token == null || token.isEmpty()) throw new AppException(ErrorCode.EMPTY_TOKEN);
+        Jwt jwt = null;
+        try {
+            jwt = jwtDecoder.decode(token);
+        } catch (AppException e) {
+            throw new AppException(e.getErrorCode());
+        }
+        Instant expiredDate = jwt.getExpiresAt();
+        long timeRemaining = Duration.between(Instant.now(), expiredDate).toSeconds();
+
+        if (timeRemaining <= 0)
+            return ResponseEntity.ok().body(ApiResponse.<Void>builder().message("Token đã hết hạn").build());
+
+        baseRedisService.set(token, "jwttoken");
+        baseRedisService.setTimeToLive(token, timeRemaining);
+
+        // Update refresh token is null in user entity
+        UserResponse currentUser = this.userService.getMyInfo();
+        this.userService.updateUserRefreshToken(null, currentUser.getEmail());
+
+        // Remove refresh token in cookies
+        ResponseCookie resDeleteCookie = ResponseCookie.from("refresh_token", null)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, resDeleteCookie.toString())
+                .body(ApiResponse.<Void>builder().message("Đăng xuất thành công").build());
     }
 }

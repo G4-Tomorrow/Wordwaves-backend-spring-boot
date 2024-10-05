@@ -3,6 +3,7 @@ package com.server.wordwaves.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,5 +44,13 @@ public class AuthenticationController {
         return ApiResponse.<IntrospectResponse>builder()
                 .result(authenticationService.introspect(request))
                 .build();
+    }
+
+    @PostMapping("/logout")
+    ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") String token) {
+        ResponseEntity<ApiResponse<Void>> responseEntity = authenticationService.logout(token.substring(7));
+        return ResponseEntity.status(responseEntity.getStatusCode())
+                .headers(responseEntity.getHeaders())
+                .body(responseEntity.getBody());
     }
 }

@@ -27,6 +27,4 @@ public interface UserService {
     void updateUserRefreshToken(String refreshToken, String email);
 
     void deleteUserById(String userId);
-
-    void logout(String token);
 }

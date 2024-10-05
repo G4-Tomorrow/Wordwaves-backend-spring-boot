@@ -1,6 +1,5 @@
 package com.server.wordwaves.service.implement;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
@@ -28,7 +27,6 @@ import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.UserMapper;
 import com.server.wordwaves.repository.RoleRepository;
 import com.server.wordwaves.repository.UserRepository;
-import com.server.wordwaves.service.BaseRedisService;
 import com.server.wordwaves.service.EmailService;
 import com.server.wordwaves.service.UserService;
 
@@ -49,7 +47,6 @@ public class UserServiceImp implements UserService {
     EmailService emailService;
     UserMapper userMapper;
     JwtTokenProvider jwtTokenProvider;
-    BaseRedisService baseRedisService;
 
     @Override
     public EmailResponse register(UserCreationRequest request) {
@@ -91,9 +88,9 @@ public class UserServiceImp implements UserService {
 
     @Override
     public UserResponse getMyInfo() {
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository
-                .findById(name)
+                .findById(userId)
                 .map(userMapper::toUserResponse)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
     }
@@ -127,22 +124,4 @@ public class UserServiceImp implements UserService {
 
     @Override
     public void deleteUserById(String userId) {}
-
-    @Override
-    public void logout(String token) {
-        if (token == null || token.isEmpty()) throw new AppException(ErrorCode.EMPTY_TOKEN);
-        Jwt jwt = null;
-        try {
-            jwt = jwtDecoder.decode(token);
-        } catch (AppException e) {
-            throw new AppException(e.getErrorCode());
-        }
-        Instant expiredDate = jwt.getExpiresAt();
-        long timeRemaining = Duration.between(Instant.now(), expiredDate).toSeconds();
-
-        if (timeRemaining <= 0) return;
-
-        baseRedisService.set(token, "jwttoken");
-        baseRedisService.setTimeToLive(token, timeRemaining);
-    }
 }

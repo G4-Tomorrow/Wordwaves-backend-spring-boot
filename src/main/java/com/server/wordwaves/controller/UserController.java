@@ -42,12 +42,6 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/logout")
-    ApiResponse<Void> logout(@RequestHeader("Authorization") String token) {
-        userService.logout(token.substring(7));
-        return ApiResponse.<Void>builder().message("Đăng xuất thành công").build();
-    }
-
     @GetMapping
     ApiResponse<List<UserResponse>> getUsers() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
