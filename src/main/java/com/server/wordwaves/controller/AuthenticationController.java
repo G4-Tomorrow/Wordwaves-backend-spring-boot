@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.server.wordwaves.dto.ApiResponse;
-import com.server.wordwaves.dto.request.AuthenticationRequest;
-import com.server.wordwaves.dto.request.IntrospectRequest;
-import com.server.wordwaves.dto.response.AuthenticationResponse;
-import com.server.wordwaves.dto.response.IntrospectResponse;
+import com.server.wordwaves.dto.request.auth.AuthenticationRequest;
+import com.server.wordwaves.dto.request.auth.IntrospectRequest;
+import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
+import com.server.wordwaves.dto.response.auth.IntrospectResponse;
+import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.service.AuthenticationService;
 
 import lombok.AccessLevel;

@@ -36,7 +36,7 @@ public enum ErrorCode {
     // API
     LACK_OF_PARAMETER(3001, "Api còn thiếu tham số", HttpStatus.BAD_REQUEST),
 
-    //ROLE
+    // ROLE
     ROLE_NOT_EXIST(4001, "Tác nhân không tồn tại", HttpStatus.BAD_REQUEST),
     ;
     int code;

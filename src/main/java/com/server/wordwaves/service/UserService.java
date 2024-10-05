@@ -2,15 +2,17 @@ package com.server.wordwaves.service;
 
 import java.util.List;
 
-import com.server.wordwaves.dto.request.LogoutRequest;
-import com.server.wordwaves.dto.request.UserCreationRequest;
-import com.server.wordwaves.dto.request.UserUpdateRequest;
-import com.server.wordwaves.dto.request.VerifyEmailRequest;
-import com.server.wordwaves.dto.response.AuthenticationResponse;
-import com.server.wordwaves.dto.response.EmailResponse;
-import com.server.wordwaves.dto.response.UserResponse;
-import com.server.wordwaves.entity.User;
 import org.springframework.security.access.prepost.PreAuthorize;
+
+import com.server.wordwaves.dto.request.auth.LogoutRequest;
+import com.server.wordwaves.dto.request.user.UserCreationRequest;
+import com.server.wordwaves.dto.request.user.UserUpdateRequest;
+import com.server.wordwaves.dto.request.user.VerifyEmailRequest;
+import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
+import com.server.wordwaves.dto.response.common.EmailResponse;
+import com.server.wordwaves.dto.response.common.PaginationInfo;
+import com.server.wordwaves.dto.response.user.UserResponse;
+import com.server.wordwaves.entity.User;
 
 public interface UserService {
     EmailResponse register(UserCreationRequest request);
@@ -18,7 +20,8 @@ public interface UserService {
     AuthenticationResponse verify(VerifyEmailRequest request);
 
     @PreAuthorize("hasRole('ADMIN')")
-    List<UserResponse> getUsers(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery);
+    PaginationInfo<List<UserResponse>> getUsers(
+            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery);
 
     UserResponse getMyInfo();
 

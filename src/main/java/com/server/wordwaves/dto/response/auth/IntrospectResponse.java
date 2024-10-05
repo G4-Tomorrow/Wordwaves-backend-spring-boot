@@ -1,4 +1,4 @@
-package com.server.wordwaves.dto.request;
+package com.server.wordwaves.dto.response.auth;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,6 +8,6 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class VerifyEmailRequest {
-    String token;
+public class IntrospectResponse {
+    boolean valid;
 }

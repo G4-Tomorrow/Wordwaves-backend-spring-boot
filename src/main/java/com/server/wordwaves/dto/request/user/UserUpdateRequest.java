@@ -1,9 +1,7 @@
-package com.server.wordwaves.dto.request;
+package com.server.wordwaves.dto.request.user;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
 
 @Data
 @Builder

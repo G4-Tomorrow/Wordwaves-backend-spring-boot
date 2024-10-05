@@ -8,10 +8,6 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.UUID;
 
-import com.server.wordwaves.service.BaseRedisService;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -24,9 +20,11 @@ import com.nimbusds.jwt.SignedJWT;
 import com.server.wordwaves.entity.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
+import com.server.wordwaves.service.BaseRedisService;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 
@@ -92,7 +90,7 @@ public class JwtTokenProvider {
     }
 
     public SignedJWT verifyToken(String token) throws JOSEException, ParseException {
-        if(baseRedisService.exist(token)) throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if (baseRedisService.exist(token)) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         JWSVerifier verifier = new MACVerifier(ACCESS_SIGNER_KEY.getBytes());
 

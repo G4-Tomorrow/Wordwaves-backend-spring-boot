@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.server.wordwaves.dto.request.LogoutRequest;
-import com.server.wordwaves.dto.request.VerifyEmailRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,11 +21,14 @@ import org.springframework.stereotype.Service;
 import com.server.wordwaves.config.CustomJwtDecoder;
 import com.server.wordwaves.config.JwtTokenProvider;
 import com.server.wordwaves.constant.PredefinedRole;
-import com.server.wordwaves.dto.request.UserCreationRequest;
-import com.server.wordwaves.dto.request.UserUpdateRequest;
-import com.server.wordwaves.dto.response.AuthenticationResponse;
-import com.server.wordwaves.dto.response.EmailResponse;
-import com.server.wordwaves.dto.response.UserResponse;
+import com.server.wordwaves.dto.request.auth.LogoutRequest;
+import com.server.wordwaves.dto.request.user.UserCreationRequest;
+import com.server.wordwaves.dto.request.user.UserUpdateRequest;
+import com.server.wordwaves.dto.request.user.VerifyEmailRequest;
+import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
+import com.server.wordwaves.dto.response.common.EmailResponse;
+import com.server.wordwaves.dto.response.common.PaginationInfo;
+import com.server.wordwaves.dto.response.user.UserResponse;
 import com.server.wordwaves.entity.Role;
 import com.server.wordwaves.entity.User;
 import com.server.wordwaves.exception.AppException;
@@ -98,9 +99,12 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public List<UserResponse> getUsers(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
+    public PaginationInfo<List<UserResponse>> getUsers(
+            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
         pageNumber--;
-        Sort sort = sortDirection.equalsIgnoreCase("DESC") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Sort sort = sortDirection.equalsIgnoreCase("DESC")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         Page<User> usersPage;
 
@@ -110,10 +114,14 @@ public class UserServiceImp implements UserService {
             usersPage = userRepository.findAll(pageable);
         }
 
-        return usersPage.stream()
-                .map(userMapper::toUserResponse).toList();
+        return PaginationInfo.<List<UserResponse>>builder()
+                .pageNumber(++pageNumber)
+                .pageSize(pageSize)
+                .sortBy(sortBy)
+                .sortDirection(sortDirection)
+                .data(usersPage.stream().map(userMapper::toUserResponse).toList())
+                .build();
     }
-
 
     @Override
     public UserResponse getMyInfo() {
@@ -150,13 +158,16 @@ public class UserServiceImp implements UserService {
     public UserResponse updateUserById(String userId, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        if (userUpdateRequest.getFullName() != null && !userUpdateRequest.getFullName().isEmpty()) {
+        if (userUpdateRequest.getFullName() != null
+                && !userUpdateRequest.getFullName().isEmpty()) {
             user.setFullName(userUpdateRequest.getFullName());
         }
 
         if (userUpdateRequest.getRole() != null && !userUpdateRequest.getRole().isEmpty()) {
             Set<Role> roles = new HashSet<>();
-            roles.add(roleRepository.findById(userUpdateRequest.getRole()).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXIST)));
+            roles.add(roleRepository
+                    .findById(userUpdateRequest.getRole())
+                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXIST)));
             user.setRoles(roles);
         }
 

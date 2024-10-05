@@ -1,4 +1,4 @@
-package com.server.wordwaves.dto.response;
+package com.server.wordwaves.dto.response.user;
 
 import java.time.Instant;
 import java.util.Set;

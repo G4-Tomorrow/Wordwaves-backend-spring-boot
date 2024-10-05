@@ -2,10 +2,7 @@ package com.server.wordwaves.config;
 
 import java.text.ParseException;
 import java.time.Instant;
-import java.util.Date;
 
-import com.server.wordwaves.exception.AppException;
-import com.server.wordwaves.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;

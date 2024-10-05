@@ -6,7 +6,6 @@ import java.util.Objects;
 
 import jakarta.validation.ConstraintViolation;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.server.wordwaves.dto.ApiResponse;
+import com.server.wordwaves.dto.response.common.ApiResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,10 +35,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ApiResponse<ArrayList<String>>> handleMissingParams(MissingServletRequestParameterException ex) {
+    public ResponseEntity<ApiResponse<ArrayList<String>>> handleMissingParams(
+            MissingServletRequestParameterException ex) {
         ErrorCode errorCode = ErrorCode.LACK_OF_PARAMETER;
         String parameterName = ex.getParameterName();
-        String errorMessage = errorCode.getMessage()+ " " + parameterName;
+        String errorMessage = errorCode.getMessage() + " " + parameterName;
 
         ApiResponse apiResponse = ApiResponse.builder()
                 .code(errorCode.getCode())

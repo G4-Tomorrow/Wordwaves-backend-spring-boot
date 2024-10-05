@@ -1,4 +1,6 @@
-package com.server.wordwaves.dto.response;
+package com.server.wordwaves.dto.response.auth;
+
+import com.server.wordwaves.dto.response.user.UserResponse;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -2,19 +2,19 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
-import com.server.wordwaves.dto.request.LogoutRequest;
-import com.server.wordwaves.dto.request.VerifyEmailRequest;
 import jakarta.validation.Valid;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import com.server.wordwaves.dto.ApiResponse;
-import com.server.wordwaves.dto.request.UserCreationRequest;
-import com.server.wordwaves.dto.request.UserUpdateRequest;
-import com.server.wordwaves.dto.response.AuthenticationResponse;
-import com.server.wordwaves.dto.response.EmailResponse;
-import com.server.wordwaves.dto.response.UserResponse;
+import com.server.wordwaves.dto.request.auth.LogoutRequest;
+import com.server.wordwaves.dto.request.user.UserCreationRequest;
+import com.server.wordwaves.dto.request.user.UserUpdateRequest;
+import com.server.wordwaves.dto.request.user.VerifyEmailRequest;
+import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
+import com.server.wordwaves.dto.response.common.ApiResponse;
+import com.server.wordwaves.dto.response.common.EmailResponse;
+import com.server.wordwaves.dto.response.common.PaginationInfo;
+import com.server.wordwaves.dto.response.user.UserResponse;
 import com.server.wordwaves.service.UserService;
 
 import lombok.AccessLevel;
@@ -52,14 +52,13 @@ public class UserController {
     }
 
     @GetMapping
-    ApiResponse<List<UserResponse>> getUsers(
+    ApiResponse<PaginationInfo<List<UserResponse>>> getUsers(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
             @RequestParam(required = false, defaultValue = "createdAt") String sortBy,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
-            @RequestParam(required = false) String searchQuery
-    ) {
-        return ApiResponse.<List<UserResponse>>builder()
+            @RequestParam(required = false) String searchQuery) {
+        return ApiResponse.<PaginationInfo<List<UserResponse>>>builder()
                 .message("Get all users")
                 .result(userService.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchQuery))
                 .build();
@@ -82,7 +81,8 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    ApiResponse<UserResponse> updateUserById(@PathVariable String userId, @RequestBody UserUpdateRequest userUpdateRequest) {
+    ApiResponse<UserResponse> updateUserById(
+            @PathVariable String userId, @RequestBody UserUpdateRequest userUpdateRequest) {
         return ApiResponse.<UserResponse>builder()
                 .message("Update user successfully")
                 .result(userService.updateUserById(userId, userUpdateRequest))
@@ -92,8 +92,6 @@ public class UserController {
     @DeleteMapping("/{userId}")
     ApiResponse<Void> deleteUserById(@PathVariable String userId) {
         userService.deleteUserById(userId);
-        return ApiResponse.<Void>builder()
-                .message("Delete a user successfully")
-                .build();
+        return ApiResponse.<Void>builder().message("Delete a user successfully").build();
     }
 }
