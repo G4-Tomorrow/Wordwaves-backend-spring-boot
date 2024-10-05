@@ -2,6 +2,7 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
+import com.server.wordwaves.dto.request.ForgotPasswordRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.dto.response.common.EmailResponse;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.user.UserResponse;
+
 import com.server.wordwaves.service.UserService;
 
 import lombok.AccessLevel;
@@ -37,6 +39,23 @@ public class UserController {
                 .build();
     }
 
+    @PostMapping("/forgot-password")
+    public ApiResponse<EmailResponse> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        return ApiResponse.<EmailResponse>builder()
+                .result(userService.forgotPassword(request.getEmail()))
+                .message("Yêu cầu đặt lại mật khẩu thành công.")
+                .build();
+    }
+
+    @PutMapping("/reset-password")
+    public ApiResponse<String> resetPassword(
+            @RequestParam String token, @RequestBody @Valid ResetPasswordRequest request) {
+        userService.resetPassword(token, request);
+        return ApiResponse.<String>builder()
+                .message("Mật khẩu đã được cập nhật thành công.")
+                .build();
+    }
+
     @GetMapping("/verify")
     ApiResponse<AuthenticationResponse> verify(@RequestParam("token") VerifyEmailRequest request) {
         return ApiResponse.<AuthenticationResponse>builder()
@@ -45,11 +64,6 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/logout")
-    ApiResponse<Void> logout(@RequestHeader("Authorization") LogoutRequest request) {
-        userService.logout(request);
-        return ApiResponse.<Void>builder().message("Đăng xuất thành công").build();
-    }
 
     @GetMapping
     ApiResponse<PaginationInfo<List<UserResponse>>> getUsers(

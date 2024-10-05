@@ -12,9 +12,14 @@ import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
 import com.server.wordwaves.dto.response.common.EmailResponse;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.user.UserResponse;
+
 import com.server.wordwaves.entity.User;
 
 public interface UserService {
+    EmailResponse forgotPassword(String email);
+
+    void resetPassword(String token, ResetPasswordRequest request);
+
     EmailResponse register(UserCreationRequest request);
 
     AuthenticationResponse verify(VerifyEmailRequest request);
@@ -35,5 +40,6 @@ public interface UserService {
 
     void deleteUserById(String userId);
 
-    void logout(LogoutRequest request);
+    User getUserByIdAndRefreshToken(String userId, String refreshToken);
+
 }
