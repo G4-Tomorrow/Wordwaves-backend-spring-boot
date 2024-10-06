@@ -1,4 +1,4 @@
-## Dự án WordWaves
+## Phần Backend của dự án WordWaves
 
 ## Chạy docker image
 
