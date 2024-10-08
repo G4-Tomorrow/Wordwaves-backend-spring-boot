@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EmailServiceImp implements EmailService {
     EmailClient emailClient;
@@ -55,21 +55,6 @@ public class EmailServiceImp implements EmailService {
     @NonFinal
     protected long accessTokenExpiration = 120;
 
-    public EmailServiceImp(EmailClient emailClient, TemplateEngine templateEngine,
-                           @Value("${app.email-client.brevo-apikey}") String apiKey,
-                           @Value("${app.email-client.sender.email}") String senderMail,
-                           @Value("${app.email-client.sender.name}") String senderName,
-                           @Value("${jwt.access-signer-key}") String SIGNER_KEY) {
-        this.emailClient = emailClient;
-        this.templateEngine = templateEngine;
-        this.apiKey = apiKey;
-        this.senderMail = senderMail;
-        this.senderName = senderName;
-        this.SIGNER_KEY = SIGNER_KEY;
-
-        // Thêm log để kiểm tra giá trị apiKey
-        log.info("API Key: {}", this.apiKey);
-    }
 
     private void sendEmail(User user, String token, String subject, String templateName) {
         Context context = new Context();

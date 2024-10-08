@@ -1,5 +1,6 @@
 package com.server.wordwaves.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.server.wordwaves.dto.request.user.*;

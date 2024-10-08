@@ -1,5 +1,6 @@
 package com.server.wordwaves.service.implement;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -7,14 +8,13 @@ import java.util.Set;
 
 import com.server.wordwaves.dto.request.user.*;
 import com.server.wordwaves.dto.response.user.UserResponse;
+import com.server.wordwaves.service.FirebaseStorageService;
 import com.server.wordwaves.service.TokenService;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -42,6 +42,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -56,6 +57,7 @@ public class UserServiceImp implements UserService {
     UserMapper userMapper;
     JwtTokenProvider jwtTokenProvider;
     TokenService tokenService;
+    FirebaseStorageService firebaseStorageService;
 
     @Override
     public EmailResponse forgotPassword(ForgotPasswordRequest request) {
@@ -188,21 +190,24 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserResponse updateUserById(String userId, UserUpdateRequest userUpdateRequest) {
+    public UserResponse updateUserById(String userId, UserUpdateRequest userUpdateRequest)  {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        if (userUpdateRequest.getFullName() != null
-                && !userUpdateRequest.getFullName().isEmpty()) {
+        String fullName = userUpdateRequest.getFullName();
+        if (fullName != null && !fullName.isEmpty()) {
             user.setFullName(userUpdateRequest.getFullName());
         }
 
-        if (userUpdateRequest.getRole() != null && !userUpdateRequest.getRole().isEmpty()) {
-            Set<Role> roles = new HashSet<>();
-            roles.add(roleRepository
-                    .findById(userUpdateRequest.getRole())
-                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXIST)));
-            user.setRoles(roles);
-        }
+//        MultipartFile avatarFile = userUpdateRequest.getAvatarFile();
+//        if(avatarFile != null && avatarFile.isEmpty()) {
+//            String avatarUrl;
+//            try {
+//                avatarUrl = firebaseStorageService.uploadFile(avatarFile);
+//            } catch (IOException e) {
+//                throw new AppException(ErrorCode.AVATAR_UPLOAD_FAIL);
+//            }
+//            user.setAvatarUrl(avatarUrl);
+//        }
 
         userRepository.save(user);
 

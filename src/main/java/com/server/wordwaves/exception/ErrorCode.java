@@ -28,6 +28,7 @@ public enum ErrorCode {
     WRONG_PASSWORD(1009, "Mật khẩu không chính xác", HttpStatus.BAD_REQUEST),
     USER_EXISTED(1010, "Tài khoản đã tồn tại", HttpStatus.BAD_REQUEST),
     PASSWORD_MISMATCH(1011, "Mật khẩu không khớp với xác nhận mật khẩu", HttpStatus.BAD_REQUEST),
+    FILE_UPLOAD_FAIL(1012, "Thay đổi ảnh đại diện thất bại", HttpStatus.BAD_REQUEST),
 
     // TOKEN
     EMPTY_TOKEN(2001, "Token rỗng", HttpStatus.BAD_REQUEST),
@@ -40,6 +41,7 @@ public enum ErrorCode {
 
     // ROLE
     ROLE_NOT_EXIST(4001, "Tác nhân không tồn tại", HttpStatus.BAD_REQUEST),
+
     ;
     int code;
     String message;
