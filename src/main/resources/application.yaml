@@ -38,3 +38,6 @@ app:
     sender:
       email: kaitoukido0204@gmail.com
       name: WordWaves Support
+
+firebase:
+  bucket-name: petgarden-bda48.appspot.com
