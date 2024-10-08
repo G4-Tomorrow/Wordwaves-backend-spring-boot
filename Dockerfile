@@ -10,8 +10,12 @@ RUN mvn package -DskipTests
 FROM amazoncorretto:21.0.4
 
 WORKDIR /app
+
+# Copy file jar từ build stage
 COPY --from=build /app/target/*.jar app.jar
 
+# Copy Firebase credentials
+COPY firebase-credentials.json /app/config/firebase-credentials.json
 
 ENV SPRING_PROFILES_ACTIVE=prod
 
