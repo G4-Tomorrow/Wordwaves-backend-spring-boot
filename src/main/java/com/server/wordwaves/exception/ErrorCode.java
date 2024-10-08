@@ -42,6 +42,9 @@ public enum ErrorCode {
     // ROLE
     ROLE_NOT_EXIST(4001, "Tác nhân không tồn tại", HttpStatus.BAD_REQUEST),
 
+    // FILE
+    EMPTY_FILE(5001, "File rỗng", HttpStatus.BAD_REQUEST),
+
     ;
     int code;
     String message;

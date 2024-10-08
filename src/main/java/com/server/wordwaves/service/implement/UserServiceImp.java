@@ -198,24 +198,14 @@ public class UserServiceImp implements UserService {
             user.setFullName(userUpdateRequest.getFullName());
         }
 
-//        MultipartFile avatarFile = userUpdateRequest.getAvatarFile();
-//        if(avatarFile != null && avatarFile.isEmpty()) {
-//            String avatarUrl;
-//            try {
-//                avatarUrl = firebaseStorageService.uploadFile(avatarFile);
-//            } catch (IOException e) {
-//                throw new AppException(ErrorCode.AVATAR_UPLOAD_FAIL);
-//            }
-//            user.setAvatarUrl(avatarUrl);
-//        }
+        String avatarName = userUpdateRequest.getAvatarName();
+        if(avatarName != null && !avatarName.isEmpty()) {
+            user.setAvatarName(avatarName);
+        }
 
-        userRepository.save(user);
+        User updatedUser = userRepository.save(user);
 
-        return UserResponse.builder()
-                .id(user.getId())
-                .fullName(user.getFullName())
-                .roles(user.getRoles())
-                .build();
+        return userMapper.toUserResponse(updatedUser);
     }
 
     @Override

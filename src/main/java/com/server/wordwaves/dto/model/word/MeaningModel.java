@@ -1,4 +1,4 @@
-package com.server.wordwaves.dto.model;
+package com.server.wordwaves.dto.model.word;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,7 +8,5 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RecipientModel {
-    //    String name;
-    String email;
+public class MeaningModel {
 }

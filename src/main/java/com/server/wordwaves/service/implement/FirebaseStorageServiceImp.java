@@ -28,7 +28,10 @@ public class FirebaseStorageServiceImp implements FirebaseStorageService {
     @Override
     public FileUploadResponse uploadFile(FileUploadRequest request) {
         Bucket bucket = StorageClient.getInstance().bucket();
+
         MultipartFile file = request.getFile();
+        if(file == null || file.isEmpty()) throw new AppException(ErrorCode.EMPTY_FILE);
+
         String filename = UUID.randomUUID().toString() + new Random().nextInt(1000);
 
         Blob blob;
@@ -38,7 +41,7 @@ public class FirebaseStorageServiceImp implements FirebaseStorageService {
             throw new AppException(ErrorCode.FILE_UPLOAD_FAIL);
         }
 
-        // Trả về đường dẫn của file đã upload
+
         return FileUploadResponse.builder()
                 .fileName(blob.getName())
                 .build();

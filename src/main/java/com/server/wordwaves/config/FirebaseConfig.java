@@ -21,7 +21,6 @@ public class FirebaseConfig {
         // Chuyển đổi chuỗi JSON thành InputStream
         ByteArrayInputStream credentialsStream = new ByteArrayInputStream(firebaseCredentials.getBytes());
 
-        // Khởi tạo Firebase với GoogleCredentials
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(credentialsStream))
                 .setStorageBucket("petgarden-bda48.appspot.com")
