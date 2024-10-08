@@ -1,14 +1,13 @@
-package com.server.wordwaves.dto.model;
+package com.server.wordwaves.dto.response.file;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RecipientModel {
-    //    String name;
-    String email;
+public class FileUploadResponse {
+    String fileName;
 }

@@ -98,14 +98,10 @@ public class UserController {
     ApiResponse<UserResponse> updateUserById(
             @PathVariable String userId, @RequestBody UserUpdateRequest userUpdateRequest) {
         return ApiResponse.<UserResponse>builder()
-                .message("Cập nhập người dùng thành công")
+                .message("Cập nhập thông tin thành công")
                 .result(userService.updateUserById(userId, userUpdateRequest))
                 .build();
     }
-
-
-
-
 
     @DeleteMapping("/{userId}")
     ApiResponse<Void> deleteUserById(@PathVariable String userId) {

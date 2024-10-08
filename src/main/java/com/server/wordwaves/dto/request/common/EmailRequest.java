@@ -2,8 +2,8 @@ package com.server.wordwaves.dto.request.common;
 
 import java.util.List;
 
-import com.server.wordwaves.dto.model.RecipientModel;
-import com.server.wordwaves.dto.model.SenderModel;
+import com.server.wordwaves.dto.model.mail.RecipientModel;
+import com.server.wordwaves.dto.model.mail.SenderModel;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
