@@ -17,6 +17,7 @@ public class UserResponse {
     String id;
     String email;
     String fullName;
+    String avatarName;
     Instant createdAt;
     Instant updatedAt;
     Set<Role> roles;

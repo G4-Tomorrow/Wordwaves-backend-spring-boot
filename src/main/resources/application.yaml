@@ -7,6 +7,11 @@ server:
 
 
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-request-size: 3MB
+      max-file-size: 3MB
   application:
     name: wordwaves
   datasource:

@@ -1,15 +1,14 @@
-package com.server.wordwaves.dto.request.user;
+package com.server.wordwaves.dto.request.file;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserUpdateRequest {
-    String fullName;
-    String avatarName;
+public class FileUploadRequest {
+    MultipartFile file;
 }
