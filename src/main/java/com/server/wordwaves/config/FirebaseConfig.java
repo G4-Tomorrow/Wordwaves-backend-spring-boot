@@ -23,7 +23,6 @@ public class FirebaseConfig {
     @Bean
     FirebaseApp firebaseApp() throws IOException {
         ClassPathResource serviceAccount = new ClassPathResource("firebase-credentials.json");
-        log.info("s: {}", serviceAccount.getInputStream());
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount.getInputStream()))
