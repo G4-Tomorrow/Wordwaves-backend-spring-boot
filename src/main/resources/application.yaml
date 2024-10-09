@@ -40,4 +40,4 @@ app:
       name: WordWaves Support
 
 firebase:
-  bucket-name: petgarden-bda48.appspot.com
+  bucket-name: wordwaves-40814.appspot.com
