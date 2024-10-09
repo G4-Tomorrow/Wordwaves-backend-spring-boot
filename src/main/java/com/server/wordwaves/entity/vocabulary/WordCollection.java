@@ -24,11 +24,13 @@ public class WordCollection extends BaseAuthor {
     String thumbnailName;
 
     @ManyToOne
-    @JoinColumn(referencedColumnName = "id")
+    @JoinColumn(name = "WordCollectionCategoryId", referencedColumnName = "id")
     WordCollectionCategory wordCollectionCategory;
 
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "CollectionToTopic")
+    @JoinTable(name = "CollectionToTopic",
+            joinColumns = @JoinColumn(name = "WordCollectionId", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "TopicId", referencedColumnName = "id"))
     Set<Topic> topics;
 }

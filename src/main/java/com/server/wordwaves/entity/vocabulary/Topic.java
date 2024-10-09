@@ -23,6 +23,8 @@ public class Topic extends BaseAuthor {
     String thumbnailName;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "TopicToWord")
+    @JoinTable(name = "TopicToWord",
+            joinColumns = @JoinColumn(name = "TopicId", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "WordId", referencedColumnName = "id"))
     Set<Word> words;
 }

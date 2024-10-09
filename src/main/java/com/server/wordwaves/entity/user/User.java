@@ -29,7 +29,9 @@ public class User extends BaseEntity {
     String avatarName;
 
     @ManyToMany
-    @JoinTable(name = "UserToRole")
+    @JoinTable(name = "UserToRole",
+            joinColumns = @JoinColumn(name = "UserId", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"))
     Set<Role> roles;
 
     @Column(columnDefinition = "TEXT")
