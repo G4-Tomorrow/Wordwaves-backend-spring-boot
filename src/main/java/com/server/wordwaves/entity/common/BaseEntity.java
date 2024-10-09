@@ -17,10 +17,9 @@ import lombok.experimental.FieldDefaults;
 public abstract class BaseEntity {
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(updatable = false)
     Instant createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
     Instant updatedAt;
 }

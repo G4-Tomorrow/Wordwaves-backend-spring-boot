@@ -14,22 +14,21 @@ import java.util.Set;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-@Table(name = "collection")
 public class WordCollection extends BaseAuthor {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    @Column(name = "name", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
+    @Column(unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     String name;
     String thumbnailName;
 
     @ManyToOne
-    @JoinColumn(name = "collection_category_id", referencedColumnName = "id")
+    @JoinColumn(referencedColumnName = "id")
     WordCollectionCategory wordCollectionCategory;
 
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "collections_topics")
+    @JoinTable(name = "CollectionToTopic")
     Set<Topic> topics;
 }

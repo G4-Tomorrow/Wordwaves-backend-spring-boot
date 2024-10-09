@@ -14,7 +14,6 @@ import java.util.Set;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-@Table(name = "topic")
 public class Topic extends BaseAuthor {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -24,6 +23,6 @@ public class Topic extends BaseAuthor {
     String thumbnailName;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "topics_words")
+    @JoinTable(name = "TopicToWord")
     Set<Word> words;
 }

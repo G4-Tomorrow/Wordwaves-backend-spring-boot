@@ -1,5 +1,6 @@
 package com.server.wordwaves.entity.common;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 
@@ -20,13 +21,13 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class BaseAuthor extends BaseEntity {
 
-    String createdBy;
+    String createdById;
 
     @PrePersist
     public void prePersist() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated())
             throw new AppException(ErrorCode.UNAUTHENTICATED);
-        this.createdBy = authentication.getName();
+        this.createdById = authentication.getName();
     }
 }

@@ -24,6 +24,6 @@ public class Role extends BaseEntity {
     String name;
 
     @ManyToMany
-    @JoinTable(name = "roles_permissions")
+    @JoinTable(name = "RoleToPermission")
     Set<Permission> permissions;
 }

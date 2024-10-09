@@ -21,7 +21,7 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    @Column(name = "email", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
+    @Column(unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     String email;
 
     String password;
@@ -29,9 +29,9 @@ public class User extends BaseEntity {
     String avatarName;
 
     @ManyToMany
-    @JoinTable(name = "users_roles")
+    @JoinTable(name = "UserToRole")
     Set<Role> roles;
 
-    @Column(name = "refresh_token", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     String refreshToken;
 }
