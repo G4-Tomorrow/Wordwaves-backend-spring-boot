@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.server.wordwaves.constant.PredefinedRole;
-import com.server.wordwaves.entity.Role;
-import com.server.wordwaves.entity.User;
+import com.server.wordwaves.entity.user.Role;
+import com.server.wordwaves.entity.user.User;
 import com.server.wordwaves.repository.RoleRepository;
 import com.server.wordwaves.repository.UserRepository;
 

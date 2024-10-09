@@ -1,7 +1,9 @@
-package com.server.wordwaves.entity;
+package com.server.wordwaves.entity.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+
+import com.server.wordwaves.entity.common.BaseEntity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

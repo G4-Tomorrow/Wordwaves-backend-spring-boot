@@ -1,8 +1,10 @@
-package com.server.wordwaves.entity;
+package com.server.wordwaves.entity.user;
 
 import java.util.Set;
 
 import jakarta.persistence.*;
+
+import com.server.wordwaves.entity.common.BaseEntity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -27,7 +29,7 @@ public class User extends BaseEntity {
     String avatarName;
 
     @ManyToMany
-    @JoinTable(name = "user_roles")
+    @JoinTable(name = "users_roles")
     Set<Role> roles;
 
     @Column(name = "refresh_token", columnDefinition = "TEXT")

@@ -2,12 +2,12 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
-import com.server.wordwaves.dto.request.user.ForgotPasswordRequest;
-import com.server.wordwaves.dto.request.user.ResetPasswordRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
 
+import com.server.wordwaves.dto.request.user.ForgotPasswordRequest;
+import com.server.wordwaves.dto.request.user.ResetPasswordRequest;
 import com.server.wordwaves.dto.request.user.UserCreationRequest;
 import com.server.wordwaves.dto.request.user.UserUpdateRequest;
 import com.server.wordwaves.dto.request.user.VerifyEmailRequest;
@@ -16,7 +16,6 @@ import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.dto.response.common.EmailResponse;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.user.UserResponse;
-
 import com.server.wordwaves.service.UserService;
 
 import lombok.AccessLevel;

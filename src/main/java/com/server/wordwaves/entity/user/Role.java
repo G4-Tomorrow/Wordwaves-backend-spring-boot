@@ -1,4 +1,4 @@
-package com.server.wordwaves.entity;
+package com.server.wordwaves.entity.user;
 
 import java.util.Set;
 
@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+
+import com.server.wordwaves.entity.common.BaseEntity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +24,6 @@ public class Role extends BaseEntity {
     String name;
 
     @ManyToMany
-    @JoinTable(name = "role_permissions")
+    @JoinTable(name = "roles_permissions")
     Set<Permission> permissions;
 }

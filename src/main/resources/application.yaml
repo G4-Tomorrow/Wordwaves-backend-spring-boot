@@ -16,9 +16,9 @@ spring:
     name: wordwaves
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://ugy3xdlg4yzsgnbc:AJMQxWffY78sikU7JJjx@bv50k19rodxkhj0lbdvb-mysql.services.clever-cloud.com:3306/bv50k19rodxkhj0lbdvb
-    username: ugy3xdlg4yzsgnbc
-    password: AJMQxWffY78sikU7JJjx
+    url: jdbc:mysql://avnadmin:AVNS_NaOkIhMfoLS45jVy0F4@wordwaves-wordwaves.f.aivencloud.com:21917/defaultdb?ssl-mode=REQUIRED
+    username: avnadmin
+    password: AVNS_NaOkIhMfoLS45jVy0F4
   jpa:
     hibernate:
       ddl-auto: update
@@ -38,6 +38,9 @@ app:
     sender:
       email: kaitoukido0204@gmail.com
       name: WordWaves Support
-
-firebase:
-  bucket-name: wordwaves-40814.appspot.com
+  dictionary-client:
+    url: https://api.dictionaryapi.dev/api/v2/entries/en
+  pexels-client:
+    url: https://api.pexels.com/v1/search
+  firebase:
+    bucket-name: wordwaves-40814.appspot.com

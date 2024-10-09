@@ -45,6 +45,10 @@ public enum ErrorCode {
     // FILE
     EMPTY_FILE(5001, "File rỗng", HttpStatus.BAD_REQUEST),
 
+    // VOCABULARY
+    WORD_COLLECTION_NAME_IS_REQUIRED(6001, "Tên của bộ từ vựng không được để trống", HttpStatus.BAD_REQUEST),
+    COLLECTION_EXISTED(6002, "Bộ từ vựng đã tồn tại" , HttpStatus.BAD_REQUEST)
+
     ;
     int code;
     String message;

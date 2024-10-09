@@ -1,4 +1,4 @@
-package com.server.wordwaves.entity;
+package com.server.wordwaves.entity.common;
 
 import java.time.Instant;
 
