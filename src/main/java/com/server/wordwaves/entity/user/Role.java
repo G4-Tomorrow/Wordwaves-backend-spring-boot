@@ -1,11 +1,13 @@
 package com.server.wordwaves.entity.user;
 
-import com.server.wordwaves.entity.common.BaseEntity;
+import java.util.Set;
+
 import jakarta.persistence.*;
+
+import com.server.wordwaves.entity.common.BaseEntity;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
 
 @Getter
 @Setter
@@ -19,8 +21,9 @@ public class Role extends BaseEntity {
     String name;
 
     @ManyToMany
-    @JoinTable(name = "RoleToPermission",
+    @JoinTable(
+            name = "RoleToPermission",
             joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"),
-    inverseJoinColumns = @JoinColumn(name = "PermissionName", referencedColumnName = "name"))
+            inverseJoinColumns = @JoinColumn(name = "PermissionName", referencedColumnName = "name"))
     Set<Permission> permissions;
 }

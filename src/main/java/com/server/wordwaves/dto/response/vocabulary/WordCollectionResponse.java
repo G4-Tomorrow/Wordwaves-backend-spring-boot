@@ -1,6 +1,9 @@
 package com.server.wordwaves.dto.response.vocabulary;
 
+import java.time.Instant;
+
 import com.server.wordwaves.entity.vocabulary.WordCollectionCategory;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,9 +12,12 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class WordCollectionCreationResponse {
-    String id;  
+public class WordCollectionResponse {
+    String id;
     String name;
     String thumbnailName;
-    WordCollectionCategory category;
+    WordCollectionCategory wordCollectionCategory;
+    Instant createdAt;
+    Instant updatedAt;
+    String createdById;
 }

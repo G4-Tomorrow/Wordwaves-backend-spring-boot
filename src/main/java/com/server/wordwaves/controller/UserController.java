@@ -72,7 +72,7 @@ public class UserController {
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
             @RequestParam(required = false) String searchQuery) {
         return ApiResponse.<PaginationInfo<List<UserResponse>>>builder()
-                .message("Lấy tất cả người dùng")
+                .message("Lấy nhiều người dùng")
                 .result(userService.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchQuery))
                 .build();
     }

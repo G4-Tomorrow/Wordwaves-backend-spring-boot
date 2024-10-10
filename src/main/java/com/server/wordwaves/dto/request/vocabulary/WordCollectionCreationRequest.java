@@ -15,5 +15,7 @@ public class WordCollectionCreationRequest {
     String name;
 
     String thumbnailName;
+
+    @NotBlank(message = "WORD_COLLECTION_CATEGORY_IS_REQUIRED")
     String category;
 }

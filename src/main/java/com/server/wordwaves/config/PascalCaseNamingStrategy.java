@@ -43,7 +43,8 @@ public class PascalCaseNamingStrategy implements PhysicalNamingStrategy {
             String[] parts = text.split("_");
             StringBuilder pascalCase = new StringBuilder();
             for (String part : parts) {
-                pascalCase.append(part.substring(0, 1).toUpperCase())
+                pascalCase
+                        .append(part.substring(0, 1).toUpperCase())
                         .append(part.substring(1).toLowerCase());
             }
             return pascalCase.toString();

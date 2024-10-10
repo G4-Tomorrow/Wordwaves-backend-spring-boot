@@ -1,7 +1,9 @@
 package com.server.wordwaves.entity.vocabulary;
 
-import com.server.wordwaves.entity.common.BaseAuthor;
 import jakarta.persistence.*;
+
+import com.server.wordwaves.entity.common.BaseAuthor;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

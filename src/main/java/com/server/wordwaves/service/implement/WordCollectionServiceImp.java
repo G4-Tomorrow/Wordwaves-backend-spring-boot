@@ -1,7 +1,20 @@
 package com.server.wordwaves.service.implement;
 
+import java.util.List;
+import java.util.Optional;
+
+import com.server.wordwaves.repository.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
 import com.server.wordwaves.dto.request.vocabulary.WordCollectionCreationRequest;
-import com.server.wordwaves.dto.response.vocabulary.WordCollectionCreationResponse;
+import com.server.wordwaves.dto.response.common.PaginationInfo;
+import com.server.wordwaves.dto.response.vocabulary.WordCollectionResponse;
 import com.server.wordwaves.entity.vocabulary.WordCollection;
 import com.server.wordwaves.entity.vocabulary.WordCollectionCategory;
 import com.server.wordwaves.exception.AppException;
@@ -10,14 +23,12 @@ import com.server.wordwaves.mapper.WordCollectionMapper;
 import com.server.wordwaves.repository.WordCollectionCategoryRepository;
 import com.server.wordwaves.repository.WordCollectionRepository;
 import com.server.wordwaves.service.WordCollectionService;
+import com.server.wordwaves.utils.MyStringUtils;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -27,24 +38,25 @@ public class WordCollectionServiceImp implements WordCollectionService {
     WordCollectionRepository wordCollectionRepository;
     WordCollectionMapper wordCollectionMapper;
     WordCollectionCategoryRepository wordCollectionCategoryRepository;
+    UserRepository userRepository;
 
     @Override
-    public WordCollectionCreationResponse create(WordCollectionCreationRequest request) {
+    public WordCollectionResponse create(WordCollectionCreationRequest request) {
         String category = request.getCategory();
         WordCollection wordCollection = wordCollectionMapper.toWordCollection(request);
 
         // check xem category có null hay ko
         if (category != null && !category.isEmpty()) {
-            Optional<WordCollectionCategory> wordCollectionCategoryOptional = wordCollectionCategoryRepository.findByName(category);
+            Optional<WordCollectionCategory> wordCollectionCategoryOptional =
+                    wordCollectionCategoryRepository.findByName(category);
 
             if (wordCollectionCategoryOptional.isPresent()) {
                 // xử lí nếu category đã tồn tại
                 wordCollection.setWordCollectionCategory(wordCollectionCategoryOptional.get());
             } else {
                 // xử lí nếu category chưa tồn tại
-                WordCollectionCategory wordCollectionCategory = wordCollectionCategoryRepository.save(WordCollectionCategory.builder()
-                        .name(category)
-                        .build());
+                WordCollectionCategory wordCollectionCategory = wordCollectionCategoryRepository.save(
+                        WordCollectionCategory.builder().name(category).build());
                 wordCollection.setWordCollectionCategory(wordCollectionCategory);
             }
         }
@@ -57,4 +69,53 @@ public class WordCollectionServiceImp implements WordCollectionService {
         }
         return wordCollectionMapper.toWordCollectionResponse(createdWordCollection);
     }
+
+    @Override
+    public PaginationInfo<List<WordCollectionResponse>> getCollections(
+            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, String userId) {
+        pageNumber--;
+
+        Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
+                ? Sort.unsorted()
+                : sortDirection.equalsIgnoreCase("DESC")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+        Specification<WordCollection> spec = Specification.where(null);
+
+        // Nếu có searchQuery, thêm điều kiện tìm kiếm theo tên
+        if (MyStringUtils.isNotNullAndNotEmpty(searchQuery)) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + searchQuery.toLowerCase() + "%"));
+        }
+
+        // Kiểm tra userId và thêm điều kiện tương ứng
+        if (MyStringUtils.isNotNullAndNotEmpty(userId)) {
+            // Nếu có userId, tìm kiếm theo userId
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("createdById"), userId));
+        } else {
+            // Nếu không có userId, lấy tất cả userId có vai trò ADMIN
+            List<String> adminUserIds = userRepository.findAllUserIdsByRole("ADMIN");
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    root.get("createdById").in(adminUserIds));
+        }
+
+        Page<WordCollection> wordCollectionsPage = wordCollectionRepository.findAll(spec, pageable);
+
+        List<WordCollectionResponse> responses = wordCollectionsPage.getContent().stream()
+                .map(wordCollectionMapper::toWordCollectionResponse)
+                .toList();
+
+        return PaginationInfo.<List<WordCollectionResponse>>builder()
+                .pageNumber(++pageNumber)
+                .pageSize(pageSize)
+                .sortBy(sortBy)
+                .sortDirection(sortDirection)
+                .searchQuery(searchQuery)
+                .data(responses)
+                .build();
+    }
+
 }
