@@ -15,12 +15,16 @@ import com.server.wordwaves.dto.request.vocabulary.WordCollectionCreationRequest
 import com.server.wordwaves.dto.response.common.Pagination;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.common.QueryOptions;
+import com.server.wordwaves.dto.response.vocabulary.TopicResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordCollectionResponse;
+import com.server.wordwaves.entity.vocabulary.Topic;
 import com.server.wordwaves.entity.vocabulary.WordCollection;
 import com.server.wordwaves.entity.vocabulary.WordCollectionCategory;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
+import com.server.wordwaves.mapper.TopicMapper;
 import com.server.wordwaves.mapper.WordCollectionMapper;
+import com.server.wordwaves.repository.TopicRepository;
 import com.server.wordwaves.repository.UserRepository;
 import com.server.wordwaves.repository.WordCollectionCategoryRepository;
 import com.server.wordwaves.repository.WordCollectionRepository;
@@ -37,9 +41,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WordCollectionServiceImp implements WordCollectionService {
+    private final TopicMapper topicMapper;
     WordCollectionRepository wordCollectionRepository;
     WordCollectionMapper wordCollectionMapper;
     WordCollectionCategoryRepository wordCollectionCategoryRepository;
+    TopicRepository topicRepository;
     UserRepository userRepository;
 
     @Override
@@ -125,6 +131,47 @@ public class WordCollectionServiceImp implements WordCollectionService {
                         .searchQuery(searchQuery)
                         .build())
                 .data(responses)
+                .build();
+    }
+
+    @Override
+    public PaginationInfo<List<TopicResponse>> getTopics(
+            int pageNumber,
+            int pageSize,
+            String sortBy,
+            String sortDirection,
+            String searchQuery,
+            String collectionId) {
+        --pageNumber;
+        Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
+                ? Sort.unsorted()
+                : sortDirection.equalsIgnoreCase("DESC")
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+        Page<Topic> topicPage;
+        // Nếu có searchQuery thì tìm kiếm với phân trang, ngược lại thì tìm bình thường
+        if (MyStringUtils.isNotNullAndNotEmpty(searchQuery)) {
+            topicPage = wordCollectionRepository.findTopicsByIdAndNameContainingIgnoreCase(
+                    collectionId, searchQuery, pageable);
+        } else {
+            topicPage = wordCollectionRepository.findTopicsById(collectionId, pageable);
+        }
+
+        return PaginationInfo.<List<TopicResponse>>builder()
+                .pagination(Pagination.builder()
+                        .pageNumber(++pageNumber)
+                        .pageSize(pageSize)
+                        .totalPages(topicPage.getTotalPages())
+                        .totalElements(topicPage.getTotalElements())
+                        .build())
+                .queryOptions(QueryOptions.builder()
+                        .sortBy(sortBy)
+                        .sortDirection(sortDirection)
+                        .searchQuery(searchQuery)
+                        .build())
+                .data(topicPage.map(topicMapper::toTopicResponse).toList())
                 .build();
     }
 }

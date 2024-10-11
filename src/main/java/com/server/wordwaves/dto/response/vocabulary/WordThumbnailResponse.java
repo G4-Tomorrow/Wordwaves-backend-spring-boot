@@ -1,9 +1,9 @@
 package com.server.wordwaves.dto.response.vocabulary;
 
+import java.util.List;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Data
 @Builder

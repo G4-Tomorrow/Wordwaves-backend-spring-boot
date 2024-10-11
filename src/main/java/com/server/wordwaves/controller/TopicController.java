@@ -1,18 +1,22 @@
 package com.server.wordwaves.controller;
 
+import java.util.List;
+
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.*;
+
 import com.server.wordwaves.dto.request.vocabulary.TopicCreationRequest;
 import com.server.wordwaves.dto.response.common.ApiResponse;
+import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.vocabulary.TopicResponse;
+import com.server.wordwaves.dto.response.vocabulary.WordResponse;
 import com.server.wordwaves.service.TopicService;
-import jakarta.validation.Valid;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/topics")
@@ -27,6 +31,20 @@ public class TopicController {
         return ApiResponse.<TopicResponse>builder()
                 .message("Tạo chủ đề mới thành công")
                 .result(topicService.create(request))
+                .build();
+    }
+
+    @GetMapping("/{topicId}")
+    ApiResponse<PaginationInfo<List<WordResponse>>> getWords(
+            @RequestParam int pageNumber,
+            @RequestParam int pageSize,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
+            @RequestParam(required = false) String searchQuery,
+            @PathVariable("topicId") String topicId) {
+        return ApiResponse.<PaginationInfo<List<WordResponse>>>builder()
+                .message("Lấy các từ vựng theo chủ đề")
+                .result(topicService.getWords(pageNumber, pageSize, sortBy, sortDirection, searchQuery, topicId))
                 .build();
     }
 }
