@@ -2,12 +2,12 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
-import com.server.wordwaves.dto.request.user.ForgotPasswordRequest;
-import com.server.wordwaves.dto.request.user.ResetPasswordRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
 
+import com.server.wordwaves.dto.request.user.ForgotPasswordRequest;
+import com.server.wordwaves.dto.request.user.ResetPasswordRequest;
 import com.server.wordwaves.dto.request.user.UserCreationRequest;
 import com.server.wordwaves.dto.request.user.UserUpdateRequest;
 import com.server.wordwaves.dto.request.user.VerifyEmailRequest;
@@ -16,7 +16,6 @@ import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.dto.response.common.EmailResponse;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.user.UserResponse;
-
 import com.server.wordwaves.service.UserService;
 
 import lombok.AccessLevel;
@@ -69,11 +68,11 @@ public class UserController {
     ApiResponse<PaginationInfo<List<UserResponse>>> getUsers(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
-            @RequestParam(required = false, defaultValue = "createdAt") String sortBy,
+            @RequestParam(required = false) String sortBy,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
             @RequestParam(required = false) String searchQuery) {
         return ApiResponse.<PaginationInfo<List<UserResponse>>>builder()
-                .message("Lấy tất cả người dùng")
+                .message("Lấy nhiều người dùng")
                 .result(userService.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchQuery))
                 .build();
     }

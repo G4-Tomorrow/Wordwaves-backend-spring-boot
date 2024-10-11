@@ -1,6 +1,7 @@
 package com.server.wordwaves.dto.request.user;
 
 import jakarta.validation.constraints.NotBlank;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

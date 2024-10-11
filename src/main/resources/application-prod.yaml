@@ -9,6 +9,8 @@ spring:
 jwt:
   access-signer-key: ${ACCESS_SIGNER_KEY}
   refresh-signer-key: ${REFRESH_SIGNER_KEY}
+  access-token-duration-in-seconds: ${ACCESS_TOKEN_EXPIRATION}
+  refresh-token-duration-in-seconds: ${REFRESH_TOKEN_EXPIRATION}
 
 app:
   email-client:

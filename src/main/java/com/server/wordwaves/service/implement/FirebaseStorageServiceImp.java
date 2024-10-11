@@ -1,5 +1,12 @@
 package com.server.wordwaves.service.implement;
 
+import java.io.IOException;
+import java.util.Random;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.cloud.StorageClient;
@@ -8,16 +15,11 @@ import com.server.wordwaves.dto.response.file.FileUploadResponse;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.service.FirebaseStorageService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.Random;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -30,7 +32,7 @@ public class FirebaseStorageServiceImp implements FirebaseStorageService {
         Bucket bucket = StorageClient.getInstance().bucket();
 
         MultipartFile file = request.getFile();
-        if(file == null || file.isEmpty()) throw new AppException(ErrorCode.EMPTY_FILE);
+        if (file == null || file.isEmpty()) throw new AppException(ErrorCode.EMPTY_FILE);
 
         String filename = UUID.randomUUID().toString() + new Random().nextInt(1000);
 
@@ -41,9 +43,6 @@ public class FirebaseStorageServiceImp implements FirebaseStorageService {
             throw new AppException(ErrorCode.FILE_UPLOAD_FAIL);
         }
 
-
-        return FileUploadResponse.builder()
-                .fileName(blob.getName())
-                .build();
+        return FileUploadResponse.builder().fileName(blob.getName()).build();
     }
 }
