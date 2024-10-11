@@ -23,5 +23,4 @@ public class Word extends BaseAuthor {
     String name;
 
     String thumbnailUrl;
-    String yourMeaning;
 }

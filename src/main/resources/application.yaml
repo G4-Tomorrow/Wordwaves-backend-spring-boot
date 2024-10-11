@@ -44,5 +44,6 @@ app:
     url: https://api.dictionaryapi.dev/api/v2/entries/en
   pexels-client:
     url: https://api.pexels.com/v1/search
+    apikey: FQfOWjWjZ3hi9i1Y3KT1yngoYRYnwO7FoivYa9JmDU06u8a7OUOXkEU7
   firebase:
     bucket-name: wordwaves-40814.appspot.com

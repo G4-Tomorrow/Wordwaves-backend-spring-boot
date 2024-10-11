@@ -48,7 +48,14 @@ public enum ErrorCode {
     // VOCABULARY
     WORD_COLLECTION_NAME_IS_REQUIRED(6001, "Tên của bộ từ vựng không được để trống", HttpStatus.BAD_REQUEST),
     COLLECTION_EXISTED(6002, "Bộ từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
-    WORD_COLLECTION_CATEGORY_IS_REQUIRED(6003, "Phân loại bộ từ vựng không được để trống", HttpStatus.BAD_REQUEST);
+    WORD_COLLECTION_CATEGORY_IS_REQUIRED(6003, "Phân loại bộ từ vựng không được để trống", HttpStatus.BAD_REQUEST),
+    TOPIC_NAME_IS_REQUIRED(6004, "Tên chủ đề không được để trống", HttpStatus.BAD_REQUEST),
+    WORD_NAME_IS_REQUIRED(6005, "Tên của từ vựng không được để trống", HttpStatus.BAD_REQUEST),
+    TOPIC_NOT_EXISTED(6006, "Chủ đề không tồn tại", HttpStatus.BAD_REQUEST),
+    WORD_NOT_EXISTED(6007, "Từ vựng không tồn tại", HttpStatus.BAD_REQUEST),
+    INVALID_WORD(6008, "Từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
+    WORD_EXISTED(6009, "Từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
+    ;
 
     int code;
     String message;
