@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.server.wordwaves.utils.MyStringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +22,9 @@ import com.server.wordwaves.constant.PredefinedRole;
 import com.server.wordwaves.dto.request.user.*;
 import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
 import com.server.wordwaves.dto.response.common.EmailResponse;
+import com.server.wordwaves.dto.response.common.Pagination;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
+import com.server.wordwaves.dto.response.common.QueryOptions;
 import com.server.wordwaves.dto.response.user.UserResponse;
 import com.server.wordwaves.entity.user.Role;
 import com.server.wordwaves.entity.user.User;
@@ -132,24 +135,32 @@ public class UserServiceImp implements UserService {
     public PaginationInfo<List<UserResponse>> getUsers(
             int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
         pageNumber--;
-        Sort sort = sortDirection.equalsIgnoreCase("DESC")
+        Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
+                ? Sort.unsorted()
+                : sortDirection.equalsIgnoreCase("DESC")
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         Page<User> usersPage;
 
-        if (searchQuery != null && !searchQuery.isEmpty()) {
+        if (MyStringUtils.isNotNullAndNotEmpty(searchQuery)) {
             usersPage = userRepository.findByFullNameContainingOrEmailContaining(searchQuery, searchQuery, pageable);
         } else {
             usersPage = userRepository.findAll(pageable);
         }
 
         return PaginationInfo.<List<UserResponse>>builder()
-                .pageNumber(++pageNumber)
-                .pageSize(pageSize)
-                .sortBy(sortBy)
-                .sortDirection(sortDirection)
-                .searchQuery(searchQuery)
+                .pagination(Pagination.builder()
+                        .pageNumber(++pageNumber)
+                        .pageSize(pageSize)
+                        .totalPages(usersPage.getTotalPages())
+                        .totalElements(usersPage.getTotalElements())
+                        .build())
+                .queryOptions(QueryOptions.builder()
+                        .sortBy(sortBy)
+                        .sortDirection(sortDirection)
+                        .searchQuery(searchQuery)
+                        .build())
                 .data(usersPage.stream().map(userMapper::toUserResponse).toList())
                 .build();
     }

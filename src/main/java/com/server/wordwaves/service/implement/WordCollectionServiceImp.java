@@ -3,7 +3,6 @@ package com.server.wordwaves.service.implement;
 import java.util.List;
 import java.util.Optional;
 
-import com.server.wordwaves.repository.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,13 +12,16 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.server.wordwaves.dto.request.vocabulary.WordCollectionCreationRequest;
+import com.server.wordwaves.dto.response.common.Pagination;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
+import com.server.wordwaves.dto.response.common.QueryOptions;
 import com.server.wordwaves.dto.response.vocabulary.WordCollectionResponse;
 import com.server.wordwaves.entity.vocabulary.WordCollection;
 import com.server.wordwaves.entity.vocabulary.WordCollectionCategory;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.WordCollectionMapper;
+import com.server.wordwaves.repository.UserRepository;
 import com.server.wordwaves.repository.WordCollectionCategoryRepository;
 import com.server.wordwaves.repository.WordCollectionRepository;
 import com.server.wordwaves.service.WordCollectionService;
@@ -78,44 +80,51 @@ public class WordCollectionServiceImp implements WordCollectionService {
         Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
                 ? Sort.unsorted()
                 : sortDirection.equalsIgnoreCase("DESC")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
         Specification<WordCollection> spec = Specification.where(null);
 
-        // Nếu có searchQuery, thêm điều kiện tìm kiếm theo tên
+        // Nếu có searchQuery, thêm điều kiện tìm kiếm
         if (MyStringUtils.isNotNullAndNotEmpty(searchQuery)) {
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + searchQuery.toLowerCase() + "%"));
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("name")), "%" + searchQuery.toLowerCase() + "%"));
         }
 
-        // Kiểm tra userId và thêm điều kiện tương ứng
+        // Kiểm tra userId
         if (MyStringUtils.isNotNullAndNotEmpty(userId)) {
             // Nếu có userId, tìm kiếm theo userId
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("createdById"), userId));
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("createdById"), userId));
         } else {
             // Nếu không có userId, lấy tất cả userId có vai trò ADMIN
             List<String> adminUserIds = userRepository.findAllUserIdsByRole("ADMIN");
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    root.get("createdById").in(adminUserIds));
+            // thêm điều kiện để trả về các bản ghi được tạo bởi userid
+            spec = spec.and(
+                    (root, query, criteriaBuilder) -> root.get("createdById").in(adminUserIds));
         }
 
+        // gọi database
         Page<WordCollection> wordCollectionsPage = wordCollectionRepository.findAll(spec, pageable);
+        log.info("collection: {}", wordCollectionsPage);
 
         List<WordCollectionResponse> responses = wordCollectionsPage.getContent().stream()
                 .map(wordCollectionMapper::toWordCollectionResponse)
                 .toList();
 
         return PaginationInfo.<List<WordCollectionResponse>>builder()
-                .pageNumber(++pageNumber)
-                .pageSize(pageSize)
-                .sortBy(sortBy)
-                .sortDirection(sortDirection)
-                .searchQuery(searchQuery)
+                .pagination(Pagination.builder()
+                        .pageNumber(++pageNumber)
+                        .pageSize(pageSize)
+                        .totalPages(wordCollectionsPage.getTotalPages())
+                        .totalElements(wordCollectionsPage.getTotalElements())
+                        .build())
+                .queryOptions(QueryOptions.builder()
+                        .sortBy(sortBy)
+                        .sortDirection(sortDirection)
+                        .searchQuery(searchQuery)
+                        .build())
                 .data(responses)
                 .build();
     }
-
 }

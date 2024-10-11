@@ -8,9 +8,9 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PaginationInfo<T> {
-    Pagination pagination;
-    QueryOptions queryOptions;
-
-    T data;
+public class Pagination {
+    int pageNumber;
+    int pageSize;
+    int totalPages;
+    long totalElements;
 }

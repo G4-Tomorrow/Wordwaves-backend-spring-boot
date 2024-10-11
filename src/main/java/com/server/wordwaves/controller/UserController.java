@@ -68,7 +68,7 @@ public class UserController {
     ApiResponse<PaginationInfo<List<UserResponse>>> getUsers(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
-            @RequestParam(required = false, defaultValue = "createdAt") String sortBy,
+            @RequestParam(required = false) String sortBy,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
             @RequestParam(required = false) String searchQuery) {
         return ApiResponse.<PaginationInfo<List<UserResponse>>>builder()
