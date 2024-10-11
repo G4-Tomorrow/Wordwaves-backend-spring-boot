@@ -26,6 +26,7 @@ public class BaseRedisServiceImp implements BaseRedisService {
         this.hashOperations = redisTemplate.opsForHash();
     }
 
+
     @Override
     public void set(String key, String value) {
         redisTemplate.opsForValue().set(key, value);
