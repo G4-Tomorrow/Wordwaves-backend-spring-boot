@@ -2,6 +2,7 @@ package com.server.wordwaves.controller;
 
 import java.text.ParseException;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,7 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    ResponseEntity<ApiResponse<AuthenticationResponse>> login(@RequestBody AuthenticationRequest request) {
+    ResponseEntity<ApiResponse<AuthenticationResponse>> login(@RequestBody @Valid AuthenticationRequest request) {
         ResponseEntity<AuthenticationResponse> responseEntity = authenticationService.authenticate(request);
         ApiResponse<AuthenticationResponse> apiResponse = ApiResponse.<AuthenticationResponse>builder()
                 .result(responseEntity.getBody())
@@ -41,7 +42,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/introspect")
-    ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) {
+    ApiResponse<IntrospectResponse> introspect(@RequestBody @Valid IntrospectRequest request) {
         return ApiResponse.<IntrospectResponse>builder()
                 .result(authenticationService.introspect(request))
                 .build();

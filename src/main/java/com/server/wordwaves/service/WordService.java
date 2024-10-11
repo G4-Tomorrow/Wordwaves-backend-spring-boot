@@ -1,3 +1,10 @@
 package com.server.wordwaves.service;
 
-public interface WordService {}
+import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
+import com.server.wordwaves.dto.response.vocabulary.WordResponse;
+
+import java.io.IOException;
+
+public interface WordService {
+    WordResponse create(WordCreationRequest request);
+}

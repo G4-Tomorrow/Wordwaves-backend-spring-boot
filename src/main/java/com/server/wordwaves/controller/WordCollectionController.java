@@ -2,6 +2,7 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import com.server.wordwaves.dto.request.vocabulary.WordCollectionCreationRequest;
@@ -24,7 +25,7 @@ public class WordCollectionController {
     WordCollectionService wordCollectionService;
 
     @PostMapping
-    ApiResponse<WordCollectionResponse> create(@RequestBody WordCollectionCreationRequest request) {
+    ApiResponse<WordCollectionResponse> create(@RequestBody @Valid WordCollectionCreationRequest request) {
         return ApiResponse.<WordCollectionResponse>builder()
                 .message("Tạo bộ từ vựng thành công")
                 .result(wordCollectionService.create(request))

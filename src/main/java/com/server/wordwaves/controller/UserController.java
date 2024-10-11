@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @PostMapping("/forgot-password")
-    public ApiResponse<EmailResponse> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ApiResponse<EmailResponse> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
         return ApiResponse.<EmailResponse>builder()
                 .result(userService.forgotPassword(request))
                 .message("Yêu cầu đặt lại mật khẩu thành công.")
