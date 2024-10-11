@@ -1,15 +1,11 @@
 package com.server.wordwaves.service.implement;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.server.wordwaves.dto.request.user.*;
-import com.server.wordwaves.dto.response.user.UserResponse;
-import com.server.wordwaves.service.FirebaseStorageService;
-import com.server.wordwaves.service.TokenService;
+import com.server.wordwaves.utils.MyStringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,26 +19,29 @@ import org.springframework.stereotype.Service;
 import com.server.wordwaves.config.CustomJwtDecoder;
 import com.server.wordwaves.config.JwtTokenProvider;
 import com.server.wordwaves.constant.PredefinedRole;
-
+import com.server.wordwaves.dto.request.user.*;
 import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
 import com.server.wordwaves.dto.response.common.EmailResponse;
+import com.server.wordwaves.dto.response.common.Pagination;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
-
-import com.server.wordwaves.entity.Role;
-import com.server.wordwaves.entity.User;
+import com.server.wordwaves.dto.response.common.QueryOptions;
+import com.server.wordwaves.dto.response.user.UserResponse;
+import com.server.wordwaves.entity.user.Role;
+import com.server.wordwaves.entity.user.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.UserMapper;
 import com.server.wordwaves.repository.RoleRepository;
 import com.server.wordwaves.repository.UserRepository;
 import com.server.wordwaves.service.EmailService;
+import com.server.wordwaves.service.FirebaseStorageService;
+import com.server.wordwaves.service.TokenService;
 import com.server.wordwaves.service.UserService;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -67,7 +66,8 @@ public class UserServiceImp implements UserService {
 
     @Override
     public void resetPassword(String token, ResetPasswordRequest request) {
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) throw new AppException(ErrorCode.PASSWORD_MISMATCH);
+        if (!request.getNewPassword().equals(request.getConfirmPassword()))
+            throw new AppException(ErrorCode.PASSWORD_MISMATCH);
         User user = validateTokenAndGetUser(token);
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
@@ -75,9 +75,7 @@ public class UserServiceImp implements UserService {
 
     @Override
     public User getUserByEmail(String email) {
-        return userRepository
-                .findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
     }
 
     @Override
@@ -137,24 +135,32 @@ public class UserServiceImp implements UserService {
     public PaginationInfo<List<UserResponse>> getUsers(
             int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
         pageNumber--;
-        Sort sort = sortDirection.equalsIgnoreCase("DESC")
+        Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
+                ? Sort.unsorted()
+                : sortDirection.equalsIgnoreCase("DESC")
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         Page<User> usersPage;
 
-        if (searchQuery != null && !searchQuery.isEmpty()) {
+        if (MyStringUtils.isNotNullAndNotEmpty(searchQuery)) {
             usersPage = userRepository.findByFullNameContainingOrEmailContaining(searchQuery, searchQuery, pageable);
         } else {
             usersPage = userRepository.findAll(pageable);
         }
 
         return PaginationInfo.<List<UserResponse>>builder()
-                .pageNumber(++pageNumber)
-                .pageSize(pageSize)
-                .sortBy(sortBy)
-                .sortDirection(sortDirection)
-                .searchQuery(searchQuery)
+                .pagination(Pagination.builder()
+                        .pageNumber(++pageNumber)
+                        .pageSize(pageSize)
+                        .totalPages(usersPage.getTotalPages())
+                        .totalElements(usersPage.getTotalElements())
+                        .build())
+                .queryOptions(QueryOptions.builder()
+                        .sortBy(sortBy)
+                        .sortDirection(sortDirection)
+                        .searchQuery(searchQuery)
+                        .build())
                 .data(usersPage.stream().map(userMapper::toUserResponse).toList())
                 .build();
     }
@@ -190,7 +196,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserResponse updateUserById(String userId, UserUpdateRequest userUpdateRequest)  {
+    public UserResponse updateUserById(String userId, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         String fullName = userUpdateRequest.getFullName();
@@ -199,7 +205,7 @@ public class UserServiceImp implements UserService {
         }
 
         String avatarName = userUpdateRequest.getAvatarName();
-        if(avatarName != null && !avatarName.isEmpty()) {
+        if (avatarName != null && !avatarName.isEmpty()) {
             user.setAvatarName(avatarName);
         }
 
@@ -212,5 +218,4 @@ public class UserServiceImp implements UserService {
     public void deleteUserById(String userId) {
         userRepository.deleteById(userId);
     }
-
 }

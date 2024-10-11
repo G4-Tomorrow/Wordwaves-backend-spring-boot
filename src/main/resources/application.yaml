@@ -16,11 +16,13 @@ spring:
     name: wordwaves
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://ugy3xdlg4yzsgnbc:AJMQxWffY78sikU7JJjx@bv50k19rodxkhj0lbdvb-mysql.services.clever-cloud.com:3306/bv50k19rodxkhj0lbdvb
-    username: ugy3xdlg4yzsgnbc
-    password: AJMQxWffY78sikU7JJjx
+    url: jdbc:mysql://avnadmin:AVNS_NaOkIhMfoLS45jVy0F4@wordwaves-wordwaves.f.aivencloud.com:21917/defaultdb?ssl-mode=REQUIRED
+    username: avnadmin
+    password: AVNS_NaOkIhMfoLS45jVy0F4
   jpa:
     hibernate:
+      naming:
+        physical-strategy: com.server.wordwaves.config.PascalCaseNamingStrategy
       ddl-auto: update
     show-sql: true
 
@@ -28,7 +30,7 @@ spring:
 jwt:
   access-signer-key: "6FvxQMx9pcbEFqKFFP4XH748Kg//XkcCtf68+/P7ZRvIXnba3dG7POT/cUCAWV5Q"
   refresh-signer-key: "CAqDB1w3mJFJEb3ifzhGVJou64rhlft96l8FSS+i+0XGHSKb+OMxXbzOeHoLxaFL"
-  access-token-duration-in-seconds: 3600 # 1h  (in seconds)
+  access-token-duration-in-seconds: 7200 # 2h (in seconds)
   refresh-token-duration-in-seconds: 604800 # 7 days (in seconds)
 
 app:
@@ -38,6 +40,9 @@ app:
     sender:
       email: kaitoukido0204@gmail.com
       name: WordWaves Support
-
-firebase:
-  bucket-name: petgarden-bda48.appspot.com
+  dictionary-client:
+    url: https://api.dictionaryapi.dev/api/v2/entries/en
+  pexels-client:
+    url: https://api.pexels.com/v1/search
+  firebase:
+    bucket-name: wordwaves-40814.appspot.com

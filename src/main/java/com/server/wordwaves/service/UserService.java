@@ -1,18 +1,16 @@
 package com.server.wordwaves.service;
 
-import java.io.IOException;
 import java.util.List;
 
-import com.server.wordwaves.dto.request.user.*;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import com.server.wordwaves.dto.request.user.*;
 import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
 import com.server.wordwaves.dto.response.common.EmailResponse;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.user.UserResponse;
-
-import com.server.wordwaves.entity.User;
+import com.server.wordwaves.entity.user.User;
 
 public interface UserService {
     EmailResponse forgotPassword(ForgotPasswordRequest request);
@@ -41,5 +39,4 @@ public interface UserService {
     void deleteUserById(String userId);
 
     User getUserByIdAndRefreshToken(String userId, String refreshToken);
-
 }

@@ -18,7 +18,7 @@ import com.server.wordwaves.dto.model.mail.RecipientModel;
 import com.server.wordwaves.dto.model.mail.SenderModel;
 import com.server.wordwaves.dto.request.common.EmailRequest;
 import com.server.wordwaves.dto.response.common.EmailResponse;
-import com.server.wordwaves.entity.User;
+import com.server.wordwaves.entity.user.User;
 import com.server.wordwaves.repository.httpclient.EmailClient;
 import com.server.wordwaves.service.EmailService;
 
@@ -54,7 +54,6 @@ public class EmailServiceImp implements EmailService {
 
     @NonFinal
     protected long accessTokenExpiration = 120;
-
 
     private void sendEmail(User user, String token, String subject, String templateName) {
         Context context = new Context();

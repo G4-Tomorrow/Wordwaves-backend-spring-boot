@@ -1,8 +1,10 @@
-package com.server.wordwaves.entity;
+package com.server.wordwaves.entity.user;
 
 import java.util.Set;
 
 import jakarta.persistence.*;
+
+import com.server.wordwaves.entity.common.BaseEntity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -19,7 +21,7 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    @Column(name = "email", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
+    @Column(unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     String email;
 
     String password;
@@ -27,9 +29,12 @@ public class User extends BaseEntity {
     String avatarName;
 
     @ManyToMany
-    @JoinTable(name = "user_roles")
+    @JoinTable(
+            name = "UserToRole",
+            joinColumns = @JoinColumn(name = "UserId", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"))
     Set<Role> roles;
 
-    @Column(name = "refresh_token", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     String refreshToken;
 }

@@ -3,7 +3,7 @@ package com.server.wordwaves.dto.response.user;
 import java.time.Instant;
 import java.util.Set;
 
-import com.server.wordwaves.entity.Role;
+import com.server.wordwaves.entity.user.Role;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

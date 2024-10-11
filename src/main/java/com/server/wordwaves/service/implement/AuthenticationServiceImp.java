@@ -5,10 +5,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 
-import com.server.wordwaves.dto.request.auth.LogoutRequest;
-import com.server.wordwaves.dto.request.auth.RefreshTokenRequest;
-import com.server.wordwaves.dto.response.user.UserResponse;
-import com.server.wordwaves.service.TokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -21,18 +17,20 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import com.server.wordwaves.config.CustomJwtDecoder;
 import com.server.wordwaves.config.JwtTokenProvider;
-
 import com.server.wordwaves.dto.request.auth.AuthenticationRequest;
 import com.server.wordwaves.dto.request.auth.IntrospectRequest;
+import com.server.wordwaves.dto.request.auth.LogoutRequest;
+import com.server.wordwaves.dto.request.auth.RefreshTokenRequest;
 import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
 import com.server.wordwaves.dto.response.auth.IntrospectResponse;
-
-import com.server.wordwaves.entity.User;
+import com.server.wordwaves.dto.response.user.UserResponse;
+import com.server.wordwaves.entity.user.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.UserMapper;
 import com.server.wordwaves.service.AuthenticationService;
 import com.server.wordwaves.service.BaseRedisService;
+import com.server.wordwaves.service.TokenService;
 import com.server.wordwaves.service.UserService;
 
 import lombok.AccessLevel;
