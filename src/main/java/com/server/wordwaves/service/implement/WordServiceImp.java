@@ -4,8 +4,16 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import com.server.wordwaves.dto.response.common.Pagination;
+import com.server.wordwaves.dto.response.common.PaginationInfo;
+import com.server.wordwaves.dto.response.common.QueryOptions;
+import com.server.wordwaves.utils.MyStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -103,5 +111,53 @@ public class WordServiceImp implements WordService {
             wordResponse = wordMapper.toWordResponse(createdWord);
         }
         return wordResponse;
+    }
+
+    @Override
+    public PaginationInfo<List<WordResponse>> getWords(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
+        --pageNumber;
+        Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
+                ? Sort.unsorted()
+                : sortDirection.equalsIgnoreCase("DESC")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+        Page<Word> wordPage = MyStringUtils.isNullOrEmpty(searchQuery)
+                ? wordRepository.findAll(pageable)
+                : wordRepository.findByNameContainingIgnoreCase(searchQuery, pageable);
+
+        List<WordResponse> wordResponses = wordPage.map(word -> {
+            try {
+                List<WordResponse> tmp = dictionaryClient.retrieveEntries(word.getName());
+                WordResponse wordResponse = tmp.getFirst();
+                wordResponse.setId(word.getId());
+                wordResponse.setName(word.getName());
+                wordResponse.setThumbnailUrl(word.getThumbnailUrl());
+                wordResponse.setCreatedAt(word.getCreatedAt());
+                wordResponse.setUpdatedAt(word.getUpdatedAt());
+                wordResponse.setCreatedById(word.getCreatedById());
+                wordResponse.setVietnamese(word.getVietnamese());
+                return wordResponse;
+            } catch (FeignException e) {
+                return wordMapper.toWordResponse(word);
+            }
+        }).toList();
+
+        return PaginationInfo.<List<WordResponse>>builder()
+                .pagination(Pagination.builder()
+                        .pageNumber(++pageNumber)
+                        .pageSize(pageSize)
+                        .totalPages(wordPage.getTotalPages())
+                        .totalElements(wordPage.getTotalElements())
+                        .build())
+                .queryOptions(QueryOptions.builder()
+                        .sortBy(sortBy)
+                        .sortDirection(sortDirection)
+                        .searchQuery(searchQuery)
+                        .build())
+                .data(wordResponses)
+                .build();
     }
 }
