@@ -9,3 +9,17 @@ docker run --name WordWaves -d -p 8080:8080 -e DATABASE_URL="avnadmin:AVNS_NaOkI
 ```sh
 https://backend-production-c2cb.up.railway.app/wordwaves/<path>
 ```
+## Thông tin Database
+- Host:
+```plaintext
+wordwaves-wordwaves.f.aivencloud.com
+```
+- User:
+```plaintext
+avnadmin
+```
+- Password:
+```plaintext
+AVNS_NaOkIhMfoLS45jVy0F4
+```
+
