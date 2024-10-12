@@ -3,7 +3,9 @@ package com.server.wordwaves.controller;
 import java.text.ParseException;
 
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import com.nimbusds.jose.JOSEException;
@@ -28,6 +30,19 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/auth")
 public class AuthenticationController {
     AuthenticationService authenticationService;
+
+    @GetMapping("/oauth2/login-success")
+    ResponseEntity<ApiResponse<AuthenticationResponse>> oauth2Login(
+            OAuth2AuthenticationToken oauth2AuthenticationToken) {
+        ResponseEntity<AuthenticationResponse> responseEntity =
+                authenticationService.oauth2Authenticate(oauth2AuthenticationToken);
+        ApiResponse<AuthenticationResponse> apiResponse = ApiResponse.<AuthenticationResponse>builder()
+                .result(responseEntity.getBody())
+                .build();
+        return ResponseEntity.status(responseEntity.getStatusCode())
+                .headers(responseEntity.getHeaders())
+                .body(apiResponse);
+    }
 
     @PostMapping("/login")
     ResponseEntity<ApiResponse<AuthenticationResponse>> login(@RequestBody @Valid AuthenticationRequest request) {

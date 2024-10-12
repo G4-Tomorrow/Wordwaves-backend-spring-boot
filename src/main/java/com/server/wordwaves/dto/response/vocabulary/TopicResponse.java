@@ -1,6 +1,7 @@
 package com.server.wordwaves.dto.response.vocabulary;
 
 import com.server.wordwaves.dto.response.common.BaseAuthorResponse;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;

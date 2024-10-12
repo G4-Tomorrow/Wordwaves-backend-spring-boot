@@ -39,4 +39,8 @@ public interface UserService {
     void deleteUserById(String userId);
 
     User getUserByIdAndRefreshToken(String userId, String refreshToken);
+
+    boolean existsUserByEmail(String email);
+
+    void createOAuth2User(User user);
 }

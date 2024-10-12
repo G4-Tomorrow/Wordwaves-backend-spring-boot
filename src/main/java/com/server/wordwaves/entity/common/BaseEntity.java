@@ -9,13 +9,15 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
-@MappedSuperclass
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class BaseEntity {
-
     @CreationTimestamp
     @Column(updatable = false)
     Instant createdAt;

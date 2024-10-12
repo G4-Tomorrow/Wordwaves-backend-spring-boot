@@ -55,7 +55,13 @@ public enum ErrorCode {
     WORD_NOT_EXISTED(6007, "Từ vựng không tồn tại", HttpStatus.BAD_REQUEST),
     INVALID_WORD(6008, "Từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
     WORD_EXISTED(6009, "Từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
-    ;
+
+    // OAUTH2 ERROR CODE
+    OAUTH2_USER_EXISTED_WITH_DIFFERENT_PROVIDER(
+            7001, "Tài khoản đã được liên kết với nhà cung cấp OAuth2 khác trước đó", HttpStatus.BAD_REQUEST),
+    USER_EXISTED_WITH_BASIC_ACCOUNT(
+            7002, "Tài khoản đã tồn tại trên hệ thống với email/password", HttpStatus.BAD_REQUEST),
+    USER_EXISTED_WITH_OAUTH2(7003, "Tài khoản đã tồn tại với nhà cung cấp OAuth2", HttpStatus.BAD_REQUEST);
 
     int code;
     String message;

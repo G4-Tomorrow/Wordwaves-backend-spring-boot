@@ -1,10 +1,10 @@
 package com.server.wordwaves.dto.response.common;
 
+import java.time.Instant;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-
-import java.time.Instant;
 
 @Getter
 @Setter

@@ -5,8 +5,12 @@ server:
       charset: UTF-8
   port: 8080
 
-
 spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML5
+    cache: false
   servlet:
     multipart:
       enabled: true
@@ -25,7 +29,16 @@ spring:
         physical-strategy: com.server.wordwaves.config.PascalCaseNamingStrategy
       ddl-auto: update
     show-sql: true
-
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: "233350138347-bmdnbcmrurg2vsbtfv1m1m1ug5ls7tnp.apps.googleusercontent.com"
+            client-secret: "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"
+          facebook:
+            client-id: "1462073664414959"
+            client-secret: "e3bab52757bac528b4cb35977c57acbd"
 
 jwt:
   access-signer-key: "6FvxQMx9pcbEFqKFFP4XH748Kg//XkcCtf68+/P7ZRvIXnba3dG7POT/cUCAWV5Q"

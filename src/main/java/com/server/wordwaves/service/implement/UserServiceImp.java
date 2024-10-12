@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.server.wordwaves.utils.MyStringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,9 +33,9 @@ import com.server.wordwaves.mapper.UserMapper;
 import com.server.wordwaves.repository.RoleRepository;
 import com.server.wordwaves.repository.UserRepository;
 import com.server.wordwaves.service.EmailService;
-import com.server.wordwaves.service.FirebaseStorageService;
 import com.server.wordwaves.service.TokenService;
 import com.server.wordwaves.service.UserService;
+import com.server.wordwaves.utils.MyStringUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +55,6 @@ public class UserServiceImp implements UserService {
     UserMapper userMapper;
     JwtTokenProvider jwtTokenProvider;
     TokenService tokenService;
-    FirebaseStorageService firebaseStorageService;
 
     @Override
     public EmailResponse forgotPassword(ForgotPasswordRequest request) {
@@ -91,15 +89,16 @@ public class UserServiceImp implements UserService {
         String token = request.getToken();
 
         Jwt parsedToken = jwtDecoder.decode(token);
-        User user = User.builder()
-                .email(parsedToken.getSubject())
-                .password(parsedToken.getClaim("ps"))
-                .build();
+        User user = userRepository
+                .findByEmail(parsedToken.getSubject())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setPassword(parsedToken.getClaim("ps"));
+        user.setProvider("basic");
 
         Set<Role> roles = new HashSet<>();
         roleRepository.findById(PredefinedRole.USER_ROLE.getName()).ifPresent(roles::add);
-
         user.setRoles(roles);
+
         try {
             userRepository.save(user);
         } catch (DataIntegrityViolationException exception) {
@@ -138,8 +137,8 @@ public class UserServiceImp implements UserService {
         Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
                 ? Sort.unsorted()
                 : sortDirection.equalsIgnoreCase("DESC")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         Page<User> usersPage;
 
@@ -217,5 +216,16 @@ public class UserServiceImp implements UserService {
     @Override
     public void deleteUserById(String userId) {
         userRepository.deleteById(userId);
+    }
+
+    @Override
+    public boolean existsUserByEmail(String email) {
+        return this.userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public void createOAuth2User(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) throw new AppException(ErrorCode.EMAIL_EXISTED);
+        userRepository.save(user);
     }
 }

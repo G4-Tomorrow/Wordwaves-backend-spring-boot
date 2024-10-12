@@ -3,13 +3,16 @@ package com.server.wordwaves.service.implement;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import com.server.wordwaves.config.CustomJwtDecoder;
 import com.server.wordwaves.config.JwtTokenProvider;
+import com.server.wordwaves.constant.PredefinedRole;
 import com.server.wordwaves.dto.request.auth.AuthenticationRequest;
 import com.server.wordwaves.dto.request.auth.IntrospectRequest;
 import com.server.wordwaves.dto.request.auth.LogoutRequest;
@@ -24,10 +28,12 @@ import com.server.wordwaves.dto.request.auth.RefreshTokenRequest;
 import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
 import com.server.wordwaves.dto.response.auth.IntrospectResponse;
 import com.server.wordwaves.dto.response.user.UserResponse;
+import com.server.wordwaves.entity.user.Role;
 import com.server.wordwaves.entity.user.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.UserMapper;
+import com.server.wordwaves.repository.RoleRepository;
 import com.server.wordwaves.service.AuthenticationService;
 import com.server.wordwaves.service.BaseRedisService;
 import com.server.wordwaves.service.TokenService;
@@ -51,6 +57,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
     UserMapper userMapper;
     BaseRedisService baseRedisService;
     TokenService tokenService;
+    RoleRepository roleRepository;
 
     @NonFinal
     @Value("${jwt.access-signer-key}")
@@ -64,10 +71,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
     @Value("${jwt.refresh-token-duration-in-seconds}")
     protected long REFRESH_TOKEN_EXPIRATION;
 
-    private ResponseEntity<AuthenticationResponse> createAuthResponse(User currentUser) {
-        if (Objects.isNull(currentUser)) {
-            throw new AppException(ErrorCode.USER_NOT_EXISTED);
-        }
+    public ResponseEntity<AuthenticationResponse> createAuthResponse(User currentUser) {
+        if (Objects.isNull(currentUser)) throw new AppException(ErrorCode.USER_NOT_EXISTED);
 
         // Add information about current user login to response
         AuthenticationResponse authResponse = new AuthenticationResponse();
@@ -92,6 +97,48 @@ public class AuthenticationServiceImp implements AuthenticationService {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, resCookies.toString())
                 .body(authResponse);
+    }
+
+    @Override
+    public ResponseEntity<AuthenticationResponse> oauth2Authenticate(OAuth2AuthenticationToken oauth2AuthenticationToken) {
+        String email = oauth2AuthenticationToken.getPrincipal().getAttribute("email");
+        String fullName = oauth2AuthenticationToken.getPrincipal().getAttribute("name");
+        String avatar = oauth2AuthenticationToken.getPrincipal().getAttribute("picture");
+        String provider = oauth2AuthenticationToken.getAuthorizedClientRegistrationId();
+        String providerUserId = oauth2AuthenticationToken.getName();
+
+        if (userService.existsUserByEmail(email)) {
+            User existingUser = userService.getUserByEmail(email);
+
+            // If user have basic account, no have OAuth2 account 1 (register OAuth2 account 2 same email basic account)
+            if (existingUser.getProvider() == null && existingUser.getPassword() != null){
+                throw new AppException(ErrorCode.USER_EXISTED_WITH_BASIC_ACCOUNT);
+            }
+
+            // If user have basic account and have OAuth2 account 1 (register OAuth2 account 2 same email OAuth2 account 1 before)
+            if (existingUser.getProvider() != null && !existingUser.getProvider().equals(provider)) {
+                throw new AppException(ErrorCode.OAUTH2_USER_EXISTED_WITH_DIFFERENT_PROVIDER);
+            }
+
+            // If user have basic account and have OAuth2 account 1 (login with OAuth2 account 1, don't register)
+            return createAuthResponse(existingUser);
+
+        } else {
+            User newUser = User.builder()
+                    .email(email).fullName(fullName)
+                    .avatarName(avatar).provider(provider)
+                    .password(null).providerUserId(providerUserId)
+                    .build();
+
+            Set<Role> roles = new HashSet<>();
+            roleRepository.findById(PredefinedRole.USER_ROLE.getName()).ifPresent(roles::add);
+            newUser.setRoles(roles);
+
+            userService.createOAuth2User(newUser);
+        }
+
+        User currentUser = userService.getUserByEmail(email);
+        return createAuthResponse(currentUser);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.server.wordwaves.controller;
 import java.util.List;
 
 import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
 
 import com.server.wordwaves.dto.request.vocabulary.WordCollectionCreationRequest;
