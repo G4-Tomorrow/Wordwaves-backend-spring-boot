@@ -2,8 +2,10 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
+import com.server.wordwaves.dto.request.vocabulary.TopicAddWordsRequest;
 import jakarta.validation.Valid;
 
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.bind.annotation.*;
 
 import com.server.wordwaves.dto.request.vocabulary.TopicCreationRequest;
@@ -34,7 +36,7 @@ public class TopicController {
                 .build();
     }
 
-    @GetMapping("/{topicId}")
+    @GetMapping("/get-word/{topicId}")
     ApiResponse<PaginationInfo<List<WordResponse>>> getWords(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
@@ -46,5 +48,14 @@ public class TopicController {
                 .message("Lấy các từ vựng theo chủ đề")
                 .result(topicService.getWords(pageNumber, pageSize, sortBy, sortDirection, searchQuery, topicId))
                 .build();
+    }
+
+    @PutMapping("/add/{topicId}")
+    ApiResponse<Void> addWords(@RequestBody TopicAddWordsRequest request, @PathVariable @NotBlank(message = "LACK_OF_PARAMETER") String topicId) {
+        int size = topicService.addWords(topicId, request);
+        return ApiResponse.<Void>builder()
+                .message("Thêm " + size + " từ vào chủ đề thành công")
+                .build();
+
     }
 }
