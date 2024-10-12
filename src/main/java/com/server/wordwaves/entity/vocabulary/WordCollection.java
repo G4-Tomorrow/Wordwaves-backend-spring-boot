@@ -32,7 +32,7 @@ public class WordCollection extends BaseAuthor {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "CollectionToTopic",
+            name = "WordCollectionToTopic",
             joinColumns = @JoinColumn(name = "WordCollectionId", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "TopicId", referencedColumnName = "id"))
     Set<Topic> topics;

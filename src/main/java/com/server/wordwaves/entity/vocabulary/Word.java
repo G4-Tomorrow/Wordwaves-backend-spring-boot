@@ -22,5 +22,7 @@ public class Word extends BaseAuthor {
     @Column(unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     String name;
 
+    String vietnamese;
+
     String thumbnailUrl;
 }

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.server.wordwaves.utils.MyStringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +36,7 @@ import com.server.wordwaves.service.EmailService;
 import com.server.wordwaves.service.FirebaseStorageService;
 import com.server.wordwaves.service.TokenService;
 import com.server.wordwaves.service.UserService;
+import com.server.wordwaves.utils.MyStringUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -138,8 +138,8 @@ public class UserServiceImp implements UserService {
         Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
                 ? Sort.unsorted()
                 : sortDirection.equalsIgnoreCase("DESC")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         Page<User> usersPage;
 

@@ -47,14 +47,18 @@ public enum ErrorCode {
 
     // VOCABULARY
     WORD_COLLECTION_NAME_IS_REQUIRED(6001, "Tên của bộ từ vựng không được để trống", HttpStatus.BAD_REQUEST),
-    COLLECTION_EXISTED(6002, "Bộ từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
-    WORD_COLLECTION_CATEGORY_IS_REQUIRED(6003, "Phân loại bộ từ vựng không được để trống", HttpStatus.BAD_REQUEST),
-    TOPIC_NAME_IS_REQUIRED(6004, "Tên chủ đề không được để trống", HttpStatus.BAD_REQUEST),
-    WORD_NAME_IS_REQUIRED(6005, "Tên của từ vựng không được để trống", HttpStatus.BAD_REQUEST),
-    TOPIC_NOT_EXISTED(6006, "Chủ đề không tồn tại", HttpStatus.BAD_REQUEST),
-    WORD_NOT_EXISTED(6007, "Từ vựng không tồn tại", HttpStatus.BAD_REQUEST),
-    INVALID_WORD(6008, "Từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
-    WORD_EXISTED(6009, "Từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
+    WORD_COLLECTION_CATEGORY_IS_REQUIRED(6002, "Phân loại bộ từ vựng không được để trống", HttpStatus.BAD_REQUEST),
+    WORD_NAME_IS_REQUIRED(6003, "Tên của từ vựng không được để trống", HttpStatus.BAD_REQUEST),
+    COLLECTION_EXISTED(6004, "Bộ từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
+    WORD_COLLECTION_NOT_EXISTED(6005, "Bộ từ vựng không tồn tại", HttpStatus.BAD_REQUEST),
+
+    TOPIC_NAME_IS_REQUIRED(6101, "Tên chủ đề không được để trống", HttpStatus.BAD_REQUEST),
+    TOPIC_NOT_EXISTED(6102, "Chủ đề không tồn tại", HttpStatus.BAD_REQUEST),
+    TOPIC_MUST_BELONG_TO_WORD_COLLECTION(6103, "Chủ đề phải thuộc về ít nhất 1 topic", HttpStatus.BAD_REQUEST),
+
+    WORD_EXISTED(6201, "Từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
+    WORD_NOT_EXISTED(6202, "Từ vựng không tồn tại", HttpStatus.BAD_REQUEST),
+    INVALID_WORD(6203, "Từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
     ;
 
     int code;

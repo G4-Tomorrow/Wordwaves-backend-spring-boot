@@ -1,5 +1,13 @@
 package com.server.wordwaves.service.implement;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
 import com.server.wordwaves.dto.response.vocabulary.WordResponse;
@@ -14,19 +22,13 @@ import com.server.wordwaves.repository.WordRepository;
 import com.server.wordwaves.repository.httpclient.DictionaryClient;
 import com.server.wordwaves.repository.httpclient.ImageClient;
 import com.server.wordwaves.service.WordService;
+
 import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -50,7 +52,8 @@ public class WordServiceImp implements WordService {
         Word word = wordMapper.toWord(request);
 
         // Lấy ảnh và set vào word
-        WordThumbnailResponse wordThumbnailResponse = imageClient.retrieveWordThumbnailUrl(pexelsApiKey, word.getName(), 1);
+        WordThumbnailResponse wordThumbnailResponse =
+                imageClient.retrieveWordThumbnailUrl(pexelsApiKey, word.getName(), 1);
         String thumbnailUrl;
 
         try {
@@ -89,15 +92,15 @@ public class WordServiceImp implements WordService {
         WordResponse wordResponse;
         if (!wordResponses.isEmpty()) {
             wordResponse = wordResponses.get(0);
-            wordResponse.setId(word.getId());
-            wordResponse.setName(word.getName());
+            wordResponse.setId(createdWord.getId());
+            wordResponse.setName(createdWord.getName());
             wordResponse.setThumbnailUrl(thumbnailUrl);
-            wordResponse.setCreatedAt(word.getCreatedAt());
-            wordResponse.setUpdatedAt(word.getUpdatedAt());
-            wordResponse.setCreatedById(wordResponse.getCreatedById());
+            wordResponse.setCreatedAt(createdWord.getCreatedAt());
+            wordResponse.setUpdatedAt(createdWord.getUpdatedAt());
+            wordResponse.setCreatedById(createdWord.getCreatedById());
         } else {
             // Nếu từ vựng hợp lệ nhưng chưa có định nghĩa
-            wordResponse = wordMapper.toWordResponse(word);
+            wordResponse = wordMapper.toWordResponse(createdWord);
         }
         return wordResponse;
     }

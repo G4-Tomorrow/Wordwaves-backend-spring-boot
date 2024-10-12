@@ -12,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
