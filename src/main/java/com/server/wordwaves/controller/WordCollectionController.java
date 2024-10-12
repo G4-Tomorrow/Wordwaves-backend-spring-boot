@@ -49,7 +49,7 @@ public class WordCollectionController {
                 .build();
     }
 
-    @GetMapping("/{collectionId}")
+    @GetMapping("/get-topic/{collectionId}")
     ApiResponse<PaginationInfo<List<TopicResponse>>> getTopics(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,

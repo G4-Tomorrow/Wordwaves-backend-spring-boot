@@ -1,5 +1,6 @@
 package com.server.wordwaves.service.implement;
 
+import com.server.wordwaves.dto.request.vocabulary.TopicAddWordsRequest;
 import com.server.wordwaves.dto.request.vocabulary.TopicCreationRequest;
 import com.server.wordwaves.dto.response.common.Pagination;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
@@ -15,6 +16,7 @@ import com.server.wordwaves.mapper.TopicMapper;
 import com.server.wordwaves.mapper.WordMapper;
 import com.server.wordwaves.repository.TopicRepository;
 import com.server.wordwaves.repository.WordCollectionRepository;
+import com.server.wordwaves.repository.WordRepository;
 import com.server.wordwaves.repository.httpclient.DictionaryClient;
 import com.server.wordwaves.service.TopicService;
 import com.server.wordwaves.utils.MyStringUtils;
@@ -38,6 +40,7 @@ import java.util.Optional;
 public class TopicServiceImp implements TopicService {
     TopicRepository topicRepository;
     WordCollectionRepository wordCollectionRepository;
+    WordRepository wordRepository;
     TopicMapper topicMapper;
     DictionaryClient dictionaryClient;
     WordMapper wordMapper;
@@ -78,6 +81,7 @@ public class TopicServiceImp implements TopicService {
             wordPage = topicRepository.findWordsByTopicId(topicId, pageable);
         }
 
+
         List<WordResponse> wordResponses = wordPage.map(word -> {
             List<WordResponse> tmp = dictionaryClient.retrieveEntries(word.getName());
             WordResponse wordResponse = tmp.getFirst();
@@ -105,5 +109,25 @@ public class TopicServiceImp implements TopicService {
                         .build())
                 .data(wordResponses)
                 .build();
+    }
+
+    @Override
+    public int addWords(String topicId, TopicAddWordsRequest request) {
+        Optional<Topic> topicOptional = topicRepository.findById(topicId);
+
+        // Check xem topic có tồn tại hay ko
+        if(topicOptional.isEmpty()) throw new AppException(ErrorCode.TOPIC_NOT_EXISTED);
+
+        // Get topic và thêm words vào
+        Topic topic = topicOptional.get();
+        List<Word> words = request.getWordIds().stream().map(wordId -> {
+            Optional<Word> word = wordRepository.findById(wordId);
+            if(word.isEmpty()) throw new AppException(ErrorCode.WORD_NOT_EXISTED);
+            return word.get();
+        }).toList();
+
+        topic.getWords().addAll(words);
+        topicRepository.save(topic);
+        return request.getWordIds().size();
     }
 }
