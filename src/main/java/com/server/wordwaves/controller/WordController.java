@@ -1,14 +1,16 @@
 package com.server.wordwaves.controller;
 
-import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
-import com.server.wordwaves.dto.response.common.ApiResponse;
-import com.server.wordwaves.dto.response.vocabulary.WordResponse;
-import com.server.wordwaves.service.WordService;
 import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
+import com.server.wordwaves.dto.response.common.ApiResponse;
+import com.server.wordwaves.dto.response.vocabulary.WordResponse;
+import com.server.wordwaves.service.WordService;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
