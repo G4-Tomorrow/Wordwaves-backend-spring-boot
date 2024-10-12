@@ -1,9 +1,8 @@
 package com.server.wordwaves.config;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
-import java.util.List;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,9 +19,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import java.util.List;
+
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
@@ -33,13 +32,17 @@ public class SecurityConfig {
     CustomJwtDecoder customJwtDecoder;
 
     private static final String[] PUBLIC_ENDPOINTS = {
-        "/users",
-        "/users/verify",
-        "/users/forgot-password",
-        "/users/reset-password",
-        "/auth/login",
-        "/auth/refresh",
-        "/auth/introspect"
+            "/users",
+            "/users/verify",
+            "/users/forgot-password",
+            "/users/reset-password",
+            "/auth/login",
+            "/auth/refresh",
+            "/auth/introspect",
+            "swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/swagger-resources"
     };
 
     @Bean

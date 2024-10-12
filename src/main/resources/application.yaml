@@ -26,6 +26,13 @@ spring:
       ddl-auto: update
     show-sql: true
 
+openapi:
+  service:
+    api-docs: api-service
+    server: http://localhost:8080
+    title: API Service
+    version: 1.0.0
+
 
 jwt:
   access-signer-key: "6FvxQMx9pcbEFqKFFP4XH748Kg//XkcCtf68+/P7ZRvIXnba3dG7POT/cUCAWV5Q"

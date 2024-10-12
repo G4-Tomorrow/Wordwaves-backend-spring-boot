@@ -36,6 +36,7 @@
         <redis.data.version>3.3.4</redis.data.version>
         <redis.version>5.2.0</redis.version>
         <firebase.version>9.3.0</firebase.version>
+        <doc.version>2.6.0</doc.version>
     </properties>
     <dependencies>
         <dependency>
@@ -113,6 +114,13 @@
             <artifactId>firebase-admin</artifactId>
             <version>${firebase.version}</version>
         </dependency>
+        <!--        có thể add vào microservice-->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${doc.version}</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
