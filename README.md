@@ -22,4 +22,7 @@ avnadmin
 ```plaintext
 AVNS_NaOkIhMfoLS45jVy0F4
 ```
-
+- Port:
+```plaintext
+21917
+```
