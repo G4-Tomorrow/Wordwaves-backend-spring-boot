@@ -1,5 +1,14 @@
 package com.server.wordwaves.service.implement;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import com.server.wordwaves.dto.request.vocabulary.TopicAddWordsRequest;
 import com.server.wordwaves.dto.request.vocabulary.TopicCreationRequest;
 import com.server.wordwaves.dto.response.common.Pagination;
@@ -20,18 +29,11 @@ import com.server.wordwaves.repository.WordRepository;
 import com.server.wordwaves.repository.httpclient.DictionaryClient;
 import com.server.wordwaves.service.TopicService;
 import com.server.wordwaves.utils.MyStringUtils;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -69,8 +71,8 @@ public class TopicServiceImp implements TopicService {
         Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
                 ? Sort.unsorted()
                 : sortDirection.equalsIgnoreCase("DESC")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
         Page<Word> wordPage;
@@ -81,19 +83,19 @@ public class TopicServiceImp implements TopicService {
             wordPage = topicRepository.findWordsByTopicId(topicId, pageable);
         }
 
-
         List<WordResponse> wordResponses = wordPage.map(word -> {
-            List<WordResponse> tmp = dictionaryClient.retrieveEntries(word.getName());
-            WordResponse wordResponse = tmp.getFirst();
-            wordResponse.setId(word.getId());
-            wordResponse.setName(word.getName());
-            wordResponse.setThumbnailUrl(word.getThumbnailUrl());
-            wordResponse.setCreatedAt(word.getCreatedAt());
-            wordResponse.setUpdatedAt(word.getUpdatedAt());
-            wordResponse.setCreatedById(word.getCreatedById());
-            wordResponse.setVietnamese(word.getVietnamese());
-            return wordResponse;
-        }).toList();
+                    List<WordResponse> tmp = dictionaryClient.retrieveEntries(word.getName());
+                    WordResponse wordResponse = tmp.getFirst();
+                    wordResponse.setId(word.getId());
+                    wordResponse.setName(word.getName());
+                    wordResponse.setThumbnailUrl(word.getThumbnailUrl());
+                    wordResponse.setCreatedAt(word.getCreatedAt());
+                    wordResponse.setUpdatedAt(word.getUpdatedAt());
+                    wordResponse.setCreatedById(word.getCreatedById());
+                    wordResponse.setVietnamese(word.getVietnamese());
+                    return wordResponse;
+                })
+                .toList();
 
         return PaginationInfo.<List<WordResponse>>builder()
                 .pagination(Pagination.builder()
@@ -116,15 +118,17 @@ public class TopicServiceImp implements TopicService {
         Optional<Topic> topicOptional = topicRepository.findById(topicId);
 
         // Check xem topic có tồn tại hay ko
-        if(topicOptional.isEmpty()) throw new AppException(ErrorCode.TOPIC_NOT_EXISTED);
+        if (topicOptional.isEmpty()) throw new AppException(ErrorCode.TOPIC_NOT_EXISTED);
 
         // Get topic và thêm words vào
         Topic topic = topicOptional.get();
-        List<Word> words = request.getWordIds().stream().map(wordId -> {
-            Optional<Word> word = wordRepository.findById(wordId);
-            if(word.isEmpty()) throw new AppException(ErrorCode.WORD_NOT_EXISTED);
-            return word.get();
-        }).toList();
+        List<Word> words = request.getWordIds().stream()
+                .map(wordId -> {
+                    Optional<Word> word = wordRepository.findById(wordId);
+                    if (word.isEmpty()) throw new AppException(ErrorCode.WORD_NOT_EXISTED);
+                    return word.get();
+                })
+                .toList();
 
         topic.getWords().addAll(words);
         topicRepository.save(topic);

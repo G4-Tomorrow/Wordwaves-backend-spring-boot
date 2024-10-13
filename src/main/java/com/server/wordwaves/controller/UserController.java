@@ -48,16 +48,15 @@ public class UserController {
     }
 
     @PutMapping("/reset-password")
-    public ApiResponse<String> resetPassword(
-            @RequestParam String token, @RequestBody @Valid ResetPasswordRequest request) {
-        userService.resetPassword(token, request);
+    public ApiResponse<String> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+        userService.resetPassword(request);
         return ApiResponse.<String>builder()
                 .message("Mật khẩu đã được cập nhật thành công.")
                 .build();
     }
 
-    @GetMapping("/verify")
-    ApiResponse<AuthenticationResponse> verify(@RequestParam("token") VerifyEmailRequest request) {
+    @PostMapping("/verify")
+    ApiResponse<AuthenticationResponse> verify(@RequestBody VerifyEmailRequest request) {
         return ApiResponse.<AuthenticationResponse>builder()
                 .message("Xác thực email thành công")
                 .result(userService.verify(request))

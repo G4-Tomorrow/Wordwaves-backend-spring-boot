@@ -29,6 +29,8 @@ public enum ErrorCode {
     USER_EXISTED(1010, "Tài khoản đã tồn tại", HttpStatus.BAD_REQUEST),
     PASSWORD_MISMATCH(1011, "Mật khẩu không khớp với xác nhận mật khẩu", HttpStatus.BAD_REQUEST),
     FILE_UPLOAD_FAIL(1012, "Thay đổi ảnh đại diện thất bại", HttpStatus.BAD_REQUEST),
+    NEW_PASSWORD_IS_REQUIRED(1013, "Mật khẩu mới không được để trống", HttpStatus.BAD_REQUEST),
+    CONFIRM_PASSWORD_IS_REQUIRED(1014, "Xác nhận mật khẩu mới không được để trống", HttpStatus.BAD_REQUEST),
 
     // TOKEN
     EMPTY_TOKEN(2001, "Token rỗng", HttpStatus.BAD_REQUEST),

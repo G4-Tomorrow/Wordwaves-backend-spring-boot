@@ -15,7 +15,7 @@ import com.server.wordwaves.entity.user.User;
 public interface UserService {
     EmailResponse forgotPassword(ForgotPasswordRequest request);
 
-    void resetPassword(String token, ResetPasswordRequest request);
+    void resetPassword(ResetPasswordRequest request);
 
     EmailResponse register(UserCreationRequest request);
 
