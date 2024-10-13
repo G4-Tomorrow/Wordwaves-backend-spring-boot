@@ -22,7 +22,6 @@ import com.server.wordwaves.entity.vocabulary.WordCollection;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.TopicMapper;
-import com.server.wordwaves.mapper.WordMapper;
 import com.server.wordwaves.repository.TopicRepository;
 import com.server.wordwaves.repository.WordCollectionRepository;
 import com.server.wordwaves.repository.WordRepository;
@@ -45,7 +44,6 @@ public class TopicServiceImp implements TopicService {
     WordRepository wordRepository;
     TopicMapper topicMapper;
     DictionaryClient dictionaryClient;
-    WordMapper wordMapper;
 
     @Override
     public TopicResponse create(TopicCreationRequest request) {

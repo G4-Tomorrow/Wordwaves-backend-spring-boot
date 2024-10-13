@@ -9,13 +9,13 @@ import com.server.wordwaves.entity.common.BaseEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Entity
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Entity
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -25,8 +25,19 @@ public class User extends BaseEntity {
     String email;
 
     String password;
+
+    @Column(columnDefinition = "TEXT")
+    String refreshToken;
+
     String fullName;
+
+    String phoneNumber;
+
     String avatarName;
+
+    String provider;
+
+    String providerUserId;
 
     @ManyToMany
     @JoinTable(
@@ -34,7 +45,4 @@ public class User extends BaseEntity {
             joinColumns = @JoinColumn(name = "UserId", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"))
     Set<Role> roles;
-
-    @Column(columnDefinition = "TEXT")
-    String refreshToken;
 }
