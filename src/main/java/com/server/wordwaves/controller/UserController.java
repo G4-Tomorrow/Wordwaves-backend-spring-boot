@@ -2,6 +2,8 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+@Tag(name = "User Controller")
 public class UserController {
     UserService userService;
 
     @PostMapping
+    @Operation(summary = "REGISTER", description = "Api Create New User")
     ApiResponse<EmailResponse> register(@RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<EmailResponse>builder()
                 .message("Email xác thực đã được gửi thành công")
