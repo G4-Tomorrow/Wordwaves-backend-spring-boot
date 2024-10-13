@@ -81,6 +81,7 @@ public class UserServiceImp implements UserService {
         if (userRepository.existsByEmail(request.getEmail())) throw new AppException(ErrorCode.EMAIL_EXISTED);
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setProvider("basic");
         return emailService.sendVerifyEmail(user);
     }
 
@@ -224,8 +225,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public void createOAuth2User(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) throw new AppException(ErrorCode.EMAIL_EXISTED);
+    public void createOrUpdateUser(User user) {
         userRepository.save(user);
     }
 }

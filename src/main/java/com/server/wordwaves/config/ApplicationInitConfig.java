@@ -38,7 +38,8 @@ public class ApplicationInitConfig {
                 roleRepository.save(
                         Role.builder().name(PredefinedRole.USER_ROLE.getName()).build());
 
-                Role adminRole = roleRepository.save(Role.builder().name(PredefinedRole.ADMIN_ROLE.getName()).build());
+                Role adminRole = roleRepository.save(
+                        Role.builder().name(PredefinedRole.ADMIN_ROLE.getName()).build());
 
                 Set<Role> roles = new HashSet<>();
                 roles.add(adminRole);

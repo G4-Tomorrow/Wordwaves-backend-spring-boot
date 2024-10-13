@@ -42,5 +42,5 @@ public interface UserService {
 
     boolean existsUserByEmail(String email);
 
-    void createOAuth2User(User user);
+    void createOrUpdateUser(User user);
 }

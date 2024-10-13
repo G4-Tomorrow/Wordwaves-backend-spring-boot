@@ -99,6 +99,12 @@ public class AuthenticationServiceImp implements AuthenticationService {
                 .body(authResponse);
     }
 
+    private void synchronizeUserInfo(User existingUser, String fullName, String avatar) {
+        if (fullName != null && !fullName.equals(existingUser.getFullName())) existingUser.setFullName(fullName);
+        if (avatar != null && !avatar.equals(existingUser.getAvatarName())) existingUser.setAvatarName(avatar);
+        this.userService.createOrUpdateUser(existingUser);
+    }
+
     @Override
     public ResponseEntity<AuthenticationResponse> oauth2Authenticate(OAuth2AuthenticationToken oauth2AuthenticationToken) {
         String email = oauth2AuthenticationToken.getPrincipal().getAttribute("email");
@@ -107,37 +113,38 @@ public class AuthenticationServiceImp implements AuthenticationService {
         String provider = oauth2AuthenticationToken.getAuthorizedClientRegistrationId();
         String providerUserId = oauth2AuthenticationToken.getName();
 
-        if (userService.existsUserByEmail(email)) {
-            User existingUser = userService.getUserByEmail(email);
+        User currentUser;
 
-            // If user have basic account, no have OAuth2 account 1 (register OAuth2 account 2 same email basic account)
-            if (existingUser.getProvider() == null && existingUser.getPassword() != null){
+        if (userService.existsUserByEmail(email)) {
+            currentUser = userService.getUserByEmail(email);
+
+            if (currentUser.getProvider() == null && currentUser.getPassword() != null){
                 throw new AppException(ErrorCode.USER_EXISTED_WITH_BASIC_ACCOUNT);
             }
 
-            // If user have basic account and have OAuth2 account 1 (register OAuth2 account 2 same email OAuth2 account 1 before)
-            if (existingUser.getProvider() != null && !existingUser.getProvider().equals(provider)) {
+            if (currentUser.getProvider() != null && !currentUser.getProvider().equals(provider)) {
                 throw new AppException(ErrorCode.OAUTH2_USER_EXISTED_WITH_DIFFERENT_PROVIDER);
             }
 
-            // If user have basic account and have OAuth2 account 1 (login with OAuth2 account 1, don't register)
-            return createAuthResponse(existingUser);
+            this.synchronizeUserInfo(currentUser, fullName, avatar);
 
         } else {
-            User newUser = User.builder()
-                    .email(email).fullName(fullName)
-                    .avatarName(avatar).provider(provider)
-                    .password(null).providerUserId(providerUserId)
+            currentUser = User.builder()
+                    .email(email)
+                    .fullName(fullName)
+                    .avatarName(avatar)
+                    .provider(provider)
+                    .password(null)
+                    .providerUserId(providerUserId)
                     .build();
 
             Set<Role> roles = new HashSet<>();
             roleRepository.findById(PredefinedRole.USER_ROLE.getName()).ifPresent(roles::add);
-            newUser.setRoles(roles);
+            currentUser.setRoles(roles);
 
-            userService.createOAuth2User(newUser);
+            userService.createOrUpdateUser(currentUser);
         }
 
-        User currentUser = userService.getUserByEmail(email);
         return createAuthResponse(currentUser);
     }
 

@@ -32,7 +32,8 @@ public class UserController {
     UserService userService;
 
     @PostMapping
-    ApiResponse<EmailResponse> register(@RequestBody @Valid UserCreationRequest request) {
+    ApiResponse<EmailResponse> register(
+            @RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<EmailResponse>builder()
                 .message("Email xác thực đã được gửi thành công")
                 .result(userService.register(request))
@@ -56,7 +57,7 @@ public class UserController {
                 .build();
     }
 
-    @GetMapping("/verify")
+    @PostMapping("/verify")
     ApiResponse<AuthenticationResponse> verify(@RequestParam("token") VerifyEmailRequest request) {
         return ApiResponse.<AuthenticationResponse>builder()
                 .message("Xác thực email thành công")
