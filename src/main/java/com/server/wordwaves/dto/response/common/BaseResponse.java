@@ -14,5 +14,6 @@ import lombok.experimental.SuperBuilder;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class BaseResponse {
     Instant createdAt;
+
     Instant updatedAt;
 }

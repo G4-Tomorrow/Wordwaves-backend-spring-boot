@@ -39,6 +39,11 @@ public class SecurityConfig {
         "/auth/refresh",
         "/auth/introspect",
         "/oauth2/**",
+        "/api-documentation",
+        "/swagger-ui/*",
+        "/v3/api-docs/**",
+        "/swagger-resources/**",
+        "/swagger-resources"
     };
 
     @Bean
@@ -53,10 +58,11 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest()
                         .authenticated())
-                //                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+                        .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .oauth2Login(oauth2login -> {
                     oauth2login.defaultSuccessUrl("/auth/oauth2/login-success", true);
                 });
+                        .authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
                         .decoder(customJwtDecoder)

@@ -57,6 +57,7 @@ public class UserServiceImp implements UserService {
     UserMapper userMapper;
     TokenService tokenService;
     AuthUtils authUtils;
+=======
 
     @Override
     public EmailResponse forgotPassword(ForgotPasswordRequest request) {
@@ -65,9 +66,10 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public void resetPassword(String token, ResetPasswordRequest request) {
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) throw new AppException(ErrorCode.PASSWORD_MISMATCH);
-        User user = validateTokenAndGetUser(token);
+    public void resetPassword(ResetPasswordRequest request) {
+        if (!request.getNewPassword().equals(request.getConfirmPassword()))
+            throw new AppException(ErrorCode.PASSWORD_MISMATCH);
+        User user = validateTokenAndGetUser(request.getToken());
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
     }

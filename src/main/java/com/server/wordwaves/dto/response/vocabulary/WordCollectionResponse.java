@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor

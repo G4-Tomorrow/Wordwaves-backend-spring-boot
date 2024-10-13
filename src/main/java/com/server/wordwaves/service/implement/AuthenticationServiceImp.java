@@ -118,6 +118,36 @@ public class AuthenticationServiceImp implements AuthenticationService {
         }
 
         return authUtils.createAuthResponse(currentUser);
+    private ResponseEntity<AuthenticationResponse> createAuthResponse(User currentUser) {
+        if (Objects.isNull(currentUser)) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
+
+        // Add information about current user login to response
+        AuthenticationResponse authResponse = new AuthenticationResponse();
+        authResponse.setUser(userMapper.toUserResponse(currentUser));
+
+//         Create access token
+        String accessToken = jwtTokenProvider.generateAccessToken(currentUser);
+        authResponse.setAccessToken(accessToken);
+
+        // Create refresh token and update refresh token to User entity
+        String refreshToken = jwtTokenProvider.generateRefreshToken(currentUser);
+        userService.updateUserRefreshToken(refreshToken, currentUser.getEmail());
+
+        // Set cookies
+        ResponseCookie resCookies = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(false) // Chỉ dùng trên localhost
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(REFRESH_TOKEN_EXPIRATION)
+                .build();
+
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, resCookies.toString())
+                .body(authResponse);
     }
 
     @Override

@@ -14,5 +14,8 @@ public class TopicCreationRequest {
     @NotBlank(message = "TOPIC_NAME_IS_REQUIRED")
     String name;
 
+    @NotBlank(message = "TOPIC_MUST_BELONG_TO_WORD_COLLECTION")
+    String collectionId;
+
     String thumbnailName;
 }

@@ -29,6 +29,8 @@ public enum ErrorCode {
     USER_EXISTED(1010, "Tài khoản đã tồn tại", HttpStatus.BAD_REQUEST),
     PASSWORD_MISMATCH(1011, "Mật khẩu không khớp với xác nhận mật khẩu", HttpStatus.BAD_REQUEST),
     FILE_UPLOAD_FAIL(1012, "Thay đổi ảnh đại diện thất bại", HttpStatus.BAD_REQUEST),
+    NEW_PASSWORD_IS_REQUIRED(1013, "Mật khẩu mới không được để trống", HttpStatus.BAD_REQUEST),
+    CONFIRM_PASSWORD_IS_REQUIRED(1014, "Xác nhận mật khẩu mới không được để trống", HttpStatus.BAD_REQUEST),
 
     // TOKEN
     EMPTY_TOKEN(2001, "Token rỗng", HttpStatus.BAD_REQUEST),
@@ -56,12 +58,25 @@ public enum ErrorCode {
     INVALID_WORD(6008, "Từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
     WORD_EXISTED(6009, "Từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
 
-    // OAUTH2 ERROR CODE
+    TOPIC_NAME_IS_REQUIRED(6101, "Tên chủ đề không được để trống", HttpStatus.BAD_REQUEST),
+    TOPIC_NOT_EXISTED(6102, "Chủ đề không tồn tại", HttpStatus.BAD_REQUEST),
+    TOPIC_MUST_BELONG_TO_WORD_COLLECTION(6103, "Chủ đề phải thuộc về ít nhất 1 topic", HttpStatus.BAD_REQUEST),
+
+    WORD_EXISTED(6201, "Từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
+    WORD_NOT_EXISTED(6202, "Từ vựng không tồn tại", HttpStatus.BAD_REQUEST),
+    INVALID_WORD(6203, "Từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
+  
+   // OAUTH2 ERROR CODE
     OAUTH2_USER_EXISTED_WITH_DIFFERENT_PROVIDER(
             7001, "Tài khoản đã được liên kết với nhà cung cấp OAuth2 khác trước đó", HttpStatus.BAD_REQUEST),
     USER_EXISTED_WITH_BASIC_ACCOUNT(
             7002, "Tài khoản đã tồn tại trên hệ thống với email/password", HttpStatus.BAD_REQUEST),
     USER_EXISTED_WITH_OAUTH2(7003, "Tài khoản đã tồn tại với nhà cung cấp OAuth2", HttpStatus.BAD_REQUEST);
+    WORD_COLLECTION_CATEGORY_IS_REQUIRED(6002, "Phân loại bộ từ vựng không được để trống", HttpStatus.BAD_REQUEST),
+    WORD_NAME_IS_REQUIRED(6003, "Tên của từ vựng không được để trống", HttpStatus.BAD_REQUEST),
+    COLLECTION_EXISTED(6004, "Bộ từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
+    WORD_COLLECTION_NOT_EXISTED(6005, "Bộ từ vựng không tồn tại", HttpStatus.BAD_REQUEST),
+    ;
 
     int code;
     String message;
