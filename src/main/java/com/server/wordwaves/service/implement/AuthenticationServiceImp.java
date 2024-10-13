@@ -73,7 +73,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
         AuthenticationResponse authResponse = new AuthenticationResponse();
         authResponse.setUser(userMapper.toUserResponse(currentUser));
 
-        // Create access token
+//         Create access token
         String accessToken = jwtTokenProvider.generateAccessToken(currentUser);
         authResponse.setAccessToken(accessToken);
 
@@ -84,9 +84,12 @@ public class AuthenticationServiceImp implements AuthenticationService {
         // Set cookies
         ResponseCookie resCookies = ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true)
+                .secure(false) // Chỉ dùng trên localhost
+                .sameSite("Lax")
                 .path("/")
                 .maxAge(REFRESH_TOKEN_EXPIRATION)
                 .build();
+
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, resCookies.toString())
