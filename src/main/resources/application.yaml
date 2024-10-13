@@ -36,8 +36,10 @@ springdoc:
 openapi:
   service:
     api-docs: api-service
-    server: http://localhost:8080
-    title: API Service
+    server:
+      local: http://localhost:8080/wordwaves
+      dev: https://backend-production-c2cb.up.railway.app/wordwaves
+    title: API Service Documentation
     version: 1.0.0
 
 
@@ -61,3 +63,8 @@ app:
     apikey: FQfOWjWjZ3hi9i1Y3KT1yngoYRYnwO7FoivYa9JmDU06u8a7OUOXkEU7
   firebase:
     bucket-name: wordwaves-40814.appspot.com
+
+client:
+  url: http://localhost:3001
+  reset-password-path: reset-password
+  verify-email-path:  verify-email

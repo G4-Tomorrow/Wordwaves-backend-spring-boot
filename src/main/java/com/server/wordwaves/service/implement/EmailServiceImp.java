@@ -1,16 +1,5 @@
 package com.server.wordwaves.service.implement;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -21,12 +10,21 @@ import com.server.wordwaves.dto.response.common.EmailResponse;
 import com.server.wordwaves.entity.user.User;
 import com.server.wordwaves.repository.httpclient.EmailClient;
 import com.server.wordwaves.service.EmailService;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -55,10 +53,25 @@ public class EmailServiceImp implements EmailService {
     @NonFinal
     protected long accessTokenExpiration = 120;
 
-    private void sendEmail(User user, String token, String subject, String templateName) {
+    @NonFinal
+    @Value("${client.url}")
+    String clientUrl;
+
+    @NonFinal
+    @Value("${client.verify-email-path}")
+    String verifyEmailPath;
+
+    @NonFinal
+    @Value("${client.reset-password-path}")
+    String resetPasswordPath;
+
+    private void sendEmail(User user, String token, String subject, String templateName, String path) {
         Context context = new Context();
         context.setVariable("email", user.getEmail());
         context.setVariable("token", token);
+        // set up path cho email
+        String handlingPath = clientUrl + "/" + path + "?token=" + token;
+        context.setVariable("handlingPath", handlingPath);
 
         String htmlContent = templateEngine.process(templateName, context);
 
@@ -75,14 +88,14 @@ public class EmailServiceImp implements EmailService {
     @Override
     public EmailResponse sendVerifyEmail(User user) {
         String token = generateEmailVerifyToken(user);
-        sendEmail(user, token, "Xác thực tài khoản", "register-template");
+        sendEmail(user, token, "Xác thực tài khoản", "register-template", verifyEmailPath);
         return EmailResponse.builder().messageId("Email đã được gửi thành công").build();
     }
 
     @Override
     public EmailResponse sendForgotPasswordEmail(User user) {
         String token = generateEmailVerifyToken(user);
-        sendEmail(user, token, "Yêu cầu đặt lại mật khẩu", "forgot-password-template");
+        sendEmail(user, token, "Yêu cầu đặt lại mật khẩu", "forgot-password-template", resetPasswordPath);
         return EmailResponse.builder().messageId("Email đã được gửi thành công").build();
     }
 

@@ -56,7 +56,6 @@ public class UserServiceImp implements UserService {
     UserMapper userMapper;
     JwtTokenProvider jwtTokenProvider;
     TokenService tokenService;
-    FirebaseStorageService firebaseStorageService;
 
     @Override
     public EmailResponse forgotPassword(ForgotPasswordRequest request) {
@@ -65,10 +64,10 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public void resetPassword(String token, ResetPasswordRequest request) {
+    public void resetPassword(ResetPasswordRequest request) {
         if (!request.getNewPassword().equals(request.getConfirmPassword()))
             throw new AppException(ErrorCode.PASSWORD_MISMATCH);
-        User user = validateTokenAndGetUser(token);
+        User user = validateTokenAndGetUser(request.getToken());
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
     }
