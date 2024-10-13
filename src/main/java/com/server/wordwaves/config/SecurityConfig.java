@@ -39,7 +39,12 @@ public class SecurityConfig {
         "/users/reset-password",
         "/auth/login",
         "/auth/refresh",
-        "/auth/introspect"
+        "/auth/introspect",
+        "/api-documentation",
+        "/swagger-ui/*",
+        "/v3/api-docs/**",
+        "/swagger-resources/**",
+        "/swagger-resources"
     };
 
     @Bean

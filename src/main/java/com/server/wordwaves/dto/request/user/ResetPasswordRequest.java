@@ -11,9 +11,12 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ResetPasswordRequest {
-    @NotBlank(message = "Mật khẩu mới không được để trống.")
+    @NotBlank(message = "EMPTY_TOKEN")
+    String token;
+
+    @NotBlank(message = "NEW_PASSWORD_IS_REQUIRED")
     String newPassword;
 
-    @NotBlank(message = "Xác nhận mật khẩu không được để trống.")
+    @NotBlank(message = "CONFIRM_PASSWORD_IS_REQUIRED")
     String confirmPassword;
 }
