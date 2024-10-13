@@ -4,9 +4,10 @@ import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
+import com.server.wordwaves.repository.UserRepository;
+import com.server.wordwaves.utils.AuthUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -32,7 +33,6 @@ import com.server.wordwaves.entity.user.Role;
 import com.server.wordwaves.entity.user.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
-import com.server.wordwaves.mapper.UserMapper;
 import com.server.wordwaves.repository.RoleRepository;
 import com.server.wordwaves.service.AuthenticationService;
 import com.server.wordwaves.service.BaseRedisService;
@@ -54,10 +54,10 @@ public class AuthenticationServiceImp implements AuthenticationService {
     PasswordEncoder passwordEncoder;
     JwtTokenProvider jwtTokenProvider;
     CustomJwtDecoder jwtDecoder;
-    UserMapper userMapper;
     BaseRedisService baseRedisService;
     TokenService tokenService;
     RoleRepository roleRepository;
+    AuthUtils authUtils;
 
     @NonFinal
     @Value("${jwt.access-signer-key}")
@@ -70,34 +70,6 @@ public class AuthenticationServiceImp implements AuthenticationService {
     @NonFinal
     @Value("${jwt.refresh-token-duration-in-seconds}")
     protected long REFRESH_TOKEN_EXPIRATION;
-
-    public ResponseEntity<AuthenticationResponse> createAuthResponse(User currentUser) {
-        if (Objects.isNull(currentUser)) throw new AppException(ErrorCode.USER_NOT_EXISTED);
-
-        // Add information about current user login to response
-        AuthenticationResponse authResponse = new AuthenticationResponse();
-        authResponse.setUser(userMapper.toUserResponse(currentUser));
-
-        // Create access token
-        String accessToken = jwtTokenProvider.generateAccessToken(currentUser);
-        authResponse.setAccessToken(accessToken);
-
-        // Create refresh token and update refresh token to User entity
-        String refreshToken = jwtTokenProvider.generateRefreshToken(currentUser);
-        userService.updateUserRefreshToken(refreshToken, currentUser.getEmail());
-
-        // Set cookies
-        ResponseCookie resCookies = ResponseCookie.from("refresh_token", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(REFRESH_TOKEN_EXPIRATION)
-                .build();
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, resCookies.toString())
-                .body(authResponse);
-    }
 
     private void synchronizeUserInfo(User existingUser, String fullName, String avatar) {
         if (fullName != null && !fullName.equals(existingUser.getFullName())) existingUser.setFullName(fullName);
@@ -145,7 +117,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
             userService.createOrUpdateUser(currentUser);
         }
 
-        return createAuthResponse(currentUser);
+        return authUtils.createAuthResponse(currentUser);
     }
 
     @Override
@@ -157,7 +129,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
             throw new AppException(ErrorCode.WRONG_PASSWORD);
         }
 
-        return createAuthResponse(currentUser);
+        return authUtils.createAuthResponse(currentUser);
     }
 
     @Override
@@ -173,7 +145,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
         // Check user by refresh token and userId
         User currentUser = this.userService.getUserByIdAndRefreshToken(userId, refreshToken);
 
-        return createAuthResponse(currentUser);
+        return authUtils.createAuthResponse(currentUser);
     }
 
     @Override
@@ -215,7 +187,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
 
         // Update refresh token is null in user entity
         UserResponse currentUser = this.userService.getMyInfo();
-        this.userService.updateUserRefreshToken(null, currentUser.getEmail());
+        authUtils.updateUserRefreshToken(null, currentUser.getEmail());
 
         // Remove refresh token in cookies
         ResponseCookie resDeleteCookie = ResponseCookie.from("refresh_token", null)

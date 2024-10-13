@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.validation.Valid;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.server.wordwaves.dto.request.user.ForgotPasswordRequest;
@@ -58,11 +59,12 @@ public class UserController {
     }
 
     @PostMapping("/verify")
-    ApiResponse<AuthenticationResponse> verify(@RequestParam("token") VerifyEmailRequest request) {
-        return ApiResponse.<AuthenticationResponse>builder()
-                .message("Xác thực email thành công")
-                .result(userService.verify(request))
-                .build();
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> verify(@RequestBody @Valid VerifyEmailRequest request) {
+        ResponseEntity<AuthenticationResponse> responseEntity = userService.verify(request);
+
+        return ResponseEntity.status(responseEntity.getStatusCode())
+                .headers(responseEntity.getHeaders())
+                .body(ApiResponse.<AuthenticationResponse>builder().result(responseEntity.getBody()).build());
     }
 
     @GetMapping

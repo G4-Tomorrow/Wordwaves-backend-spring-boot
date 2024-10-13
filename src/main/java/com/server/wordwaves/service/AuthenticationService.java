@@ -23,8 +23,5 @@ public interface AuthenticationService {
 
     ResponseEntity<Void> logout(LogoutRequest request);
 
-    ResponseEntity<AuthenticationResponse> getRefreshToken(RefreshTokenRequest request)
-            throws ParseException, JOSEException, JOSEException;
-
-    ResponseEntity<AuthenticationResponse> createAuthResponse(User user);
+    ResponseEntity<AuthenticationResponse> getRefreshToken(RefreshTokenRequest request) throws ParseException, JOSEException, JOSEException;
 }
