@@ -26,6 +26,13 @@ spring:
       ddl-auto: update
     show-sql: true
 
+
+springdoc:
+  swagger-ui:
+    path: /api-documentation
+    operations-sorter: method
+    disable-swagger-default-url: true
+
 openapi:
   service:
     api-docs: api-service

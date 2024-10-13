@@ -4,10 +4,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import com.server.wordwaves.dto.response.common.Pagination;
-import com.server.wordwaves.dto.response.common.PaginationInfo;
-import com.server.wordwaves.dto.response.common.QueryOptions;
-import com.server.wordwaves.utils.MyStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -18,6 +14,9 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
+import com.server.wordwaves.dto.response.common.Pagination;
+import com.server.wordwaves.dto.response.common.PaginationInfo;
+import com.server.wordwaves.dto.response.common.QueryOptions;
 import com.server.wordwaves.dto.response.vocabulary.WordResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordThumbnailResponse;
 import com.server.wordwaves.entity.vocabulary.Topic;
@@ -30,6 +29,7 @@ import com.server.wordwaves.repository.WordRepository;
 import com.server.wordwaves.repository.httpclient.DictionaryClient;
 import com.server.wordwaves.repository.httpclient.ImageClient;
 import com.server.wordwaves.service.WordService;
+import com.server.wordwaves.utils.MyStringUtils;
 
 import feign.FeignException;
 import lombok.AccessLevel;
@@ -114,13 +114,14 @@ public class WordServiceImp implements WordService {
     }
 
     @Override
-    public PaginationInfo<List<WordResponse>> getWords(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
+    public PaginationInfo<List<WordResponse>> getWords(
+            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
         --pageNumber;
         Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
                 ? Sort.unsorted()
                 : sortDirection.equalsIgnoreCase("DESC")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending();
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
@@ -129,21 +130,22 @@ public class WordServiceImp implements WordService {
                 : wordRepository.findByNameContainingIgnoreCase(searchQuery, pageable);
 
         List<WordResponse> wordResponses = wordPage.map(word -> {
-            try {
-                List<WordResponse> tmp = dictionaryClient.retrieveEntries(word.getName());
-                WordResponse wordResponse = tmp.getFirst();
-                wordResponse.setId(word.getId());
-                wordResponse.setName(word.getName());
-                wordResponse.setThumbnailUrl(word.getThumbnailUrl());
-                wordResponse.setCreatedAt(word.getCreatedAt());
-                wordResponse.setUpdatedAt(word.getUpdatedAt());
-                wordResponse.setCreatedById(word.getCreatedById());
-                wordResponse.setVietnamese(word.getVietnamese());
-                return wordResponse;
-            } catch (FeignException e) {
-                return wordMapper.toWordResponse(word);
-            }
-        }).toList();
+                    try {
+                        List<WordResponse> tmp = dictionaryClient.retrieveEntries(word.getName());
+                        WordResponse wordResponse = tmp.getFirst();
+                        wordResponse.setId(word.getId());
+                        wordResponse.setName(word.getName());
+                        wordResponse.setThumbnailUrl(word.getThumbnailUrl());
+                        wordResponse.setCreatedAt(word.getCreatedAt());
+                        wordResponse.setUpdatedAt(word.getUpdatedAt());
+                        wordResponse.setCreatedById(word.getCreatedById());
+                        wordResponse.setVietnamese(word.getVietnamese());
+                        return wordResponse;
+                    } catch (FeignException e) {
+                        return wordMapper.toWordResponse(word);
+                    }
+                })
+                .toList();
 
         return PaginationInfo.<List<WordResponse>>builder()
                 .pagination(Pagination.builder()
