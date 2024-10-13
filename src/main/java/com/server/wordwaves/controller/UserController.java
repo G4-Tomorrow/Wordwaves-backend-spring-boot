@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.server.wordwaves.dto.request.user.ForgotPasswordRequest;
@@ -35,6 +36,8 @@ public class UserController {
     UserService userService;
 
     @PostMapping
+    ApiResponse<EmailResponse> register(
+            @RequestBody @Valid UserCreationRequest request) {
     @Operation(summary = "REGISTER", description = "Api Create New User")
     ApiResponse<EmailResponse> register(@RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<EmailResponse>builder()
@@ -60,11 +63,12 @@ public class UserController {
     }
 
     @PostMapping("/verify")
-    ApiResponse<AuthenticationResponse> verify(@RequestBody VerifyEmailRequest request) {
-        return ApiResponse.<AuthenticationResponse>builder()
-                .message("Xác thực email thành công")
-                .result(userService.verify(request))
-                .build();
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> verify(@RequestBody @Valid VerifyEmailRequest request) {
+        ResponseEntity<AuthenticationResponse> responseEntity = userService.verify(request);
+
+        return ResponseEntity.status(responseEntity.getStatusCode())
+                .headers(responseEntity.getHeaders())
+                .body(ApiResponse.<AuthenticationResponse>builder().result(responseEntity.getBody()).build());
     }
 
     @GetMapping

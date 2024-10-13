@@ -1,5 +1,7 @@
 package com.server.wordwaves.service.implement;
 
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -50,6 +52,7 @@ public class TopicServiceImp implements TopicService {
     @Override
     public TopicResponse create(TopicCreationRequest request) {
         Topic topic = topicMapper.toTopic(request);
+        return topicMapper.toTopicResponse(topicRepository.save(topic));
         Optional<WordCollection> wordCollectionOptional = wordCollectionRepository.findById(request.getCollectionId());
 
         // nếu topic ko tồn tai thì bắn ra lỗi

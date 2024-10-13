@@ -2,6 +2,7 @@ package com.server.wordwaves.service;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -19,7 +20,7 @@ public interface UserService {
 
     EmailResponse register(UserCreationRequest request);
 
-    AuthenticationResponse verify(VerifyEmailRequest request);
+    ResponseEntity<AuthenticationResponse> verify(VerifyEmailRequest request);
 
     @PreAuthorize("hasRole('ADMIN')")
     PaginationInfo<List<UserResponse>> getUsers(
@@ -34,9 +35,11 @@ public interface UserService {
 
     User getUserByEmail(String email);
 
-    void updateUserRefreshToken(String refreshToken, String email);
-
     void deleteUserById(String userId);
 
     User getUserByIdAndRefreshToken(String userId, String refreshToken);
+
+    boolean existsUserByEmail(String email);
+
+    void createOrUpdateUser(User user);
 }

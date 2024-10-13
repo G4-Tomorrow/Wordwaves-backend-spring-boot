@@ -1,7 +1,5 @@
 package com.server.wordwaves.config;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -40,6 +38,7 @@ public class SecurityConfig {
         "/auth/login",
         "/auth/refresh",
         "/auth/introspect",
+        "/oauth2/**",
         "/api-documentation",
         "/swagger-ui/*",
         "/v3/api-docs/**",
@@ -58,6 +57,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINTS)
                         .permitAll()
                         .anyRequest()
+                        .authenticated())
+                        .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+                .oauth2Login(oauth2login -> {
+                    oauth2login.defaultSuccessUrl("/auth/oauth2/login-success", true);
+                });
                         .authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer

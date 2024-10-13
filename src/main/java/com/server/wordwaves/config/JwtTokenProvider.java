@@ -3,11 +3,9 @@ package com.server.wordwaves.config;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 
+import com.server.wordwaves.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -17,6 +15,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.server.wordwaves.entity.user.Role;
 import com.server.wordwaves.entity.user.User;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
@@ -114,16 +113,22 @@ public class JwtTokenProvider {
         return verifyToken(token, "refresh");
     }
 
-    private String buildScope(User user) {
+    private String buildScopeFromRoles(Set<Role> roles) {
         StringJoiner stringJoiner = new StringJoiner(" ");
 
-        if (!CollectionUtils.isEmpty(user.getRoles()))
-            user.getRoles().forEach(role -> {
+        if (!CollectionUtils.isEmpty(roles)) {
+            roles.forEach(role -> {
                 stringJoiner.add("ROLE_" + role.getName());
-                if (!CollectionUtils.isEmpty(role.getPermissions()))
+                if (!CollectionUtils.isEmpty(role.getPermissions())) {
                     role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
+                }
             });
+        }
 
         return stringJoiner.toString();
+    }
+
+    private String buildScope(User user) {
+        return buildScopeFromRoles(user.getRoles());
     }
 }

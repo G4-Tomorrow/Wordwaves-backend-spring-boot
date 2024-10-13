@@ -5,18 +5,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.server.wordwaves.config.JwtTokenProvider;
+import com.server.wordwaves.utils.AuthUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import com.server.wordwaves.config.CustomJwtDecoder;
-import com.server.wordwaves.config.JwtTokenProvider;
 import com.server.wordwaves.constant.PredefinedRole;
 import com.server.wordwaves.dto.request.user.*;
 import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
@@ -33,7 +35,6 @@ import com.server.wordwaves.mapper.UserMapper;
 import com.server.wordwaves.repository.RoleRepository;
 import com.server.wordwaves.repository.UserRepository;
 import com.server.wordwaves.service.EmailService;
-import com.server.wordwaves.service.FirebaseStorageService;
 import com.server.wordwaves.service.TokenService;
 import com.server.wordwaves.service.UserService;
 import com.server.wordwaves.utils.MyStringUtils;
@@ -54,8 +55,9 @@ public class UserServiceImp implements UserService {
     PasswordEncoder passwordEncoder;
     EmailService emailService;
     UserMapper userMapper;
-    JwtTokenProvider jwtTokenProvider;
     TokenService tokenService;
+    AuthUtils authUtils;
+=======
 
     @Override
     public EmailResponse forgotPassword(ForgotPasswordRequest request) {
@@ -86,13 +88,16 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public AuthenticationResponse verify(VerifyEmailRequest request) {
+    public ResponseEntity<AuthenticationResponse> verify(VerifyEmailRequest request) {
         String token = request.getToken();
 
         Jwt parsedToken = jwtDecoder.decode(token);
+        String email = parsedToken.getSubject();
+        String plainPassword = parsedToken.getClaim("ps");
+
         User user = User.builder()
-                .email(parsedToken.getSubject())
-                .password(parsedToken.getClaim("ps"))
+                .email(email)
+                .password(passwordEncoder.encode(plainPassword))
                 .build();
 
         Set<Role> roles = new HashSet<>();
@@ -105,10 +110,7 @@ public class UserServiceImp implements UserService {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
 
-        return AuthenticationResponse.builder()
-                .accessToken(jwtTokenProvider.generateAccessToken(user))
-                .user(userMapper.toUserResponse(user))
-                .build();
+        return authUtils.createAuthResponse(user);
     }
 
     private User validateTokenAndGetUser(String token) {
@@ -187,14 +189,6 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public void updateUserRefreshToken(String refreshToken, String email) {
-        User currentUser =
-                userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        currentUser.setRefreshToken(refreshToken);
-        userRepository.save(currentUser);
-    }
-
-    @Override
     public UserResponse updateUserById(String userId, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
@@ -216,5 +210,15 @@ public class UserServiceImp implements UserService {
     @Override
     public void deleteUserById(String userId) {
         userRepository.deleteById(userId);
+    }
+
+    @Override
+    public boolean existsUserByEmail(String email) {
+        return this.userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public void createOrUpdateUser(User user) {
+        userRepository.save(user);
     }
 }
