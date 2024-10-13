@@ -1,5 +1,13 @@
 package com.server.wordwaves.utils;
 
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+
 import com.server.wordwaves.config.JwtTokenProvider;
 import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
 import com.server.wordwaves.entity.user.User;
@@ -7,20 +15,12 @@ import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.UserMapper;
 import com.server.wordwaves.repository.UserRepository;
-import com.server.wordwaves.service.AuthenticationService;
-import com.server.wordwaves.service.UserService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-
-import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -64,7 +64,8 @@ public class AuthUtils {
     }
 
     public void updateUserRefreshToken(String refreshToken, String email) {
-        User currentUser = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User currentUser =
+                userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         currentUser.setRefreshToken(refreshToken);
         userRepository.save(currentUser);
     }

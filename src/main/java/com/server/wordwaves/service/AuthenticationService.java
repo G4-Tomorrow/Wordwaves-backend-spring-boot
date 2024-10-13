@@ -12,7 +12,6 @@ import com.server.wordwaves.dto.request.auth.LogoutRequest;
 import com.server.wordwaves.dto.request.auth.RefreshTokenRequest;
 import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
 import com.server.wordwaves.dto.response.auth.IntrospectResponse;
-import com.server.wordwaves.entity.user.User;
 
 public interface AuthenticationService {
     ResponseEntity<AuthenticationResponse> authenticate(AuthenticationRequest request);
@@ -23,5 +22,6 @@ public interface AuthenticationService {
 
     ResponseEntity<Void> logout(LogoutRequest request);
 
-    ResponseEntity<AuthenticationResponse> getRefreshToken(RefreshTokenRequest request) throws ParseException, JOSEException, JOSEException;
+    ResponseEntity<AuthenticationResponse> getRefreshToken(RefreshTokenRequest request)
+            throws ParseException, JOSEException, JOSEException;
 }

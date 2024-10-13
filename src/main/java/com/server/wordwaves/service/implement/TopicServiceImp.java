@@ -1,7 +1,5 @@
 package com.server.wordwaves.service.implement;
 
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +22,6 @@ import com.server.wordwaves.entity.vocabulary.WordCollection;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.TopicMapper;
-import com.server.wordwaves.mapper.WordMapper;
 import com.server.wordwaves.repository.TopicRepository;
 import com.server.wordwaves.repository.WordCollectionRepository;
 import com.server.wordwaves.repository.WordRepository;
@@ -47,12 +44,10 @@ public class TopicServiceImp implements TopicService {
     WordRepository wordRepository;
     TopicMapper topicMapper;
     DictionaryClient dictionaryClient;
-    WordMapper wordMapper;
 
     @Override
     public TopicResponse create(TopicCreationRequest request) {
         Topic topic = topicMapper.toTopic(request);
-        return topicMapper.toTopicResponse(topicRepository.save(topic));
         Optional<WordCollection> wordCollectionOptional = wordCollectionRepository.findById(request.getCollectionId());
 
         // nếu topic ko tồn tai thì bắn ra lỗi

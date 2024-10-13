@@ -2,8 +2,6 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -21,6 +19,8 @@ import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.user.UserResponse;
 import com.server.wordwaves.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -36,8 +36,6 @@ public class UserController {
     UserService userService;
 
     @PostMapping
-    ApiResponse<EmailResponse> register(
-            @RequestBody @Valid UserCreationRequest request) {
     @Operation(summary = "REGISTER", description = "Api Create New User")
     ApiResponse<EmailResponse> register(@RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<EmailResponse>builder()
@@ -68,7 +66,9 @@ public class UserController {
 
         return ResponseEntity.status(responseEntity.getStatusCode())
                 .headers(responseEntity.getHeaders())
-                .body(ApiResponse.<AuthenticationResponse>builder().result(responseEntity.getBody()).build());
+                .body(ApiResponse.<AuthenticationResponse>builder()
+                        .result(responseEntity.getBody())
+                        .build());
     }
 
     @GetMapping

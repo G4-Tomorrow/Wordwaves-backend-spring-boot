@@ -36,9 +36,12 @@ public class AuthenticationController {
             OAuth2AuthenticationToken oauth2AuthenticationToken) {
         ResponseEntity<AuthenticationResponse> responseEntity =
                 authenticationService.oauth2Authenticate(oauth2AuthenticationToken);
+
         ApiResponse<AuthenticationResponse> apiResponse = ApiResponse.<AuthenticationResponse>builder()
+                .message("Đăng nhập qua OAuth2")
                 .result(responseEntity.getBody())
                 .build();
+
         return ResponseEntity.status(responseEntity.getStatusCode())
                 .headers(responseEntity.getHeaders())
                 .body(apiResponse);
@@ -48,6 +51,7 @@ public class AuthenticationController {
     ResponseEntity<ApiResponse<AuthenticationResponse>> login(@RequestBody @Valid AuthenticationRequest request) {
         ResponseEntity<AuthenticationResponse> responseEntity = authenticationService.authenticate(request);
         ApiResponse<AuthenticationResponse> apiResponse = ApiResponse.<AuthenticationResponse>builder()
+                .message("Đăng nhập")
                 .result(responseEntity.getBody())
                 .build();
 
@@ -59,6 +63,7 @@ public class AuthenticationController {
     @PostMapping("/introspect")
     ApiResponse<IntrospectResponse> introspect(@RequestBody @Valid IntrospectRequest request) {
         return ApiResponse.<IntrospectResponse>builder()
+                .message("Kiểm tra token đã hết hạn hoặc bị logout chưa")
                 .result(authenticationService.introspect(request))
                 .build();
     }
@@ -79,6 +84,7 @@ public class AuthenticationController {
             @CookieValue(name = "refresh_token") RefreshTokenRequest request) throws ParseException, JOSEException {
         ResponseEntity<AuthenticationResponse> responseEntity = authenticationService.getRefreshToken(request);
         ApiResponse<AuthenticationResponse> apiResponse = ApiResponse.<AuthenticationResponse>builder()
+                .message("Refresh token")
                 .result(responseEntity.getBody())
                 .build();
 

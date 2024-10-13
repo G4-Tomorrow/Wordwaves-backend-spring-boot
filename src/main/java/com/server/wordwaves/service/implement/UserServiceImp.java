@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.server.wordwaves.config.JwtTokenProvider;
-import com.server.wordwaves.utils.AuthUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +35,7 @@ import com.server.wordwaves.repository.UserRepository;
 import com.server.wordwaves.service.EmailService;
 import com.server.wordwaves.service.TokenService;
 import com.server.wordwaves.service.UserService;
+import com.server.wordwaves.utils.AuthUtils;
 import com.server.wordwaves.utils.MyStringUtils;
 
 import lombok.AccessLevel;
@@ -57,7 +56,6 @@ public class UserServiceImp implements UserService {
     UserMapper userMapper;
     TokenService tokenService;
     AuthUtils authUtils;
-=======
 
     @Override
     public EmailResponse forgotPassword(ForgotPasswordRequest request) {

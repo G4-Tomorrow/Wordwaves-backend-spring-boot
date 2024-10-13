@@ -6,8 +6,6 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.server.wordwaves.repository.UserRepository;
-import com.server.wordwaves.utils.AuthUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -38,6 +36,7 @@ import com.server.wordwaves.service.AuthenticationService;
 import com.server.wordwaves.service.BaseRedisService;
 import com.server.wordwaves.service.TokenService;
 import com.server.wordwaves.service.UserService;
+import com.server.wordwaves.utils.AuthUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -78,7 +77,8 @@ public class AuthenticationServiceImp implements AuthenticationService {
     }
 
     @Override
-    public ResponseEntity<AuthenticationResponse> oauth2Authenticate(OAuth2AuthenticationToken oauth2AuthenticationToken) {
+    public ResponseEntity<AuthenticationResponse> oauth2Authenticate(
+            OAuth2AuthenticationToken oauth2AuthenticationToken) {
         String email = oauth2AuthenticationToken.getPrincipal().getAttribute("email");
         String fullName = oauth2AuthenticationToken.getPrincipal().getAttribute("name");
         String avatar = oauth2AuthenticationToken.getPrincipal().getAttribute("picture");
@@ -90,7 +90,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
         if (userService.existsUserByEmail(email)) {
             currentUser = userService.getUserByEmail(email);
 
-            if (currentUser.getProvider() == null && currentUser.getPassword() != null){
+            if (currentUser.getProvider() == null && currentUser.getPassword() != null) {
                 throw new AppException(ErrorCode.USER_EXISTED_WITH_BASIC_ACCOUNT);
             }
 
@@ -118,36 +118,6 @@ public class AuthenticationServiceImp implements AuthenticationService {
         }
 
         return authUtils.createAuthResponse(currentUser);
-    private ResponseEntity<AuthenticationResponse> createAuthResponse(User currentUser) {
-        if (Objects.isNull(currentUser)) {
-            throw new AppException(ErrorCode.USER_NOT_EXISTED);
-        }
-
-        // Add information about current user login to response
-        AuthenticationResponse authResponse = new AuthenticationResponse();
-        authResponse.setUser(userMapper.toUserResponse(currentUser));
-
-//         Create access token
-        String accessToken = jwtTokenProvider.generateAccessToken(currentUser);
-        authResponse.setAccessToken(accessToken);
-
-        // Create refresh token and update refresh token to User entity
-        String refreshToken = jwtTokenProvider.generateRefreshToken(currentUser);
-        userService.updateUserRefreshToken(refreshToken, currentUser.getEmail());
-
-        // Set cookies
-        ResponseCookie resCookies = ResponseCookie.from("refresh_token", refreshToken)
-                .httpOnly(true)
-                .secure(false) // Chỉ dùng trên localhost
-                .sameSite("Lax")
-                .path("/")
-                .maxAge(REFRESH_TOKEN_EXPIRATION)
-                .build();
-
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, resCookies.toString())
-                .body(authResponse);
     }
 
     @Override
