@@ -12,5 +12,6 @@ import lombok.experimental.FieldDefaults;
 public class UserUpdateRequest {
     @Schema(example = "Lưu Thị Thủy")
     String fullName;
+
     String avatarName;
 }

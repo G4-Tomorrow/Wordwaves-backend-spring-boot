@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest()
                         .authenticated())
+
                 // .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .oauth2Login(oauth2login -> {
                     oauth2login.defaultSuccessUrl("/auth/oauth2/login-success", true);
@@ -77,8 +78,14 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(
-                List.of("http://127.0.0.1:5500", "http://localhost:3000", "http://localhost:3001", "https://localhost:3001", "https://localhost:3000"));
+        configuration.setAllowedOrigins(List.of(
+                "http://127.0.0.1:5500",
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "https://localhost:3001",
+                "https://localhost:3000",
+                "https://backend-production-c2cb.up.railway.app"));
+
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
