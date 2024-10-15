@@ -2,8 +2,6 @@ package com.server.wordwaves.controller;
 
 import java.text.ParseException;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -20,6 +18,8 @@ import com.server.wordwaves.dto.response.auth.IntrospectResponse;
 import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.service.AuthenticationService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

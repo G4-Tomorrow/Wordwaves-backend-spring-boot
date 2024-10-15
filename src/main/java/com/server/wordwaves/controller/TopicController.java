@@ -2,8 +2,6 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
@@ -21,6 +19,8 @@ import com.server.wordwaves.dto.response.vocabulary.TopicResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordResponse;
 import com.server.wordwaves.service.TopicService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

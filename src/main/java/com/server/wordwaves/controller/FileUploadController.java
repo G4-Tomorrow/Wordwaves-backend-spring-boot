@@ -1,7 +1,5 @@
 package com.server.wordwaves.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +10,8 @@ import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.dto.response.file.FileUploadResponse;
 import com.server.wordwaves.service.FirebaseStorageService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
