@@ -2,6 +2,8 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
@@ -29,10 +31,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+@Tag(name = "Topic Controller")
 public class TopicController {
     TopicService topicService;
 
     @PostMapping
+    @Operation(summary = "CREATE TOPIC")
     ApiResponse<TopicResponse> create(@RequestBody @Valid TopicCreationRequest request) {
         return ApiResponse.<TopicResponse>builder()
                 .message("Tạo chủ đề mới thành công")
@@ -41,6 +45,7 @@ public class TopicController {
     }
 
     @GetMapping("/get-word/{topicId}")
+    @Operation(summary = "GET WORDS FROM TOPIC")
     ApiResponse<PaginationInfo<List<WordResponse>>> getWords(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
@@ -55,6 +60,7 @@ public class TopicController {
     }
 
     @PutMapping("/add/{topicId}")
+    @Operation(summary = "ADD WORDS INTO TOPIC")
     ApiResponse<Void> addWords(
             @RequestBody TopicAddWordsRequest request,
             @PathVariable @NotBlank(message = "LACK_OF_PARAMETER") String topicId) {

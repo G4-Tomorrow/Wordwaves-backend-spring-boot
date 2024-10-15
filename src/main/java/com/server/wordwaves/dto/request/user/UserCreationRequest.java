@@ -17,7 +17,7 @@ public class UserCreationRequest {
 
     @Email(message = "INVALID_EMAIL")
     @NotBlank(message = "EMAIL_IS_REQUIRED")
-    @Schema(example = "louisPham@yopmail.com")
+    @Schema(example = "quan1@yopmail.com")
     String email;
 
     //    @Size(min = 8, message = "INVALID_PASSWORD")

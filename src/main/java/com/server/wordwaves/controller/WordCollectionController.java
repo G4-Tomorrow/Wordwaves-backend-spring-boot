@@ -2,6 +2,8 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
@@ -23,10 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+@Tag(name = "Word Collection Controller")
 public class WordCollectionController {
     WordCollectionService wordCollectionService;
 
     @PostMapping
+    @Operation(summary = "CREATE WORD COLLECTION")
     ApiResponse<WordCollectionResponse> create(@RequestBody @Valid WordCollectionCreationRequest request) {
         return ApiResponse.<WordCollectionResponse>builder()
                 .message("Tạo bộ từ vựng thành công")
@@ -35,6 +39,7 @@ public class WordCollectionController {
     }
 
     @GetMapping
+    @Operation(summary = "GET COLLECTIONS")
     ApiResponse<PaginationInfo<List<WordCollectionResponse>>> getCollections(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
@@ -50,6 +55,7 @@ public class WordCollectionController {
     }
 
     @GetMapping("/get-topic/{collectionId}")
+    @Operation(summary = "GET TOPICS FROM WORD COLLECTION")
     ApiResponse<PaginationInfo<List<TopicResponse>>> getTopics(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
