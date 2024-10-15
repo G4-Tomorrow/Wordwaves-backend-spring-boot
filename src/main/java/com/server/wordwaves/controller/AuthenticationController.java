@@ -2,6 +2,8 @@ package com.server.wordwaves.controller;
 
 import java.text.ParseException;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -28,10 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/auth")
+@Tag(name = "Authentication Controller")
 public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @GetMapping("/oauth2/login-success")
+    @Operation(summary = "OAUTH2 LOGIN")
     ResponseEntity<ApiResponse<AuthenticationResponse>> oauth2Login(
             OAuth2AuthenticationToken oauth2AuthenticationToken) {
         ResponseEntity<AuthenticationResponse> responseEntity =
@@ -48,6 +52,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "BASIC LOGIN")
     ResponseEntity<ApiResponse<AuthenticationResponse>> login(@RequestBody @Valid AuthenticationRequest request) {
         ResponseEntity<AuthenticationResponse> responseEntity = authenticationService.authenticate(request);
         ApiResponse<AuthenticationResponse> apiResponse = ApiResponse.<AuthenticationResponse>builder()
@@ -61,6 +66,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/introspect")
+    @Operation(summary = "INTROSPECT")
     ApiResponse<IntrospectResponse> introspect(@RequestBody @Valid IntrospectRequest request) {
         return ApiResponse.<IntrospectResponse>builder()
                 .message("Kiểm tra token đã hết hạn hoặc bị logout chưa")
@@ -69,6 +75,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "LOGOUT")
     ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") LogoutRequest request) {
         ResponseEntity<Void> responseEntity = authenticationService.logout(request);
         ApiResponse<Void> apiResponse =
@@ -80,6 +87,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/refresh")
+    @Operation(summary = "REFRESH TOKEN")
     ResponseEntity<ApiResponse<AuthenticationResponse>> refresh(
             @CookieValue(name = "refresh_token") RefreshTokenRequest request) throws ParseException, JOSEException {
         ResponseEntity<AuthenticationResponse> responseEntity = authenticationService.getRefreshToken(request);

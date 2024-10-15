@@ -1,5 +1,6 @@
 package com.server.wordwaves.dto.model.mail;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,5 +11,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RecipientModel {
     //    String name;
+    @Schema(example = "quan01@yopmail.com")
     String email;
 }

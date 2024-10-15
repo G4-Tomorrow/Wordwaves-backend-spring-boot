@@ -1,5 +1,7 @@
 package com.server.wordwaves.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +22,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/files")
+@Tag(name = "File Upload Controller")
 public class FileUploadController {
     FirebaseStorageService firebaseStorageService;
 
     @PostMapping
+    @Operation(summary = "UPLOAD IMAGE")
     ApiResponse<FileUploadResponse> upload(@ModelAttribute FileUploadRequest request) {
         return ApiResponse.<FileUploadResponse>builder()
                 .message("Upload ảnh thành công")
