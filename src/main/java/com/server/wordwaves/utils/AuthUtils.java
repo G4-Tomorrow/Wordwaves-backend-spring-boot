@@ -54,7 +54,7 @@ public class AuthUtils {
         ResponseCookie resCookies = ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true)
                 .secure(false) // Chỉ dùng trên localhost
-                .sameSite("Lax")
+                .sameSite("None") // test
                 .path("/")
                 .maxAge(REFRESH_TOKEN_EXPIRATION)
                 .build();
