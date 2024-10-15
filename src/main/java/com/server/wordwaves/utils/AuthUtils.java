@@ -52,7 +52,7 @@ public class AuthUtils {
 
         // Set cookies
         ResponseCookie resCookies = ResponseCookie.from("refresh_token", refreshToken)
-                .httpOnly(true)
+                // .httpOnly(true)
                 .domain(null)
                 .secure(true) // Chỉ dùng trên localhost
                 .sameSite("None") // test
