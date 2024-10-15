@@ -53,7 +53,7 @@ public class AuthUtils {
         // Set cookies
         ResponseCookie resCookies = ResponseCookie.from("refresh_token", refreshToken)
                 // .httpOnly(true)
-                .domain(null)
+                .domain(".railway.app")
                 .secure(true) // Chỉ dùng trên localhost
                 .sameSite("None") // test
                 .path("/")
