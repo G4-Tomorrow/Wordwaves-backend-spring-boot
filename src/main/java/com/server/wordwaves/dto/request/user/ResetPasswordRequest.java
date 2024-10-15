@@ -1,8 +1,8 @@
 package com.server.wordwaves.dto.request.user;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -17,7 +17,6 @@ public class ResetPasswordRequest {
 
     @NotBlank(message = "NEW_PASSWORD_IS_REQUIRED")
     @Schema(example = "12345@Cu")
-
     String newPassword;
 
     @NotBlank(message = "CONFIRM_PASSWORD_IS_REQUIRED")

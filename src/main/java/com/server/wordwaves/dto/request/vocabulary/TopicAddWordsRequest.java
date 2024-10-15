@@ -12,8 +12,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TopicAddWordsRequest {
-    @Schema(
-            example = "[\"hello\", \"an\", \"word\"]"
-    )
+    @Schema(example = "[\"hello\", \"an\", \"word\"]")
     List<String> wordIds;
 }
