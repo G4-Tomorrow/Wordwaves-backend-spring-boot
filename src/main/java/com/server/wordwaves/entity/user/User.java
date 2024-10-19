@@ -1,5 +1,6 @@
 package com.server.wordwaves.entity.user;
 
+import java.time.Instant;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -39,6 +40,10 @@ public class User extends BaseEntity {
     String provider;
 
     String providerUserId;
+
+    int streak;
+
+    Instant lastRevision;
 
     @ManyToMany
     @JoinTable(
