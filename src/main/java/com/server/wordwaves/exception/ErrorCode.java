@@ -57,6 +57,7 @@ public enum ErrorCode {
     TOPIC_NAME_IS_REQUIRED(6101, "Tên chủ đề không được để trống", HttpStatus.BAD_REQUEST),
     TOPIC_NOT_EXISTED(6102, "Chủ đề không tồn tại", HttpStatus.BAD_REQUEST),
     TOPIC_MUST_BELONG_TO_WORD_COLLECTION(6103, "Chủ đề phải thuộc về ít nhất 1 topic", HttpStatus.BAD_REQUEST),
+    CONCURRENT_ADD_WORD_INTO_TOPIC(6104, "Xung đột trong quá trình thêm từ vựng vào chủ đề", HttpStatus.CONFLICT),
 
     WORD_EXISTED(6201, "Từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
     WORD_NOT_EXISTED(6202, "Từ vựng không tồn tại", HttpStatus.BAD_REQUEST),
