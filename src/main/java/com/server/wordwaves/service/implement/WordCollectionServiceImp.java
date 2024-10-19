@@ -45,7 +45,6 @@ public class WordCollectionServiceImp implements WordCollectionService {
     WordCollectionRepository wordCollectionRepository;
     WordCollectionMapper wordCollectionMapper;
     WordCollectionCategoryRepository wordCollectionCategoryRepository;
-    TopicRepository topicRepository;
     UserRepository userRepository;
 
     @Override
