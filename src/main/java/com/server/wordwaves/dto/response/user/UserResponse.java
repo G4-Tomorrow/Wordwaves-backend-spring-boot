@@ -21,7 +21,5 @@ public class UserResponse extends BaseResponse {
     String email;
     String fullName;
     String avatarName;
-    Instant createdAt;
-    Instant updatedAt;
     Set<Role> roles;
 }

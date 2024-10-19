@@ -8,6 +8,7 @@ import com.server.wordwaves.entity.common.BaseAuthor;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @NoArgsConstructor
@@ -15,7 +16,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Builder
+@SuperBuilder
 public class WordCollection extends BaseAuthor {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

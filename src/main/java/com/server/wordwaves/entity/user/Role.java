@@ -2,16 +2,18 @@ package com.server.wordwaves.entity.user;
 
 import java.util.Set;
 
+import com.server.wordwaves.entity.common.BaseAuthor;
 import jakarta.persistence.*;
 
 import com.server.wordwaves.entity.common.BaseEntity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
