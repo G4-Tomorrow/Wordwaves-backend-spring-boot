@@ -7,6 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import com.server.wordwaves.dto.request.vocabulary.TopicAddWordsRequest;
@@ -33,6 +36,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -91,6 +95,7 @@ public class TopicServiceImp implements TopicService {
                     wordResponse.setUpdatedAt(word.getUpdatedAt());
                     wordResponse.setCreatedById(word.getCreatedById());
                     wordResponse.setVietnamese(word.getVietnamese());
+                    wordResponse.setUpdatedById(word.getUpdatedById());
                     return wordResponse;
                 })
                 .toList();
@@ -111,7 +116,14 @@ public class TopicServiceImp implements TopicService {
                 .build();
     }
 
+    // Hàm add word vào trong topic, nếu như có 1 word ko hợp lệ thì sẽ rollback và ném ra ngoại lệ
     @Override
+    @Transactional
+    @Retryable(
+            retryFor = ObjectOptimisticLockingFailureException.class,
+            maxAttempts = 3, // Thử retry tối đa 3 lần
+            backoff = @Backoff(delay = 500, multiplier = 1.5) // Đợi 500ms trước lần retry kế tiếp
+    )
     public int addWords(String topicId, TopicAddWordsRequest request) {
         Optional<Topic> topicOptional = topicRepository.findById(topicId);
 

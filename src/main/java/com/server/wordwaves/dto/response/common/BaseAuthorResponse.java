@@ -10,9 +10,8 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class BaseAuthorResponse extends BaseResponse {
-    @JsonProperty(index = 100)
     String createdById;
+    String updatedById;
 }

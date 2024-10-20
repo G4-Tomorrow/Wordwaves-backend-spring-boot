@@ -2,6 +2,7 @@ package com.server.wordwaves.dto.response.vocabulary;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

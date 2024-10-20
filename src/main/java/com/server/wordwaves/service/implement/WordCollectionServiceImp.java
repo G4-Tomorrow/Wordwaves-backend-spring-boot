@@ -24,7 +24,6 @@ import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.TopicMapper;
 import com.server.wordwaves.mapper.WordCollectionMapper;
-import com.server.wordwaves.repository.TopicRepository;
 import com.server.wordwaves.repository.UserRepository;
 import com.server.wordwaves.repository.WordCollectionCategoryRepository;
 import com.server.wordwaves.repository.WordCollectionRepository;

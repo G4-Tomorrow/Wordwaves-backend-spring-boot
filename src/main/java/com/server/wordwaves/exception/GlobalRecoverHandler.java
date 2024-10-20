@@ -1,11 +1,13 @@
 package com.server.wordwaves.exception;
 
-import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
-import com.server.wordwaves.dto.response.vocabulary.WordResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Component;
+
+import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
+import com.server.wordwaves.dto.response.vocabulary.WordResponse;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j

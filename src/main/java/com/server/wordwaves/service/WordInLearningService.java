@@ -1,4 +1,3 @@
 package com.server.wordwaves.service;
 
-public interface WordInLearningService {
-}
+public interface WordInLearningService {}

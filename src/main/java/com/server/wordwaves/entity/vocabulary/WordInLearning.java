@@ -1,15 +1,17 @@
 package com.server.wordwaves.entity.vocabulary;
 
+import java.time.Instant;
+import java.util.UUID;
+
+import jakarta.persistence.*;
+
 import com.server.wordwaves.constant.Level;
 import com.server.wordwaves.entity.common.BaseEntity;
 import com.server.wordwaves.entity.user.User;
-import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-
-import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @NoArgsConstructor

@@ -1,7 +1,5 @@
 package com.server.wordwaves.config;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -60,7 +58,7 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest()
                         .authenticated())
-//                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+                //                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .oauth2Login(oauth2login -> {
                     oauth2login.defaultSuccessUrl("/auth/oauth2/login-success", true);
                 });
