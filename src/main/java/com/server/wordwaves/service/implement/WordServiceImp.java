@@ -87,7 +87,7 @@ public class WordServiceImp implements WordService {
 
         Word createdWord = null;
         try {
-            createdWord = wordRepository.save(word);
+            createdWord = wordRepository.saveAndFlush(word);
         } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.WORD_EXISTED);
         }
