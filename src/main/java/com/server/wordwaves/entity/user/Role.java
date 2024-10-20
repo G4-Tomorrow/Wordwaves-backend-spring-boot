@@ -20,6 +20,8 @@ public class Role extends BaseEntity {
     @Id
     String name;
 
+    String description;
+
     @ManyToMany
     @JoinTable(
             name = "RoleToPermission",

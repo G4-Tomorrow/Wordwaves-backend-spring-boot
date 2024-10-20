@@ -18,4 +18,6 @@ import lombok.experimental.FieldDefaults;
 public class Permission extends BaseEntity {
     @Id
     String name;
+
+    String description;
 }

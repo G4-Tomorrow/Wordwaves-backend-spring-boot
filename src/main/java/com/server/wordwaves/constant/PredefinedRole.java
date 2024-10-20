@@ -9,7 +9,6 @@ import lombok.experimental.FieldDefaults;
 public enum PredefinedRole {
     USER_ROLE("USER"),
     ADMIN_ROLE("ADMIN"),
-    EMPLOYER_ROLE("EMPLOYER"),
     ;
     String name;
 
