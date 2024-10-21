@@ -7,15 +7,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.server.wordwaves.service.BaseService;
-import com.server.wordwaves.utils.ErrorMessageUtils;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import com.server.wordwaves.dto.request.role.RoleCreationRequest;
 import com.server.wordwaves.dto.request.role.RoleUpdateRequest;
-import com.server.wordwaves.dto.response.common.Pagination;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
-import com.server.wordwaves.dto.response.common.QueryOptions;
 import com.server.wordwaves.dto.response.role.RoleResponse;
 import com.server.wordwaves.entity.user.Permission;
 import com.server.wordwaves.entity.user.Role;
@@ -69,48 +66,44 @@ public class RoleServiceImp implements RoleService {
 
         List<String> permissionNames = request.getPermissionNames();
 
-        Set<String> existingPermissionsInRole = role.getPermissions().stream()
-                .map(Permission::getName)
-                .collect(Collectors.toSet());
-
-        List<String> notAddedPermissions = new ArrayList<>();
-        List<String> alreadyExistPermissions = new ArrayList<>();
-        List<String> addedPermissions = new ArrayList<>();
+        List<String> notExistingPermissions = new ArrayList<>();
 
         if (permissionNames != null && !permissionNames.isEmpty()) {
             List<Permission> existingPermissions = permissionRepository.findAllById(permissionNames);
-
             Set<String> existingPermissionNames = existingPermissions.stream()
                     .map(Permission::getName)
                     .collect(Collectors.toSet());
 
-            notAddedPermissions = permissionNames.stream()
+            notExistingPermissions = permissionNames.stream()
                     .filter(permissionName -> !existingPermissionNames.contains(permissionName))
                     .collect(Collectors.toList());
 
-            alreadyExistPermissions = permissionNames.stream()
+            if (!notExistingPermissions.isEmpty()) {
+                throw new AppException(
+                        ErrorCode.PERMISSION_NOT_EXISTED,
+                        "Các quyền hạn sau không tồn tại trên hệ thống: " + String.join(", ", notExistingPermissions)
+                );
+            }
+
+            Set<String> existingPermissionsInRole = role.getPermissions().stream()
+                    .map(Permission::getName)
+                    .collect(Collectors.toSet());
+
+            List<String> alreadyExistPermissions = permissionNames.stream()
                     .filter(existingPermissionsInRole::contains)
                     .collect(Collectors.toList());
 
-            List<Permission> permissionsToAdd = existingPermissions.stream()
-                    .filter(permission -> !existingPermissionsInRole.contains(permission.getName()))
-                    .collect(Collectors.toList());
+            if (!alreadyExistPermissions.isEmpty()) {
+                throw new AppException(ErrorCode.PERMISSION_ALREADY_EXISTED,
+                        "Quyền hạn " + String.join(", ", alreadyExistPermissions) + " đã tồn tại trong vai trò " + name);
+            }
 
-            role.getPermissions().addAll(permissionsToAdd);
-
-            addedPermissions = permissionsToAdd.stream()
-                    .map(Permission::getName)
-                    .collect(Collectors.toList());
+            role.getPermissions().addAll(existingPermissions);
         }
 
         Role updatedRole = roleRepository.save(role);
 
-        String message = ErrorMessageUtils.generateUpdateRoleMessage(name, addedPermissions, notAddedPermissions, alreadyExistPermissions);
-
-        RoleResponse response = roleMapper.toRoleResponse(updatedRole);
-        response.setMessage(message);
-
-        return response;
+        return roleMapper.toRoleResponse(updatedRole);
     }
 
     @Override

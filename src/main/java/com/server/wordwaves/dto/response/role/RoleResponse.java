@@ -18,5 +18,4 @@ public class RoleResponse extends BaseResponse {
     String name;
     String description;
     Set<Permission> permissions;
-    String message;
 }
