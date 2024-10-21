@@ -77,13 +77,4 @@ public class RoleController {
                 .result(roleService.getRoles(pageNumber, pageSize, sortBy, sortDirection, searchQuery))
                 .build();
     }
-
-    @PostMapping("/{name}/permissions")
-    @Operation(summary = "THÊM QUYỀN HẠN VÀO VAI TRÒ")
-    public ApiResponse<Void> addPermissionsToRole(@PathVariable String name, @RequestBody List<String> permissionNames) {
-        roleService.addPermissionsToRole(name, permissionNames);
-        return ApiResponse.<Void>builder()
-                .message("Thêm quyền hạn vào vai trò thành công")
-                .build();
-    }
 }

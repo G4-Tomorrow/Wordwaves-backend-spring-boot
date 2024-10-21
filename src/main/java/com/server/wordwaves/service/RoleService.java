@@ -23,7 +23,4 @@ public interface RoleService {
 
     @PreAuthorize("hasRole('ADMIN')")
     PaginationInfo<List<RoleResponse>> getRoles(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery);
-
-    @PreAuthorize("hasRole('ADMIN')")
-    void addPermissionsToRole(String roleName, List<String> permissionNames);
 }

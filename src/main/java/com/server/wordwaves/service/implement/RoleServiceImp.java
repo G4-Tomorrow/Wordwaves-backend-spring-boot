@@ -1,9 +1,11 @@
 package com.server.wordwaves.service.implement;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.server.wordwaves.utils.ErrorMessageUtils;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -57,9 +59,55 @@ public class RoleServiceImp implements RoleService {
     public RoleResponse updateRole(String name, RoleUpdateRequest request) {
         Role role = roleRepository.findById(name)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
-        role.setDescription(request.getDescription());
+
+        if (request.getDescription() != null && !request.getDescription().isEmpty()) {
+            role.setDescription(request.getDescription());
+        }
+
+        List<String> permissionNames = request.getPermissionNames();
+
+        Set<String> existingPermissionsInRole = role.getPermissions().stream()
+                .map(Permission::getName)
+                .collect(Collectors.toSet());
+
+        List<String> notAddedPermissions = new ArrayList<>();
+        List<String> alreadyExistPermissions = new ArrayList<>();
+        List<String> addedPermissions = new ArrayList<>();
+
+        if (permissionNames != null && !permissionNames.isEmpty()) {
+            List<Permission> existingPermissions = permissionRepository.findAllById(permissionNames);
+
+            Set<String> existingPermissionNames = existingPermissions.stream()
+                    .map(Permission::getName)
+                    .collect(Collectors.toSet());
+
+            notAddedPermissions = permissionNames.stream()
+                    .filter(permissionName -> !existingPermissionNames.contains(permissionName))
+                    .collect(Collectors.toList());
+
+            alreadyExistPermissions = permissionNames.stream()
+                    .filter(existingPermissionsInRole::contains)
+                    .collect(Collectors.toList());
+
+            List<Permission> permissionsToAdd = existingPermissions.stream()
+                    .filter(permission -> !existingPermissionsInRole.contains(permission.getName()))
+                    .collect(Collectors.toList());
+
+            role.getPermissions().addAll(permissionsToAdd);
+
+            addedPermissions = permissionsToAdd.stream()
+                    .map(Permission::getName)
+                    .collect(Collectors.toList());
+        }
+
         Role updatedRole = roleRepository.save(role);
-        return roleMapper.toRoleResponse(updatedRole);
+
+        String message = ErrorMessageUtils.generateUpdateRoleMessage(name, addedPermissions, notAddedPermissions, alreadyExistPermissions);
+
+        RoleResponse response = roleMapper.toRoleResponse(updatedRole);
+        response.setMessage(message);
+
+        return response;
     }
 
     @Override
@@ -109,19 +157,5 @@ public class RoleServiceImp implements RoleService {
                 .queryOptions(queryOptions)
                 .data(roles)
                 .build();
-    }
-
-    @Override
-    public void addPermissionsToRole(String roleName, List<String> permissionNames) {
-        Role role = roleRepository.findById(roleName)
-                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
-        Set<Permission> permissions = permissionRepository.findAllById(permissionNames)
-                .stream()
-                .collect(Collectors.toSet());
-        if (permissions.isEmpty()) {
-            throw new AppException(ErrorCode.PERMISSION_NOT_EXISTED);
-        }
-        role.setPermissions(permissions);
-        roleRepository.save(role);
     }
 }
