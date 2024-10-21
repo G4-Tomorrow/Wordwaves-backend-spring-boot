@@ -49,10 +49,11 @@ public class WordController {
             @RequestParam int pageSize,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
-            @RequestParam(required = false) String searchQuery) {
+            @RequestParam(required = false) String searchQuery,
+            @RequestParam(required = false, defaultValue = "false") boolean isUnassigned) {  // Thêm tham số mới
         return ApiResponse.<PaginationInfo<List<WordResponse>>>builder()
                 .message("Lấy từ vựng")
-                .result(wordService.getWords(pageNumber, pageSize, sortBy, sortDirection, searchQuery))
+                .result(wordService.getWords(pageNumber, pageSize, sortBy, sortDirection, searchQuery, isUnassigned))
                 .build();
     }
 

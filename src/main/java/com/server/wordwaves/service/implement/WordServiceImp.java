@@ -1,22 +1,5 @@
 package com.server.wordwaves.service.implement;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
 import com.server.wordwaves.dto.response.common.Pagination;
@@ -36,13 +19,28 @@ import com.server.wordwaves.repository.httpclient.DictionaryClient;
 import com.server.wordwaves.repository.httpclient.ImageClient;
 import com.server.wordwaves.service.WordService;
 import com.server.wordwaves.utils.MyStringUtils;
-
-import feign.FeignException;
+import com.server.wordwaves.utils.WordUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -52,9 +50,9 @@ public class WordServiceImp implements WordService {
     WordRepository wordRepository;
     TopicRepository topicRepository;
     WordMapper wordMapper;
-    DictionaryClient dictionaryClient;
     ImageClient imageClient;
     ApplicationEventPublisher eventPublisher;
+    WordUtils wordUtils;
 
     ObjectMapper objectMapper;
 
@@ -103,64 +101,33 @@ public class WordServiceImp implements WordService {
         }
 
         // Lấy từ điển
-        List<WordResponse> wordResponses = null;
-        try {
-            wordResponses = dictionaryClient.retrieveEntries(word.getName());
-        } catch (FeignException e) {
-            log.info("!!!ERROR: Lấy thông tin từ vựng thất bại");
-        }
-
-        // Lấy từ phản hồi đầu tiên từ danh sách
-        WordResponse wordResponse;
-        if (!wordResponses.isEmpty()) {
-            wordResponse = wordResponses.get(0);
-            wordResponse.setId(createdWord.getId());
-            wordResponse.setName(createdWord.getName());
-            wordResponse.setThumbnailUrl(thumbnailUrl);
-            wordResponse.setCreatedAt(createdWord.getCreatedAt());
-            wordResponse.setUpdatedAt(createdWord.getUpdatedAt());
-            wordResponse.setCreatedById(createdWord.getCreatedById());
-            wordResponse.setUpdatedById(createdWord.getUpdatedById());
-        } else {
-            // Nếu từ vựng hợp lệ nhưng chưa có định nghĩa
-            wordResponse = wordMapper.toWordResponse(createdWord);
-        }
-        return wordResponse;
+        return wordUtils.getWordDetail(createdWord);
     }
 
     @Override
     public PaginationInfo<List<WordResponse>> getWords(
-            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
+            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, boolean isUnassigned) {
         --pageNumber;
         Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
                 ? Sort.unsorted()
                 : sortDirection.equalsIgnoreCase("DESC")
-                        ? Sort.by(sortBy).descending()
-                        : Sort.by(sortBy).ascending();
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<Word> wordPage;
 
-        Page<Word> wordPage = MyStringUtils.isNullOrEmpty(searchQuery)
-                ? wordRepository.findAll(pageable)
-                : wordRepository.findByNameContainingIgnoreCase(searchQuery, pageable);
+        if (isUnassigned) {
+            // Lấy danh sách từ vựng chưa thuộc về bất kỳ topic nào
+            wordPage = wordRepository.findWordsWithoutTopicsByNameContaining(searchQuery, pageable);
+        } else {
+            // Nếu không tìm từ vựng theo các điều kiện khác
+            wordPage = MyStringUtils.isNullOrEmpty(searchQuery)
+                    ? wordRepository.findAll(pageable)
+                    : wordRepository.findByNameContainingIgnoreCase(searchQuery, pageable);
+        }
 
-        List<WordResponse> wordResponses = wordPage.map(word -> {
-                    try {
-                        List<WordResponse> tmp = dictionaryClient.retrieveEntries(word.getName());
-                        WordResponse wordResponse = tmp.getFirst();
-                        wordResponse.setId(word.getId());
-                        wordResponse.setName(word.getName());
-                        wordResponse.setThumbnailUrl(word.getThumbnailUrl());
-                        wordResponse.setCreatedAt(word.getCreatedAt());
-                        wordResponse.setUpdatedAt(word.getUpdatedAt());
-                        wordResponse.setCreatedById(word.getCreatedById());
-                        wordResponse.setUpdatedById(word.getUpdatedById());
-                        wordResponse.setVietnamese(word.getVietnamese());
-                        return wordResponse;
-                    } catch (FeignException e) {
-                        return wordMapper.toWordResponse(word);
-                    }
-                })
+        List<WordResponse> wordResponses = wordPage.map(wordUtils::getWordDetail)
                 .toList();
 
         return PaginationInfo.<List<WordResponse>>builder()
@@ -179,6 +146,8 @@ public class WordServiceImp implements WordService {
                 .build();
     }
 
+
     @Override
-    public void deleteById(String wordId) {}
+    public void deleteById(String wordId) {
+    }
 }

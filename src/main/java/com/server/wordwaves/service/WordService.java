@@ -10,7 +10,7 @@ public interface WordService {
     WordResponse create(WordCreationRequest request);
 
     PaginationInfo<List<WordResponse>> getWords(
-            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery);
+            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, boolean isUnassigned);
 
     void deleteById(String wordId);
 }

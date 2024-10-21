@@ -20,6 +20,7 @@ import com.server.wordwaves.repository.WordRepository;
 import com.server.wordwaves.repository.httpclient.DictionaryClient;
 import com.server.wordwaves.service.TopicService;
 import com.server.wordwaves.utils.MyStringUtils;
+import com.server.wordwaves.utils.WordUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -47,8 +48,8 @@ public class TopicServiceImp implements TopicService {
     WordCollectionRepository wordCollectionRepository;
     WordRepository wordRepository;
     TopicMapper topicMapper;
-    DictionaryClient dictionaryClient;
     ApplicationEventPublisher eventPublisher;
+    WordUtils wordUtils;
 
     @Override
     public TopicResponse create(TopicCreationRequest request) {
@@ -86,20 +87,7 @@ public class TopicServiceImp implements TopicService {
             wordPage = topicRepository.findWordsByTopicId(topicId, pageable);
         }
 
-        List<WordResponse> wordResponses = wordPage.map(word -> {
-                    List<WordResponse> tmp = dictionaryClient.retrieveEntries(word.getName());
-                    WordResponse wordResponse = tmp.getFirst();
-                    wordResponse.setId(word.getId());
-                    wordResponse.setName(word.getName());
-                    wordResponse.setThumbnailUrl(word.getThumbnailUrl());
-                    wordResponse.setCreatedAt(word.getCreatedAt());
-                    wordResponse.setUpdatedAt(word.getUpdatedAt());
-                    wordResponse.setCreatedById(word.getCreatedById());
-                    wordResponse.setVietnamese(word.getVietnamese());
-                    wordResponse.setUpdatedById(word.getUpdatedById());
-                    return wordResponse;
-                })
-                .toList();
+        List<WordResponse> wordResponses = wordPage.map(wordUtils::getWordDetail).toList();
 
         return PaginationInfo.<List<WordResponse>>builder()
                 .pagination(Pagination.builder()
@@ -118,7 +106,6 @@ public class TopicServiceImp implements TopicService {
     }
 
     // Hàm add word vào trong topic, nếu như có 1 word ko hợp lệ thì sẽ rollback và ném ra ngoại lệ
-
     @Override
     @Transactional
     @Retryable(
@@ -143,6 +130,7 @@ public class TopicServiceImp implements TopicService {
 
         topic.getWords().addAll(words);
         topicRepository.save(topic);
+
         // publish event để tính toán lại số lượng từ vựng của topic
         eventPublisher.publishEvent(new WordsChangedEvent(this, List.of(topicId)));
         return request.getWordIds().size();
