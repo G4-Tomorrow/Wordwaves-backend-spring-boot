@@ -12,4 +12,6 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleResponse extends BaseResponse {
+    String name;
+    String description;
 }

@@ -68,8 +68,13 @@ public enum ErrorCode {
     USER_EXISTED_WITH_BASIC_ACCOUNT(
             7002, "Tài khoản đã tồn tại trên hệ thống với email/password", HttpStatus.BAD_REQUEST),
     USER_EXISTED_WITH_OAUTH2(7003, "Tài khoản đã tồn tại với nhà cung cấp OAuth2", HttpStatus.BAD_REQUEST),
-    ;
 
+    // PERMISSION ERROR CODE
+    PERMISSION_EXISTED(8001, "Quyền hạn đã tồn tại", HttpStatus.BAD_REQUEST),
+    PERMISSION_NAME_IS_REQUIRED(8002, "Tên quyền hạn không được để trống", HttpStatus.BAD_REQUEST),
+    PERMISSION_NOT_EXISTED(8003, "Quyền hạn không tồn tại", HttpStatus.BAD_REQUEST),
+
+    ;
     int code;
     String message;
     HttpStatusCode statusCode;

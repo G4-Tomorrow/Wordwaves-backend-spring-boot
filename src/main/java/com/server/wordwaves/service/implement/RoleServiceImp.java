@@ -1,5 +1,6 @@
 package com.server.wordwaves.service.implement;
 
+import com.server.wordwaves.mapper.RoleMapper;
 import com.server.wordwaves.repository.RoleRepository;
 import com.server.wordwaves.service.RoleService;
 import lombok.AccessLevel;
@@ -14,4 +15,5 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RoleServiceImp implements RoleService {
     RoleRepository roleRepository;
+    RoleMapper roleMapper;
 }
