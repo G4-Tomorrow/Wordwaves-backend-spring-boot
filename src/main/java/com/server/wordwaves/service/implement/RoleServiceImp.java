@@ -3,8 +3,10 @@ package com.server.wordwaves.service.implement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.server.wordwaves.service.BaseService;
 import com.server.wordwaves.utils.ErrorMessageUtils;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,7 @@ public class RoleServiceImp implements RoleService {
     RoleRepository roleRepository;
     PermissionRepository permissionRepository;
     RoleMapper roleMapper;
+    BaseService<Role, RoleResponse> baseService;
 
     @Override
     public RoleResponse createRole(RoleCreationRequest request) {
@@ -120,42 +123,22 @@ public class RoleServiceImp implements RoleService {
 
     @Override
     public PaginationInfo<List<RoleResponse>> getRoles(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
-        pageNumber--;
-        Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
-                ? Sort.unsorted()
-                : sortDirection.equalsIgnoreCase("DESC")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
-        Page<Role> rolesPage;
 
-        if (MyStringUtils.isNotNullAndNotEmpty(searchQuery)) {
-            rolesPage = roleRepository.findByNameContainingOrDescriptionContaining(searchQuery, searchQuery, pageable);
-        } else {
-            rolesPage = roleRepository.findAll(pageable);
-        }
+        Function<String, Page<Role>> searchFunction = query -> {
+            if (MyStringUtils.isNotNullAndNotEmpty(query)) {
+                return roleRepository.findByNameContainingOrDescriptionContaining(query, query, pageable);
+            } else {
+                return roleRepository.findAll(pageable);
+            }
+        };
 
-        List<RoleResponse> roles = rolesPage.stream()
+        Function<Page<Role>, List<RoleResponse>> mapFunction = page -> page.stream()
                 .map(roleMapper::toRoleResponse)
                 .collect(Collectors.toList());
 
-        Pagination pagination = Pagination.builder()
-                .pageNumber(++pageNumber)
-                .pageSize(pageSize)
-                .totalPages(rolesPage.getTotalPages())
-                .totalElements(rolesPage.getTotalElements())
-                .build();
-
-        QueryOptions queryOptions = QueryOptions.builder()
-                .sortBy(sortBy)
-                .sortDirection(sortDirection)
-                .searchQuery(searchQuery)
-                .build();
-
-        return PaginationInfo.<List<RoleResponse>>builder()
-                .pagination(pagination)
-                .queryOptions(queryOptions)
-                .data(roles)
-                .build();
+        return baseService.getAll(pageNumber, pageSize, sortBy, sortDirection, searchQuery, searchFunction, mapFunction);
     }
 }

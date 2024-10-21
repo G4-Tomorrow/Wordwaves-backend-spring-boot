@@ -1,8 +1,10 @@
 package com.server.wordwaves.service.implement;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.server.wordwaves.service.BaseService;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,7 @@ public class PermissionServiceImp implements PermissionService {
 
     PermissionRepository permissionRepository;
     PermissionMapper permissionMapper;
+    BaseService<Permission, PermissionResponse> baseService;
 
     @Override
     public PermissionResponse createPermission(PermissionCreationRequest request) {
@@ -68,42 +71,22 @@ public class PermissionServiceImp implements PermissionService {
 
     @Override
     public PaginationInfo<List<PermissionResponse>> getPermissions(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
-        pageNumber--;
-        Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
-                ? Sort.unsorted()
-                : sortDirection.equalsIgnoreCase("DESC")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
-        Page<Permission> permissionsPage;
 
-        if (MyStringUtils.isNotNullAndNotEmpty(searchQuery)) {
-            permissionsPage = permissionRepository.findByNameContainingOrDescriptionContaining(searchQuery, searchQuery, pageable);
-        } else {
-            permissionsPage = permissionRepository.findAll(pageable);
-        }
+        Function<String, Page<Permission>> searchFunction = query -> {
+            if (MyStringUtils.isNotNullAndNotEmpty(query)) {
+                return permissionRepository.findByNameContainingOrDescriptionContaining(query, query, pageable);
+            } else {
+                return permissionRepository.findAll(pageable);
+            }
+        };
 
-        List<PermissionResponse> permissions = permissionsPage.stream()
+        Function<Page<Permission>, List<PermissionResponse>> mapFunction = page -> page.stream()
                 .map(permissionMapper::toPermissionResponse)
                 .collect(Collectors.toList());
 
-        Pagination pagination = Pagination.builder()
-                .pageNumber(++pageNumber)
-                .pageSize(pageSize)
-                .totalPages(permissionsPage.getTotalPages())
-                .totalElements(permissionsPage.getTotalElements())
-                .build();
-
-        QueryOptions queryOptions = QueryOptions.builder()
-                .sortBy(sortBy)
-                .sortDirection(sortDirection)
-                .searchQuery(searchQuery)
-                .build();
-
-        return PaginationInfo.<List<PermissionResponse>>builder()
-                .pagination(pagination)
-                .queryOptions(queryOptions)
-                .data(permissions)
-                .build();
+        return baseService.getAll(pageNumber, pageSize, sortBy, sortDirection, searchQuery, searchFunction, mapFunction);
     }
 }
