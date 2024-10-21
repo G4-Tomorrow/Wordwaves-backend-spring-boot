@@ -3,6 +3,7 @@ package com.server.wordwaves.service;
 import java.text.ParseException;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
 import com.nimbusds.jose.JOSEException;
@@ -20,6 +21,7 @@ public interface AuthenticationService {
 
     IntrospectResponse introspect(IntrospectRequest request);
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     ResponseEntity<Void> logout(LogoutRequest request);
 
     ResponseEntity<AuthenticationResponse> getRefreshToken(RefreshTokenRequest request)

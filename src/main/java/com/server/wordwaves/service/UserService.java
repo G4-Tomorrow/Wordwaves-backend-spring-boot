@@ -25,15 +25,18 @@ public interface UserService {
     @PreAuthorize("hasRole('ADMIN')")
     PaginationInfo<List<UserResponse>> getUsers(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery);
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     UserResponse getMyInfo();
 
     @PostAuthorize("returnObject.id == authentication.name || hasRole('ADMIN')")
     UserResponse getUserById(String userId);
 
+    @PostAuthorize("returnObject.id == authentication.name || hasRole('ADMIN')")
     UserResponse updateUserById(String userId, UserUpdateRequest userUpdateRequest);
 
     User getUserByEmail(String email);
 
+    @PreAuthorize("hasRole('ADMIN')")
     void deleteUserById(String userId);
 
     User getUserByIdAndRefreshToken(String userId, String refreshToken);
