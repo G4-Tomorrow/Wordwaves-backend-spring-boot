@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum ErrorCode {
-    // UNCATEGORIZED
+    // UNCATEGORIZED ERROR CODE
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // USER ERROR CODE
@@ -32,22 +32,24 @@ public enum ErrorCode {
     NEW_PASSWORD_IS_REQUIRED(1013, "Mật khẩu mới không được để trống", HttpStatus.BAD_REQUEST),
     CONFIRM_PASSWORD_IS_REQUIRED(1014, "Xác nhận mật khẩu mới không được để trống", HttpStatus.BAD_REQUEST),
 
-    // TOKEN
+    // TOKEN ERROR CODE
     EMPTY_TOKEN(2001, "Token rỗng", HttpStatus.BAD_REQUEST),
     INVALID_TOKEN(2002, "Token giải mã không chính xác", HttpStatus.BAD_REQUEST),
     EXPIRED_TOKEN(2003, "Token đã hết hạn", HttpStatus.BAD_REQUEST),
     TOKEN_WAS_LOGOUT(2004, "Token đã đăng xuất, vui lòng đăng nhập lại", HttpStatus.BAD_REQUEST),
 
-    // API
+    // API ERROR CODE
     LACK_OF_PARAMETER(3001, "Api còn thiếu tham số", HttpStatus.BAD_REQUEST),
 
-    // ROLE
-    ROLE_NOT_EXIST(4001, "Tác nhân không tồn tại", HttpStatus.BAD_REQUEST),
+    // ROLE ERROR CODE
+    ROLE_EXISTED(4001, "Vai trò đã tồn tại", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_EXISTED(4002, "Vai trò không tồn tại", HttpStatus.BAD_REQUEST),
+    ROLE_NAME_IS_REQUIRED(4003, "Tên vai trò không được để trống", HttpStatus.BAD_REQUEST),
 
-    // FILE
+    // FILE ERROR CODE
     EMPTY_FILE(5001, "File rỗng", HttpStatus.BAD_REQUEST),
 
-    // VOCABULARY
+    // VOCABULARY ERROR CODE
     WORD_COLLECTION_NAME_IS_REQUIRED(6001, "Tên của bộ từ vựng không được để trống", HttpStatus.BAD_REQUEST),
     WORD_COLLECTION_CATEGORY_IS_REQUIRED(6002, "Phân loại bộ từ vựng không được để trống", HttpStatus.BAD_REQUEST),
     WORD_NAME_IS_REQUIRED(6003, "Tên của từ vựng không được để trống", HttpStatus.BAD_REQUEST),

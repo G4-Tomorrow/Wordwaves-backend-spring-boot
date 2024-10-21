@@ -1,6 +1,5 @@
 package com.server.wordwaves.dto.request.role;
 
-import jakarta.validation.constraints.NotBlank;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,12 +9,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RoleCreationRequest {
+public class RoleUpdateRequest {
 
-    @NotBlank(message = "ROLE_NAME_IS_REQUIRED")
-    @Schema(example = "ADMIN")
-    String name;
-
-    @Schema(example = "Vai trò quản trị viên với đầy đủ quyền hạn")
+    @Schema(example = "Cập nhật mô tả vai trò")
     String description;
 }

@@ -4,6 +4,9 @@ import com.server.wordwaves.dto.response.common.BaseResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import com.server.wordwaves.entity.user.Permission;
+
+import java.util.Set;
 
 @Data
 @SuperBuilder
@@ -14,4 +17,5 @@ import lombok.experimental.SuperBuilder;
 public class RoleResponse extends BaseResponse {
     String name;
     String description;
+    Set<Permission> permissions;
 }
