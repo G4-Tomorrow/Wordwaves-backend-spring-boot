@@ -27,15 +27,6 @@ public class WordCollection extends BaseAuthor {
 
     String thumbnailName;
 
-    @Builder.Default
-    int numOfTotalWords = 0;
-
-    @Builder.Default
-    int numOfLearningWord = 0;
-
-    @Builder.Default
-    int numOfLearnedWord = 0;
-
     @ManyToOne
     @JoinColumn(name = "WordCollectionCategoryId", referencedColumnName = "id")
     WordCollectionCategory wordCollectionCategory;

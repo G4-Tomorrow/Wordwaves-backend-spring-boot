@@ -2,6 +2,7 @@ package com.server.wordwaves.service.implement;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -113,7 +114,20 @@ public class WordCollectionServiceImp implements WordCollectionService {
         log.info("collection: {}", wordCollectionsPage);
 
         List<WordCollectionResponse> responses = wordCollectionsPage.getContent().stream()
-                .map(wordCollectionMapper::toWordCollectionResponse)
+                .map(wordCollection -> {
+                    WordCollectionResponse response = wordCollectionMapper.toWordCollectionResponse(wordCollection);
+
+                    // Tính tổng số từ vựng trong từng topic
+                    int totalWordsInTopics = wordCollection.getTopics().stream()
+                            .mapToInt(topic -> Optional.ofNullable(topic.getWords())
+                                    .map(Set::size)
+                                    .orElse(0))
+                            .sum();
+
+                    // Set tổng số từ vựng vào response
+                    response.setNumOfTotalWords(totalWordsInTopics);
+                    return response;
+                })
                 .toList();
 
         return PaginationInfo.<List<WordCollectionResponse>>builder()

@@ -1,7 +1,5 @@
 package com.server.wordwaves.dto.response.common;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;

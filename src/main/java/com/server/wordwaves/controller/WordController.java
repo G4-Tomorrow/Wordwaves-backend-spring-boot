@@ -3,6 +3,7 @@ package com.server.wordwaves.controller;
 import java.util.List;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,5 +54,11 @@ public class WordController {
                 .message("Lấy từ vựng")
                 .result(wordService.getWords(pageNumber, pageSize, sortBy, sortDirection, searchQuery))
                 .build();
+    }
+
+    @DeleteMapping("/{wordId}")
+    ApiResponse<Void> deleteById(@PathVariable @NotBlank(message = "INVALID_WORD_ID") String wordId) {
+        wordService.deleteById(wordId);
+        return ApiResponse.<Void>builder().message("Xóa từ vựng thành công").build();
     }
 }

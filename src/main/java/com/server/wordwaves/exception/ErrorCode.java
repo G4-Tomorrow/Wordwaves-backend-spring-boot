@@ -62,6 +62,7 @@ public enum ErrorCode {
     WORD_EXISTED(6201, "Từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
     WORD_NOT_EXISTED(6202, "Từ vựng không tồn tại", HttpStatus.BAD_REQUEST),
     INVALID_WORD(6203, "Từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
+    INVALID_WORD_ID(6204, "Id của từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
 
     // OAUTH2 ERROR CODE
     OAUTH2_USER_EXISTED_WITH_DIFFERENT_PROVIDER(

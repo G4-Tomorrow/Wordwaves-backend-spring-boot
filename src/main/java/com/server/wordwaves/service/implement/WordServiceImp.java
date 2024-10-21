@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +26,7 @@ import com.server.wordwaves.dto.response.vocabulary.WordResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordThumbnailResponse;
 import com.server.wordwaves.entity.vocabulary.Topic;
 import com.server.wordwaves.entity.vocabulary.Word;
+import com.server.wordwaves.event.WordsChangedEvent;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.WordMapper;
@@ -52,6 +54,7 @@ public class WordServiceImp implements WordService {
     WordMapper wordMapper;
     DictionaryClient dictionaryClient;
     ImageClient imageClient;
+    ApplicationEventPublisher eventPublisher;
 
     ObjectMapper objectMapper;
 
@@ -62,10 +65,9 @@ public class WordServiceImp implements WordService {
     @Override
     @Transactional
     @Retryable(
-            retryFor = ObjectOptimisticLockingFailureException.class,
-            maxAttempts = 3, // Thử retry tối đa 3 lần
-            backoff = @Backoff(delay = 500, multiplier = 1.5) // Đợi 500ms trước lần retry kế tiếp
-            )
+            retryFor = {ObjectOptimisticLockingFailureException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 500, multiplier = 3))
     public WordResponse create(WordCreationRequest request) {
         Word word = wordMapper.toWord(request);
 
@@ -96,8 +98,8 @@ public class WordServiceImp implements WordService {
         if (topicOptional.isPresent()) {
             Topic topic = topicOptional.get();
             topic.getWords().add(createdWord);
-            topic.incrementTotalWords(1);
             topicRepository.save(topic);
+            eventPublisher.publishEvent(new WordsChangedEvent(this, List.of(topicId)));
         }
 
         // Lấy từ điển
@@ -176,4 +178,7 @@ public class WordServiceImp implements WordService {
                 .data(wordResponses)
                 .build();
     }
+
+    @Override
+    public void deleteById(String wordId) {}
 }

@@ -41,7 +41,8 @@ public class User extends BaseEntity {
 
     String providerUserId;
 
-    int streak;
+    @Builder.Default
+    int streak = 0;
 
     Instant lastRevision;
 

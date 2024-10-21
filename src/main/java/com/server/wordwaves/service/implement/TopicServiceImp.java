@@ -1,17 +1,5 @@
 package com.server.wordwaves.service.implement;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Service;
-
 import com.server.wordwaves.dto.request.vocabulary.TopicAddWordsRequest;
 import com.server.wordwaves.dto.request.vocabulary.TopicCreationRequest;
 import com.server.wordwaves.dto.response.common.Pagination;
@@ -22,6 +10,7 @@ import com.server.wordwaves.dto.response.vocabulary.WordResponse;
 import com.server.wordwaves.entity.vocabulary.Topic;
 import com.server.wordwaves.entity.vocabulary.Word;
 import com.server.wordwaves.entity.vocabulary.WordCollection;
+import com.server.wordwaves.event.WordsChangedEvent;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.TopicMapper;
@@ -31,12 +20,23 @@ import com.server.wordwaves.repository.WordRepository;
 import com.server.wordwaves.repository.httpclient.DictionaryClient;
 import com.server.wordwaves.service.TopicService;
 import com.server.wordwaves.utils.MyStringUtils;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -48,6 +48,7 @@ public class TopicServiceImp implements TopicService {
     WordRepository wordRepository;
     TopicMapper topicMapper;
     DictionaryClient dictionaryClient;
+    ApplicationEventPublisher eventPublisher;
 
     @Override
     public TopicResponse create(TopicCreationRequest request) {
@@ -73,8 +74,8 @@ public class TopicServiceImp implements TopicService {
         Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
                 ? Sort.unsorted()
                 : sortDirection.equalsIgnoreCase("DESC")
-                        ? Sort.by(sortBy).descending()
-                        : Sort.by(sortBy).ascending();
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
         Page<Word> wordPage;
@@ -117,13 +118,13 @@ public class TopicServiceImp implements TopicService {
     }
 
     // Hàm add word vào trong topic, nếu như có 1 word ko hợp lệ thì sẽ rollback và ném ra ngoại lệ
+
     @Override
     @Transactional
     @Retryable(
-            retryFor = ObjectOptimisticLockingFailureException.class,
-            maxAttempts = 3, // Thử retry tối đa 3 lần
-            backoff = @Backoff(delay = 500, multiplier = 1.5) // Đợi 500ms trước lần retry kế tiếp
-    )
+            retryFor = {ObjectOptimisticLockingFailureException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 500, multiplier = 3))
     public int addWords(String topicId, TopicAddWordsRequest request) {
         Optional<Topic> topicOptional = topicRepository.findById(topicId);
 
@@ -142,6 +143,8 @@ public class TopicServiceImp implements TopicService {
 
         topic.getWords().addAll(words);
         topicRepository.save(topic);
+        // publish event để tính toán lại số lượng từ vựng của topic
+        eventPublisher.publishEvent(new WordsChangedEvent(this, List.of(topicId)));
         return request.getWordIds().size();
     }
 }
