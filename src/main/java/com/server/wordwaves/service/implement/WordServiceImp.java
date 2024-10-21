@@ -1,6 +1,5 @@
 package com.server.wordwaves.service.implement;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
 import com.server.wordwaves.dto.response.common.Pagination;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
@@ -15,7 +14,6 @@ import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.WordMapper;
 import com.server.wordwaves.repository.TopicRepository;
 import com.server.wordwaves.repository.WordRepository;
-import com.server.wordwaves.repository.httpclient.DictionaryClient;
 import com.server.wordwaves.repository.httpclient.ImageClient;
 import com.server.wordwaves.service.WordService;
 import com.server.wordwaves.utils.MyStringUtils;
@@ -53,8 +51,6 @@ public class WordServiceImp implements WordService {
     ImageClient imageClient;
     ApplicationEventPublisher eventPublisher;
     WordUtils wordUtils;
-
-    ObjectMapper objectMapper;
 
     @NonFinal
     @Value("${app.pexels-client.apikey}")
@@ -149,5 +145,23 @@ public class WordServiceImp implements WordService {
 
     @Override
     public void deleteById(String wordId) {
+        Word word = wordRepository.findById(wordId)
+                .orElseThrow(() -> new AppException(ErrorCode.WORD_NOT_EXISTED));
+
+        List<String> topicIds = topicRepository.findTopicIdsByWordId(wordId);
+
+        // Cập nhật các topic để loại bỏ từ này
+        for (String topicId : topicIds) {
+            Topic topic = topicRepository.findById(topicId)
+                    .orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_EXISTED)); // Xử lý nếu topic không tồn tại
+
+            topic.getWords().remove(word);
+            topicRepository.save(topic);
+        }
+
+        // Cuối cùng xóa từ
+        wordRepository.delete(word);
+        eventPublisher.publishEvent(new WordsChangedEvent(this, topicIds));
     }
+
 }

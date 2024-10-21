@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 import com.server.wordwaves.entity.vocabulary.Topic;
 import com.server.wordwaves.entity.vocabulary.Word;
 
+import java.util.List;
+
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, String> {
 
@@ -21,4 +23,7 @@ public interface TopicRepository extends JpaRepository<Topic, String> {
     // Tìm tất cả các từ trong một topic
     @Query("SELECT w FROM Topic t JOIN t.words w WHERE t.id = :topicId")
     Page<Word> findWordsByTopicId(@Param("topicId") String topicId, Pageable pageable);
+
+    @Query(value = "SELECT ttw.TopicId FROM TopicToWord ttw WHERE ttw.WordId = :wordId", nativeQuery = true)
+    List<String> findTopicIdsByWordId(String wordId);
 }
