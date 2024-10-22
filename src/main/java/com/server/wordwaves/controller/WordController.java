@@ -2,6 +2,7 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
+import com.server.wordwaves.dto.request.vocabulary.WordUpdateRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
@@ -54,6 +55,14 @@ public class WordController {
         return ApiResponse.<PaginationInfo<List<WordResponse>>>builder()
                 .message("Lấy từ vựng")
                 .result(wordService.getWords(pageNumber, pageSize, sortBy, sortDirection, searchQuery, isUnassigned))
+                .build();
+    }
+
+    @PutMapping("/{wordId}")
+    ApiResponse<WordResponse> updateById(@PathVariable @NotBlank(message = "WORD_ID_IS_REQUIRED") String wordId, @RequestBody WordUpdateRequest request) {
+        return ApiResponse.<WordResponse>builder()
+                .message("Cập nhập từ vựng thành công")
+                .result(wordService.updateById(wordId, request))
                 .build();
     }
 

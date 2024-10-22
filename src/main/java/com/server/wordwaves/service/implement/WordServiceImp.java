@@ -1,6 +1,7 @@
 package com.server.wordwaves.service.implement;
 
 import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
+import com.server.wordwaves.dto.request.vocabulary.WordUpdateRequest;
 import com.server.wordwaves.dto.response.common.Pagination;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.common.QueryOptions;
@@ -164,4 +165,15 @@ public class WordServiceImp implements WordService {
         eventPublisher.publishEvent(new WordsChangedEvent(this, topicIds));
     }
 
+    @Override
+    public WordResponse updateById(String wordId, WordUpdateRequest request) {
+        Word word = wordRepository.findById(wordId).orElseThrow(() -> new AppException(ErrorCode.WORD_NOT_EXISTED));
+        String name = request.getName();
+        String thumbnailUrl = request.getThumbnailUrl();
+
+        if(MyStringUtils.isNotNullAndNotEmpty(name)) word.setName(name);
+        if(MyStringUtils.isNotNullAndNotEmpty(thumbnailUrl)) word.setName(thumbnailUrl);
+
+        return wordUtils.getWordDetail(wordRepository.save(word));
+    }
 }

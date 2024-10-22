@@ -2,8 +2,10 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
+import com.server.wordwaves.dto.request.vocabulary.WordCollectionUpdateRequest;
 import jakarta.validation.Valid;
 
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.bind.annotation.*;
 
 import com.server.wordwaves.dto.request.vocabulary.WordCollectionCreationRequest;
@@ -67,6 +69,27 @@ public class WordCollectionController {
                 .message("Lấy các chủ đề của bộ từ vựng")
                 .result(wordCollectionService.getTopics(
                         pageNumber, pageSize, sortBy, sortDirection, searchQuery, collectionId))
+                .build();
+    }
+
+    @PutMapping("/{collectionId}")
+    @Operation(summary = "UPDATE WORD COLLECTION BY ID")
+    ApiResponse<WordCollectionResponse> updateById(
+            @PathVariable @NotBlank(message = "WORD_COLLECTION_ID_IS_REQUIRED") String collectionId,
+            @RequestBody WordCollectionUpdateRequest request) {
+        return ApiResponse.<WordCollectionResponse>builder()
+                .message("Cập nhập bộ từ vựng thành công")
+                .result(wordCollectionService.updateById(collectionId, request))
+                .build();
+    }
+
+    @DeleteMapping("/{collectionId}")
+    @Operation(summary = "DELETE WORD COLLECTION BY ID")
+    ApiResponse<Void> deleteById(
+            @PathVariable @NotBlank(message = "WORD_COLLECTION_ID_IS_REQUIRED") String collectionId) {
+        wordCollectionService.deleteById(collectionId);
+        return ApiResponse.<Void>builder()
+                .message("Xóa bộ từ vựng thành công")
                 .build();
     }
 }

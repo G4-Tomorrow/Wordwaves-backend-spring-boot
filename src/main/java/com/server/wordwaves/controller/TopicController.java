@@ -2,6 +2,7 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
+import com.server.wordwaves.dto.request.vocabulary.TopicUpdateRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
@@ -70,9 +71,23 @@ public class TopicController {
                 .build();
     }
 
-//    @PutMapping("/")
-//    @Operation(summary = "UPDATE TOPIC")
-//    ApiResponse<Void> updateTopicById() {
-//
-//    }
+    @PutMapping("/{topicId}")
+    @Operation(summary = "UPDATE TOPIC BY ID")
+    ApiResponse<TopicResponse> updateById(@PathVariable @NotBlank(message = "TOPIC_ID_IS_REQUIRED") String topicId, @RequestBody TopicUpdateRequest request) {
+        return ApiResponse.<TopicResponse>builder()
+                .message("Cập nhập thông tin chủ đề thành công")
+                .result(topicService.updateById(topicId, request))
+                .build();
+    }
+
+    @DeleteMapping("/{topicId}")
+    @Operation(summary = "DELETE TOPIC BY ID")
+    ApiResponse<Void> deleteById(@PathVariable @NotBlank(message = "TOPIC_ID_IS_REQUIRED") String topicId) {
+        topicService.deleteById(topicId);
+        return ApiResponse.<Void>builder()
+                .message("Xóa chủ đề thành công")
+                .build();
+    }
+
+
 }

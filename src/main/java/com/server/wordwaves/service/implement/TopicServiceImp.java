@@ -2,6 +2,7 @@ package com.server.wordwaves.service.implement;
 
 import com.server.wordwaves.dto.request.vocabulary.TopicAddWordsRequest;
 import com.server.wordwaves.dto.request.vocabulary.TopicCreationRequest;
+import com.server.wordwaves.dto.request.vocabulary.TopicUpdateRequest;
 import com.server.wordwaves.dto.response.common.Pagination;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.common.QueryOptions;
@@ -134,5 +135,33 @@ public class TopicServiceImp implements TopicService {
         // publish event để tính toán lại số lượng từ vựng của topic
         eventPublisher.publishEvent(new WordsChangedEvent(this, List.of(topicId)));
         return request.getWordIds().size();
+    }
+
+    @Override
+    public TopicResponse updateById(String topicId, TopicUpdateRequest request) {
+        Topic topic = topicRepository.findById(topicId)
+                .orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_EXISTED));
+
+        // Cập nhật name nếu không rỗng
+        String updatedName = request.getName();
+        if (MyStringUtils.isNotNullAndNotEmpty(updatedName)) {
+            topic.setName(updatedName);
+        }
+
+        // Cập nhật thumbnailName nếu không rỗng
+        String updatedThumbnailName = request.getThumbnailName();
+        if (MyStringUtils.isNotNullAndNotEmpty(updatedThumbnailName)) {
+            topic.setThumbnailName(updatedThumbnailName);
+        }
+
+        return topicMapper.toTopicResponse(topicRepository.save(topic));
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(String topicId) {
+        wordCollectionRepository.deleteRelationsByTopicId(topicId);
+
+        topicRepository.deleteById(topicId);
     }
 }

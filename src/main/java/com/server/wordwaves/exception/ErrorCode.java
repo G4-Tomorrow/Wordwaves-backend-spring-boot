@@ -53,16 +53,20 @@ public enum ErrorCode {
     WORD_NAME_IS_REQUIRED(6003, "Tên của từ vựng không được để trống", HttpStatus.BAD_REQUEST),
     COLLECTION_EXISTED(6004, "Bộ từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
     WORD_COLLECTION_NOT_EXISTED(6005, "Bộ từ vựng không tồn tại", HttpStatus.BAD_REQUEST),
+    WORD_COLLECTION_ID_IS_REQUIRED(6006, "Id của bộ từ vựng không được để trống", HttpStatus.BAD_REQUEST),
+    INVALID_WORD_COLLECTION_CATEGORY(6007, "Phân loại bộ từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
 
     TOPIC_NAME_IS_REQUIRED(6101, "Tên chủ đề không được để trống", HttpStatus.BAD_REQUEST),
     TOPIC_NOT_EXISTED(6102, "Chủ đề không tồn tại", HttpStatus.BAD_REQUEST),
     TOPIC_MUST_BELONG_TO_WORD_COLLECTION(6103, "Chủ đề phải thuộc về ít nhất 1 topic", HttpStatus.BAD_REQUEST),
     CONCURRENT_ADD_WORD_INTO_TOPIC(6104, "Xung đột trong quá trình thêm từ vựng vào chủ đề", HttpStatus.CONFLICT),
+    TOPIC_ID_IS_REQUIRED(6105, "Id của chủ đề không được bỏ trống", HttpStatus.BAD_REQUEST),
 
     WORD_EXISTED(6201, "Từ vựng đã tồn tại", HttpStatus.BAD_REQUEST),
     WORD_NOT_EXISTED(6202, "Từ vựng không tồn tại", HttpStatus.BAD_REQUEST),
     INVALID_WORD(6203, "Từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
     INVALID_WORD_ID(6204, "Id của từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
+    WORD_ID_IS_REQUIRED(6204, "Id của từ vựng không được để trống", HttpStatus.BAD_REQUEST),
 
     // OAUTH2 ERROR CODE
     OAUTH2_USER_EXISTED_WITH_DIFFERENT_PROVIDER(
