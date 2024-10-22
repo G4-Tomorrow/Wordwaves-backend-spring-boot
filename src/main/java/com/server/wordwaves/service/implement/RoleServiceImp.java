@@ -55,24 +55,20 @@ public class RoleServiceImp implements RoleService {
         Role role = roleRepository.findById(name).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
 
         if (request.getDescription() != null && !request.getDescription().isEmpty()) role.setDescription(request.getDescription());
-
         List<String> permissionNames = request.getPermissionNames();
-
-        List<String> notExistingPermissions = new ArrayList<>();
 
         if (permissionNames != null && !permissionNames.isEmpty()) {
             List<Permission> existingPermissions = permissionRepository.findAllById(permissionNames);
             Set<String> existingPermissionNames = existingPermissions.stream().map(Permission::getName).collect(Collectors.toSet());
 
-            notExistingPermissions = permissionNames.stream().filter(permissionName -> !existingPermissionNames.contains(permissionName)).collect(Collectors.toList());
+            List<String> notExistingPermissions = permissionNames.stream().filter(permissionName -> !existingPermissionNames.contains(permissionName)).collect(Collectors.toList());
 
             if (!notExistingPermissions.isEmpty()) throw new AppException(ErrorCode.PERMISSION_NOT_EXISTED, "Các quyền hạn sau không tồn tại trên hệ thống: " + String.join(", ", notExistingPermissions));
 
             Set<String> existingPermissionsInRole = role.getPermissions().stream().map(Permission::getName).collect(Collectors.toSet());
             List<String> alreadyExistPermissions = permissionNames.stream().filter(existingPermissionsInRole::contains).collect(Collectors.toList());
 
-            if (!alreadyExistPermissions.isEmpty()) throw new AppException(ErrorCode.PERMISSION_ALREADY_EXISTED, "Quyền hạn " + String.join(", ", alreadyExistPermissions) + " đã tồn tại trong vai trò " + name);
-
+            if (!alreadyExistPermissions.isEmpty()) throw new AppException(ErrorCode.PERMISSION_ALREADY_EXISTED, "Các quyền hạn sau đã tồn tại trong vai trò " + name + " : " + String.join(", ", alreadyExistPermissions));
             role.getPermissions().addAll(existingPermissions);
         }
 
