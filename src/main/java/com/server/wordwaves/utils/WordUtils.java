@@ -1,17 +1,19 @@
 package com.server.wordwaves.utils;
 
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
 import com.server.wordwaves.dto.response.vocabulary.WordResponse;
 import com.server.wordwaves.entity.vocabulary.Word;
 import com.server.wordwaves.mapper.WordMapper;
 import com.server.wordwaves.repository.httpclient.DictionaryClient;
+
 import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor

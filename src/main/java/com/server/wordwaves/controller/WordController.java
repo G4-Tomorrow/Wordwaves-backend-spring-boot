@@ -2,7 +2,6 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
-import com.server.wordwaves.dto.request.vocabulary.WordUpdateRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
+import com.server.wordwaves.dto.request.vocabulary.WordUpdateRequest;
 import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.vocabulary.WordResponse;
@@ -51,7 +51,8 @@ public class WordController {
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
             @RequestParam(required = false) String searchQuery,
-            @RequestParam(required = false, defaultValue = "false") boolean isUnassigned) {  // Thêm tham số mới
+            @RequestParam(required = false) String isUnassigned) { // Thêm tham số mới
+        log.info("assign: {}", isUnassigned);
         return ApiResponse.<PaginationInfo<List<WordResponse>>>builder()
                 .message("Lấy từ vựng")
                 .result(wordService.getWords(pageNumber, pageSize, sortBy, sortDirection, searchQuery, isUnassigned))
@@ -59,7 +60,9 @@ public class WordController {
     }
 
     @PutMapping("/{wordId}")
-    ApiResponse<WordResponse> updateById(@PathVariable @NotBlank(message = "WORD_ID_IS_REQUIRED") String wordId, @RequestBody WordUpdateRequest request) {
+    ApiResponse<WordResponse> updateById(
+            @PathVariable @NotBlank(message = "WORD_ID_IS_REQUIRED") String wordId,
+            @RequestBody WordUpdateRequest request) {
         return ApiResponse.<WordResponse>builder()
                 .message("Cập nhập từ vựng thành công")
                 .result(wordService.updateById(wordId, request))

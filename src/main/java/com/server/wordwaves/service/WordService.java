@@ -11,7 +11,7 @@ public interface WordService {
     WordResponse create(WordCreationRequest request);
 
     PaginationInfo<List<WordResponse>> getWords(
-            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, boolean isUnassigned);
+            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, String isUnassigned);
 
     void deleteById(String wordId);
 

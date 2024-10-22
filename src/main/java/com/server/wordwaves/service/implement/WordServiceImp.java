@@ -1,5 +1,22 @@
 package com.server.wordwaves.service.implement;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
 import com.server.wordwaves.dto.request.vocabulary.WordUpdateRequest;
 import com.server.wordwaves.dto.response.common.Pagination;
@@ -19,27 +36,12 @@ import com.server.wordwaves.repository.httpclient.ImageClient;
 import com.server.wordwaves.service.WordService;
 import com.server.wordwaves.utils.MyStringUtils;
 import com.server.wordwaves.utils.WordUtils;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -103,18 +105,22 @@ public class WordServiceImp implements WordService {
 
     @Override
     public PaginationInfo<List<WordResponse>> getWords(
-            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, boolean isUnassigned) {
-        --pageNumber;
+            int pageNumber,
+            int pageSize,
+            String sortBy,
+            String sortDirection,
+            String searchQuery,
+            String isUnassigned) {
         Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
                 ? Sort.unsorted()
                 : sortDirection.equalsIgnoreCase("DESC")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending();
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Pageable pageable = PageRequest.of(--pageNumber, pageSize, sort);
         Page<Word> wordPage;
 
-        if (isUnassigned) {
+        if (isUnassigned != null) {
             // Lấy danh sách từ vựng chưa thuộc về bất kỳ topic nào
             wordPage = wordRepository.findWordsWithoutTopicsByNameContaining(searchQuery, pageable);
         } else {
@@ -124,12 +130,12 @@ public class WordServiceImp implements WordService {
                     : wordRepository.findByNameContainingIgnoreCase(searchQuery, pageable);
         }
 
-        List<WordResponse> wordResponses = wordPage.map(wordUtils::getWordDetail)
-                .toList();
+        List<WordResponse> wordResponses =
+                wordPage.map(wordUtils::getWordDetail).toList();
 
         return PaginationInfo.<List<WordResponse>>builder()
                 .pagination(Pagination.builder()
-                        .pageNumber(++pageNumber)
+                        .pageNumber(pageNumber)
                         .pageSize(pageSize)
                         .totalPages(wordPage.getTotalPages())
                         .totalElements(wordPage.getTotalElements())
@@ -143,17 +149,16 @@ public class WordServiceImp implements WordService {
                 .build();
     }
 
-
     @Override
     public void deleteById(String wordId) {
-        Word word = wordRepository.findById(wordId)
-                .orElseThrow(() -> new AppException(ErrorCode.WORD_NOT_EXISTED));
+        Word word = wordRepository.findById(wordId).orElseThrow(() -> new AppException(ErrorCode.WORD_NOT_EXISTED));
 
         List<String> topicIds = topicRepository.findTopicIdsByWordId(wordId);
 
         // Cập nhật các topic để loại bỏ từ này
         for (String topicId : topicIds) {
-            Topic topic = topicRepository.findById(topicId)
+            Topic topic = topicRepository
+                    .findById(topicId)
                     .orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_EXISTED)); // Xử lý nếu topic không tồn tại
 
             topic.getWords().remove(word);
@@ -171,8 +176,8 @@ public class WordServiceImp implements WordService {
         String name = request.getName();
         String thumbnailUrl = request.getThumbnailUrl();
 
-        if(MyStringUtils.isNotNullAndNotEmpty(name)) word.setName(name);
-        if(MyStringUtils.isNotNullAndNotEmpty(thumbnailUrl)) word.setName(thumbnailUrl);
+        if (MyStringUtils.isNotNullAndNotEmpty(name)) word.setName(name);
+        if (MyStringUtils.isNotNullAndNotEmpty(thumbnailUrl)) word.setName(thumbnailUrl);
 
         return wordUtils.getWordDetail(wordRepository.save(word));
     }

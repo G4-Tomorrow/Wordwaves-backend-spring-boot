@@ -15,9 +15,12 @@ public interface TopicService {
     PaginationInfo<List<WordResponse>> getWords(
             int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, String topicId);
 
-    int addWords(String topicId, TopicAddWordsRequest request);
+    void addWords(String topicId, TopicAddWordsRequest request);
 
     TopicResponse updateById(String topicId, TopicUpdateRequest request);
 
     void deleteById(String topicId);
+
+    PaginationInfo<List<TopicResponse>> getTopics(
+            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, String userId);
 }

@@ -13,7 +13,9 @@ import com.server.wordwaves.entity.vocabulary.Word;
 public interface WordRepository extends JpaRepository<Word, String> {
     Page<Word> findByNameContainingIgnoreCase(String searchQuery, Pageable pageable);
 
-    @Query(value = "SELECT w.* FROM Word w WHERE w.Id NOT IN (SELECT tw.WordId FROM TopicToWord tw) AND w.Name LIKE %:searchQuery%", nativeQuery = true)
+    @Query(
+            value =
+                    "SELECT * FROM Word w WHERE w.Id NOT IN (SELECT tw.WordId FROM TopicToWord tw) AND w.Name LIKE %:searchQuery%",
+            nativeQuery = true)
     Page<Word> findWordsWithoutTopicsByNameContaining(@Param("searchQuery") String searchQuery, Pageable pageable);
-
 }

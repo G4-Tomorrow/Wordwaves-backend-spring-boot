@@ -2,6 +2,7 @@ package com.server.wordwaves.service;
 
 import java.util.List;
 
+import com.server.wordwaves.dto.request.vocabulary.WordCollectionAddTopicsRequest;
 import com.server.wordwaves.dto.request.vocabulary.WordCollectionCreationRequest;
 import com.server.wordwaves.dto.request.vocabulary.WordCollectionUpdateRequest;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
@@ -20,4 +21,6 @@ public interface WordCollectionService {
     WordCollectionResponse updateById(String collectionId, WordCollectionUpdateRequest request);
 
     void deleteById(String collectionId);
+
+    void addTopics(String collectionId, WordCollectionAddTopicsRequest request);
 }

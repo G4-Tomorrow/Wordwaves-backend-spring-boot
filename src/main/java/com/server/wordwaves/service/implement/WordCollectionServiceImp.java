@@ -1,5 +1,18 @@
 package com.server.wordwaves.service.implement;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+import com.server.wordwaves.dto.request.vocabulary.WordCollectionAddTopicsRequest;
 import com.server.wordwaves.dto.request.vocabulary.WordCollectionCreationRequest;
 import com.server.wordwaves.dto.request.vocabulary.WordCollectionUpdateRequest;
 import com.server.wordwaves.dto.response.common.Pagination;
@@ -14,32 +27,24 @@ import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.TopicMapper;
 import com.server.wordwaves.mapper.WordCollectionMapper;
+import com.server.wordwaves.repository.TopicRepository;
 import com.server.wordwaves.repository.UserRepository;
 import com.server.wordwaves.repository.WordCollectionCategoryRepository;
 import com.server.wordwaves.repository.WordCollectionRepository;
 import com.server.wordwaves.service.WordCollectionService;
 import com.server.wordwaves.utils.MyStringUtils;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WordCollectionServiceImp implements WordCollectionService {
+    private final TopicRepository topicRepository;
     private final TopicMapper topicMapper;
     WordCollectionRepository wordCollectionRepository;
     WordCollectionMapper wordCollectionMapper;
@@ -69,8 +74,8 @@ public class WordCollectionServiceImp implements WordCollectionService {
         Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
                 ? Sort.unsorted()
                 : sortDirection.equalsIgnoreCase("DESC")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
         Specification<WordCollection> spec = Specification.where(null);
@@ -142,8 +147,8 @@ public class WordCollectionServiceImp implements WordCollectionService {
         Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
                 ? Sort.unsorted()
                 : sortDirection.equalsIgnoreCase("DESC")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
         Page<Topic> topicPage;
@@ -173,14 +178,17 @@ public class WordCollectionServiceImp implements WordCollectionService {
 
     @Override
     public WordCollectionResponse updateById(String collectionId, WordCollectionUpdateRequest request) {
-        WordCollection wordCollection = wordCollectionRepository.findById(collectionId).orElseThrow(() -> new AppException(ErrorCode.WORD_COLLECTION_NOT_EXISTED));
+        WordCollection wordCollection = wordCollectionRepository
+                .findById(collectionId)
+                .orElseThrow(() -> new AppException(ErrorCode.WORD_COLLECTION_NOT_EXISTED));
         String name = request.getName();
         String thumbnailName = request.getThumbnailName();
         String category = request.getCategory();
 
         if (MyStringUtils.isNotNullAndNotEmpty(name)) wordCollection.setName(name);
         if (MyStringUtils.isNotNullAndNotEmpty(thumbnailName)) wordCollection.setThumbnailName(thumbnailName);
-        if (MyStringUtils.isNotNullAndNotEmpty(category)) wordCollection.setWordCollectionCategory(getWordCollectionCategory(category));
+        if (MyStringUtils.isNotNullAndNotEmpty(category))
+            wordCollection.setWordCollectionCategory(getWordCollectionCategory(category));
 
         return wordCollectionMapper.toWordCollectionResponse(wordCollectionRepository.save(wordCollection));
     }
@@ -188,6 +196,22 @@ public class WordCollectionServiceImp implements WordCollectionService {
     @Override
     public void deleteById(String collectionId) {
         wordCollectionRepository.deleteById(collectionId);
+    }
+
+    @Override
+    public void addTopics(String collectionId, WordCollectionAddTopicsRequest request) {
+        WordCollection wordCollection = wordCollectionRepository
+                .findById(collectionId)
+                .orElseThrow(() -> new AppException(ErrorCode.WORD_COLLECTION_NOT_EXISTED));
+
+        List<Topic> topics = request.getTopicIds().stream()
+                .map(topicRepository::findById)
+                .map(optionalTopic -> optionalTopic.orElseThrow(
+                        () -> new AppException(ErrorCode.TOPIC_NOT_EXISTED))) // Kiểm tra và lấy Topic
+                .toList();
+
+        wordCollection.getTopics().addAll(topics);
+        wordCollectionRepository.save(wordCollection);
     }
 
     private WordCollectionCategory getWordCollectionCategory(String category) {

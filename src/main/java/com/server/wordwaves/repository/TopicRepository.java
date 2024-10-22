@@ -1,5 +1,7 @@
 package com.server.wordwaves.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,8 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import com.server.wordwaves.entity.vocabulary.Topic;
 import com.server.wordwaves.entity.vocabulary.Word;
-
-import java.util.List;
 
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, String> {
@@ -26,4 +26,10 @@ public interface TopicRepository extends JpaRepository<Topic, String> {
 
     @Query(value = "SELECT ttw.TopicId FROM TopicToWord ttw WHERE ttw.WordId = :wordId", nativeQuery = true)
     List<String> findTopicIdsByWordId(String wordId);
+
+    Page<Topic> findByCreatedById(String userId, Pageable pageable);
+
+    Page<Topic> findByNameContainingIgnoreCase(String searchQuery, Pageable pageable);
+
+    Page<Topic> findByCreatedByIdAndNameContainingIgnoreCase(String userId, String searchQuery, Pageable pageable);
 }

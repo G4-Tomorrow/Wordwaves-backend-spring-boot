@@ -2,7 +2,6 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
-import com.server.wordwaves.dto.request.vocabulary.TopicUpdateRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.server.wordwaves.dto.request.vocabulary.TopicAddWordsRequest;
 import com.server.wordwaves.dto.request.vocabulary.TopicCreationRequest;
+import com.server.wordwaves.dto.request.vocabulary.TopicUpdateRequest;
 import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.vocabulary.TopicResponse;
@@ -60,20 +60,38 @@ public class TopicController {
                 .build();
     }
 
+    @GetMapping
+    @Operation(summary = "GET TOPICS")
+    ApiResponse<PaginationInfo<List<TopicResponse>>> getTopics(
+            @RequestParam int pageNumber,
+            @RequestParam int pageSize,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
+            @RequestParam(required = false) String searchQuery,
+            @RequestParam String userId) {
+        return ApiResponse.<PaginationInfo<List<TopicResponse>>>builder()
+                .message("Lấy từ vựng")
+                .result(topicService.getTopics(pageNumber, pageSize, sortBy, sortDirection, searchQuery, userId))
+                .build();
+    }
+
     @PostMapping("/{topicId}/words")
     @Operation(summary = "ADD WORDS INTO TOPIC")
-    ApiResponse<Void> addWords(
-            @RequestBody TopicAddWordsRequest request,
+    ApiResponse<List<String>> addWords(
+            @RequestBody @Valid TopicAddWordsRequest request,
             @PathVariable @NotBlank(message = "LACK_OF_PARAMETER") String topicId) {
-        int size = topicService.addWords(topicId, request);
-        return ApiResponse.<Void>builder()
-                .message("Thêm " + size + " từ vào chủ đề thành công")
+        topicService.addWords(topicId, request);
+        return ApiResponse.<List<String>>builder()
+                .message("Thêm " + request.getWordIds().size() + " từ vào chủ đề thành công")
+                .result(request.getWordIds())
                 .build();
     }
 
     @PutMapping("/{topicId}")
     @Operation(summary = "UPDATE TOPIC BY ID")
-    ApiResponse<TopicResponse> updateById(@PathVariable @NotBlank(message = "TOPIC_ID_IS_REQUIRED") String topicId, @RequestBody TopicUpdateRequest request) {
+    ApiResponse<TopicResponse> updateById(
+            @PathVariable @NotBlank(message = "TOPIC_ID_IS_REQUIRED") String topicId,
+            @RequestBody TopicUpdateRequest request) {
         return ApiResponse.<TopicResponse>builder()
                 .message("Cập nhập thông tin chủ đề thành công")
                 .result(topicService.updateById(topicId, request))
@@ -84,10 +102,6 @@ public class TopicController {
     @Operation(summary = "DELETE TOPIC BY ID")
     ApiResponse<Void> deleteById(@PathVariable @NotBlank(message = "TOPIC_ID_IS_REQUIRED") String topicId) {
         topicService.deleteById(topicId);
-        return ApiResponse.<Void>builder()
-                .message("Xóa chủ đề thành công")
-                .build();
+        return ApiResponse.<Void>builder().message("Xóa chủ đề thành công").build();
     }
-
-
 }

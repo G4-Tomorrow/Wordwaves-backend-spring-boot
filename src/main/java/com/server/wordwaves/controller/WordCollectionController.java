@@ -2,13 +2,14 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
-import com.server.wordwaves.dto.request.vocabulary.WordCollectionUpdateRequest;
 import jakarta.validation.Valid;
-
 import jakarta.validation.constraints.NotBlank;
+
 import org.springframework.web.bind.annotation.*;
 
+import com.server.wordwaves.dto.request.vocabulary.WordCollectionAddTopicsRequest;
 import com.server.wordwaves.dto.request.vocabulary.WordCollectionCreationRequest;
+import com.server.wordwaves.dto.request.vocabulary.WordCollectionUpdateRequest;
 import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.vocabulary.TopicResponse;
@@ -72,6 +73,17 @@ public class WordCollectionController {
                 .build();
     }
 
+    @PostMapping("/{collectionId}/topics")
+    ApiResponse<List<String>> addTopics(
+            @PathVariable @NotBlank(message = "WORD_COLLECTION_ID_IS_REQUIRED") String collectionId,
+            @RequestBody @Valid WordCollectionAddTopicsRequest request) {
+        wordCollectionService.addTopics(collectionId, request);
+        return ApiResponse.<List<String>>builder()
+                .message("Thêm " + request.getTopicIds().size() + " chủ đề vào bộ từ vựng thành công")
+                .result(request.getTopicIds())
+                .build();
+    }
+
     @PutMapping("/{collectionId}")
     @Operation(summary = "UPDATE WORD COLLECTION BY ID")
     ApiResponse<WordCollectionResponse> updateById(
@@ -88,8 +100,6 @@ public class WordCollectionController {
     ApiResponse<Void> deleteById(
             @PathVariable @NotBlank(message = "WORD_COLLECTION_ID_IS_REQUIRED") String collectionId) {
         wordCollectionService.deleteById(collectionId);
-        return ApiResponse.<Void>builder()
-                .message("Xóa bộ từ vựng thành công")
-                .build();
+        return ApiResponse.<Void>builder().message("Xóa bộ từ vựng thành công").build();
     }
 }
