@@ -44,7 +44,7 @@ public class TopicController {
                 .build();
     }
 
-    @GetMapping("/get-word/{topicId}")
+    @GetMapping("/{topicId}/words")
     @Operation(summary = "GET WORDS FROM TOPIC")
     ApiResponse<PaginationInfo<List<WordResponse>>> getWords(
             @RequestParam int pageNumber,
@@ -59,7 +59,7 @@ public class TopicController {
                 .build();
     }
 
-    @PutMapping("/add/{topicId}")
+    @PostMapping("/{topicId}/words")
     @Operation(summary = "ADD WORDS INTO TOPIC")
     ApiResponse<Void> addWords(
             @RequestBody TopicAddWordsRequest request,
@@ -69,4 +69,10 @@ public class TopicController {
                 .message("Thêm " + size + " từ vào chủ đề thành công")
                 .build();
     }
+
+//    @PutMapping("/")
+//    @Operation(summary = "UPDATE TOPIC")
+//    ApiResponse<Void> updateTopicById() {
+//
+//    }
 }

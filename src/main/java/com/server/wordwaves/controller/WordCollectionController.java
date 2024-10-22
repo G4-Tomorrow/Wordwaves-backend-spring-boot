@@ -54,7 +54,7 @@ public class WordCollectionController {
                 .build();
     }
 
-    @GetMapping("/get-topic/{collectionId}")
+    @GetMapping("/{collectionId}/topics")
     @Operation(summary = "GET TOPICS FROM WORD COLLECTION")
     ApiResponse<PaginationInfo<List<TopicResponse>>> getTopics(
             @RequestParam int pageNumber,
