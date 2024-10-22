@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.server.wordwaves.entity.user.User;
 import com.server.wordwaves.utils.PaginationUtils;
 import org.springframework.stereotype.Service;
 
@@ -79,8 +80,11 @@ public class RoleServiceImp implements RoleService {
 
     @Override
     public void deleteRole(String name) {
-        if (!roleRepository.existsById(name)) throw new AppException(ErrorCode.ROLE_NOT_EXISTED);
-        roleRepository.deleteById(name);
+        Role role = roleRepository.findById(name).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+        for (Permission permission : role.getPermissions()) permission.getRoles().remove(role);
+        for (User user : role.getUsers()) user.getRoles().remove(role);
+        role.getPermissions().clear(); role.getUsers().clear();
+        roleRepository.delete(role);
     }
 
     @Override

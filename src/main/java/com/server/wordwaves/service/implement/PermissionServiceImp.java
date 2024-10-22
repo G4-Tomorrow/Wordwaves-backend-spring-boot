@@ -3,6 +3,7 @@ package com.server.wordwaves.service.implement;
 import java.util.Arrays;
 import java.util.List;
 
+import com.server.wordwaves.entity.user.Role;
 import com.server.wordwaves.utils.PaginationUtils;
 import org.springframework.stereotype.Service;
 
@@ -54,8 +55,10 @@ public class PermissionServiceImp implements PermissionService {
 
     @Override
     public void deletePermission(String name) {
-        if (!permissionRepository.existsById(name)) throw new AppException(ErrorCode.PERMISSION_NOT_EXISTED);
-        permissionRepository.deleteById(name);
+        Permission permission = permissionRepository.findById(name).orElseThrow(() -> new AppException(ErrorCode.PERMISSION_NOT_EXISTED));
+        for (Role role : permission.getRoles()) role.getPermissions().remove(permission);
+        permission.getRoles().clear();
+        permissionRepository.delete(permission);
     }
 
     @Override

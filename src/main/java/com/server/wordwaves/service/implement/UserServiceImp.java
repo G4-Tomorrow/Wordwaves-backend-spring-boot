@@ -182,7 +182,10 @@ public class UserServiceImp implements UserService {
 
     @Override
     public void deleteUserById(String userId) {
-        userRepository.deleteById(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        for (Role role : user.getRoles()) role.getUsers().remove(user);
+        user.getRoles().clear();
+        userRepository.delete(user);
     }
 
     @Override
