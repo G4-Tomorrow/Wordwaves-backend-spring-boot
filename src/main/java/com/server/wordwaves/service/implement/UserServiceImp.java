@@ -1,15 +1,13 @@
 package com.server.wordwaves.service.implement;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.server.wordwaves.utils.PaginationUtils;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,9 +19,7 @@ import com.server.wordwaves.constant.PredefinedRole;
 import com.server.wordwaves.dto.request.user.*;
 import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
 import com.server.wordwaves.dto.response.common.EmailResponse;
-import com.server.wordwaves.dto.response.common.Pagination;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
-import com.server.wordwaves.dto.response.common.QueryOptions;
 import com.server.wordwaves.dto.response.user.UserResponse;
 import com.server.wordwaves.entity.user.Role;
 import com.server.wordwaves.entity.user.User;
@@ -131,37 +127,16 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public PaginationInfo<List<UserResponse>> getUsers(
-            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
-        pageNumber--;
-        Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
-                ? Sort.unsorted()
-                : sortDirection.equalsIgnoreCase("DESC")
-                        ? Sort.by(sortBy).descending()
-                        : Sort.by(sortBy).ascending();
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
-        Page<User> usersPage;
+    public PaginationInfo<List<UserResponse>> getUsers(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
+        List<String> validSortByFields = Arrays.asList("fullName", "email", "createdAt");
 
-        if (MyStringUtils.isNotNullAndNotEmpty(searchQuery)) {
-            usersPage = userRepository.findByFullNameContainingOrEmailContaining(searchQuery, searchQuery, pageable);
-        } else {
-            usersPage = userRepository.findAll(pageable);
-        }
-
-        return PaginationInfo.<List<UserResponse>>builder()
-                .pagination(Pagination.builder()
-                        .pageNumber(++pageNumber)
-                        .pageSize(pageSize)
-                        .totalPages(usersPage.getTotalPages())
-                        .totalElements(usersPage.getTotalElements())
-                        .build())
-                .queryOptions(QueryOptions.builder()
-                        .sortBy(sortBy)
-                        .sortDirection(sortDirection)
-                        .searchQuery(searchQuery)
-                        .build())
-                .data(usersPage.stream().map(userMapper::toUserResponse).toList())
-                .build();
+        return PaginationUtils.getAllEntities(pageNumber, pageSize, sortBy, sortDirection, searchQuery, validSortByFields,
+                pageable -> {
+                    if (MyStringUtils.isNotNullAndNotEmpty(searchQuery)) return userRepository.findByFullNameContainingOrEmailContaining(searchQuery, searchQuery, pageable);
+                    else return userRepository.findAll(pageable);
+                },
+                userMapper::toUserResponse
+        );
     }
 
     @Override
@@ -207,7 +182,10 @@ public class UserServiceImp implements UserService {
 
     @Override
     public void deleteUserById(String userId) {
-        userRepository.deleteById(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        for (Role role : user.getRoles()) role.getUsers().remove(user);
+        user.getRoles().clear();
+        userRepository.delete(user);
     }
 
     @Override

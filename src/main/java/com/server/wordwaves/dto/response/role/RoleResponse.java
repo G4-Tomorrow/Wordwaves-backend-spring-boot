@@ -1,13 +1,12 @@
-package com.server.wordwaves.dto.response.user;
-
-import java.util.Set;
+package com.server.wordwaves.dto.response.role;
 
 import com.server.wordwaves.dto.response.common.BaseResponse;
-import com.server.wordwaves.entity.user.Role;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import com.server.wordwaves.entity.user.Permission;
+
+import java.util.Set;
 
 @Data
 @SuperBuilder
@@ -15,10 +14,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponse extends BaseResponse {
-    String id;
-    String email;
-    String fullName;
-    String avatarName;
-    Set<Role> roles;
+public class RoleResponse extends BaseResponse {
+    String name;
+    String description;
+    Set<Permission> permissions;
 }
