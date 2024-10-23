@@ -11,7 +11,6 @@ import com.server.wordwaves.dto.request.vocabulary.WordCollectionUpdateRequest;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.vocabulary.TopicResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordCollectionResponse;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 public interface WordCollectionService {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
