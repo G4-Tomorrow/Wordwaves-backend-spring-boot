@@ -110,6 +110,7 @@ public class WordServiceImp implements WordService {
             String sortBy,
             String sortDirection,
             String searchQuery,
+            String userId,
             String isUnassigned) {
         Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
                 ? Sort.unsorted()
@@ -117,25 +118,34 @@ public class WordServiceImp implements WordService {
                         ? Sort.by(sortBy).descending()
                         : Sort.by(sortBy).ascending();
 
+        // Thiết lập pageable
         Pageable pageable = PageRequest.of(--pageNumber, pageSize, sort);
         Page<Word> wordPage;
 
-        if (isUnassigned != null) {
-            // Lấy danh sách từ vựng chưa thuộc về bất kỳ topic nào
-            wordPage = wordRepository.findWordsWithoutTopicsByNameContaining(searchQuery, pageable);
+        if (isUnassigned != null) { // ko có isUnassigned : isUnassigned = null thì lấy tất cả
+            if (MyStringUtils.isNullOrEmpty(searchQuery)) {
+                // Lấy tất cả từ chưa thuộc topic nào, được tạo bởi user
+                wordPage = wordRepository.findWordsWithoutTopicsByCreatedById(userId, pageable);
+            } else {
+                // Lấy từ không thuộc topic và có tên chứa `searchQuery`
+                wordPage = wordRepository.findWordsWithoutTopicsByCreatedByIdAndNameContaining(
+                        userId, searchQuery, pageable);
+            }
         } else {
-            // Nếu không tìm từ vựng theo các điều kiện khác
+            // Xử lý trường hợp không có `isUnassigned`
             wordPage = MyStringUtils.isNullOrEmpty(searchQuery)
-                    ? wordRepository.findAll(pageable)
-                    : wordRepository.findByNameContainingIgnoreCase(searchQuery, pageable);
+                    ? wordRepository.findByCreatedById(userId, pageable)
+                    : wordRepository.findByCreatedByIdAndNameContainingIgnoreCase(userId, searchQuery, pageable);
         }
 
+        // Mapping các từ vựng thành danh sách `WordResponse`
         List<WordResponse> wordResponses =
                 wordPage.map(wordUtils::getWordDetail).toList();
 
+        // Trả về thông tin phân trang
         return PaginationInfo.<List<WordResponse>>builder()
                 .pagination(Pagination.builder()
-                        .pageNumber(pageNumber)
+                        .pageNumber(++pageNumber)
                         .pageSize(pageSize)
                         .totalPages(wordPage.getTotalPages())
                         .totalElements(wordPage.getTotalElements())

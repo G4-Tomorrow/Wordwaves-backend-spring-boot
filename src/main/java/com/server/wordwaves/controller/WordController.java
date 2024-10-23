@@ -51,11 +51,13 @@ public class WordController {
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
             @RequestParam(required = false) String searchQuery,
+            @RequestParam String userId,
             @RequestParam(required = false) String isUnassigned) { // Thêm tham số mới
         log.info("assign: {}", isUnassigned);
         return ApiResponse.<PaginationInfo<List<WordResponse>>>builder()
                 .message("Lấy từ vựng")
-                .result(wordService.getWords(pageNumber, pageSize, sortBy, sortDirection, searchQuery, isUnassigned))
+                .result(wordService.getWords(
+                        pageNumber, pageSize, sortBy, sortDirection, searchQuery, userId, isUnassigned))
                 .build();
     }
 

@@ -32,4 +32,7 @@ public interface TopicRepository extends JpaRepository<Topic, String> {
     Page<Topic> findByNameContainingIgnoreCase(String searchQuery, Pageable pageable);
 
     Page<Topic> findByCreatedByIdAndNameContainingIgnoreCase(String userId, String searchQuery, Pageable pageable);
+
+    @Query("SELECT t.createdById FROM Topic t WHERE t.id = :identifierId")
+    String findCreatedByIdById(@Param("identifierId") String identifierId);
 }

@@ -28,7 +28,7 @@ spring:
       naming:
         physical-strategy: com.server.wordwaves.config.PascalCaseNamingStrategy
       ddl-auto: update
-    show-sql: false
+    show-sql: true
   security:
     oauth2:
       client:

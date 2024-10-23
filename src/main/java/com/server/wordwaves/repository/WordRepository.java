@@ -11,11 +11,14 @@ import com.server.wordwaves.entity.vocabulary.Word;
 
 @Repository
 public interface WordRepository extends JpaRepository<Word, String> {
-    Page<Word> findByNameContainingIgnoreCase(String searchQuery, Pageable pageable);
+    Page<Word> findByCreatedByIdAndNameContainingIgnoreCase(String createdById, String name, Pageable pageable);
 
-    @Query(
-            value =
-                    "SELECT * FROM Word w WHERE w.Id NOT IN (SELECT tw.WordId FROM TopicToWord tw) AND w.Name LIKE %:searchQuery%",
-            nativeQuery = true)
-    Page<Word> findWordsWithoutTopicsByNameContaining(@Param("searchQuery") String searchQuery, Pageable pageable);
+    Page<Word> findByCreatedById(String createdById, Pageable pageable);
+
+    Page<Word> findWordsWithoutTopicsByCreatedByIdAndNameContaining(String createdById, String name, Pageable pageable);
+
+    Page<Word> findWordsWithoutTopicsByCreatedById(String userId, Pageable pageable);
+
+    @Query("SELECT w.createdById FROM Word w WHERE w.id = :identifierId")
+    String findCreatedByIdById(@Param("identifierId") String identifierId);
 }

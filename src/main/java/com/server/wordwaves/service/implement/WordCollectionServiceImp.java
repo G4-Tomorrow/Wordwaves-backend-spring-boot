@@ -100,7 +100,6 @@ public class WordCollectionServiceImp implements WordCollectionService {
 
         // gọi database
         Page<WordCollection> wordCollectionsPage = wordCollectionRepository.findAll(spec, pageable);
-        log.info("collection: {}", wordCollectionsPage);
 
         List<WordCollectionResponse> responses = wordCollectionsPage.getContent().stream()
                 .map(wordCollection -> {

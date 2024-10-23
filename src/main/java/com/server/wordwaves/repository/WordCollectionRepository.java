@@ -28,4 +28,7 @@ public interface WordCollectionRepository
     @Modifying
     @Query(value = "DELETE FROM WordCollectionToTopic wct WHERE wct.TopicId = :topicId", nativeQuery = true)
     void deleteRelationsByTopicId(String topicId);
+
+    @Query("SELECT wc.createdById FROM WordCollection wc WHERE wc.id = :identifierId")
+    String findCreatedByIdById(@Param("identifierId") String identifierId);
 }
