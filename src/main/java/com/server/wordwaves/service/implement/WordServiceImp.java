@@ -5,15 +5,20 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
+import com.server.wordwaves.dto.request.vocabulary.WordUpdateRequest;
 import com.server.wordwaves.dto.response.common.Pagination;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.common.QueryOptions;
@@ -21,17 +26,17 @@ import com.server.wordwaves.dto.response.vocabulary.WordResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordThumbnailResponse;
 import com.server.wordwaves.entity.vocabulary.Topic;
 import com.server.wordwaves.entity.vocabulary.Word;
+import com.server.wordwaves.event.WordsChangedEvent;
 import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.WordMapper;
 import com.server.wordwaves.repository.TopicRepository;
 import com.server.wordwaves.repository.WordRepository;
-import com.server.wordwaves.repository.httpclient.DictionaryClient;
 import com.server.wordwaves.repository.httpclient.ImageClient;
 import com.server.wordwaves.service.WordService;
 import com.server.wordwaves.utils.MyStringUtils;
+import com.server.wordwaves.utils.WordUtils;
 
-import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -46,16 +51,20 @@ public class WordServiceImp implements WordService {
     WordRepository wordRepository;
     TopicRepository topicRepository;
     WordMapper wordMapper;
-    DictionaryClient dictionaryClient;
     ImageClient imageClient;
-
-    ObjectMapper objectMapper;
+    ApplicationEventPublisher eventPublisher;
+    WordUtils wordUtils;
 
     @NonFinal
     @Value("${app.pexels-client.apikey}")
     String pexelsApiKey;
 
     @Override
+    @Transactional
+    @Retryable(
+            retryFor = {ObjectOptimisticLockingFailureException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 500, multiplier = 3))
     public WordResponse create(WordCreationRequest request) {
         Word word = wordMapper.toWord(request);
 
@@ -75,78 +84,65 @@ public class WordServiceImp implements WordService {
         String topicId = request.getTopicId();
         Optional<Topic> topicOptional = topicRepository.findById(topicId);
 
-        Word createdWord;
+        Word createdWord = null;
         try {
-            createdWord = wordRepository.save(word);
+            createdWord = wordRepository.saveAndFlush(word);
         } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.WORD_EXISTED);
         }
 
+        // set word vào topic nếu topic tồn tại
         if (topicOptional.isPresent()) {
             Topic topic = topicOptional.get();
             topic.getWords().add(createdWord);
             topicRepository.save(topic);
+            eventPublisher.publishEvent(new WordsChangedEvent(this, List.of(topicId)));
         }
 
         // Lấy từ điển
-        List<WordResponse> wordResponses = null;
-        try {
-            wordResponses = dictionaryClient.retrieveEntries(word.getName());
-        } catch (FeignException e) {
-
-        }
-
-        // Lấy từ phản hồi đầu tiên từ danh sách
-        WordResponse wordResponse;
-        if (!wordResponses.isEmpty()) {
-            wordResponse = wordResponses.get(0);
-            wordResponse.setId(createdWord.getId());
-            wordResponse.setName(createdWord.getName());
-            wordResponse.setThumbnailUrl(thumbnailUrl);
-            wordResponse.setCreatedAt(createdWord.getCreatedAt());
-            wordResponse.setUpdatedAt(createdWord.getUpdatedAt());
-            wordResponse.setCreatedById(createdWord.getCreatedById());
-        } else {
-            // Nếu từ vựng hợp lệ nhưng chưa có định nghĩa
-            wordResponse = wordMapper.toWordResponse(createdWord);
-        }
-        return wordResponse;
+        return wordUtils.getWordDetail(createdWord);
     }
 
     @Override
     public PaginationInfo<List<WordResponse>> getWords(
-            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
-        --pageNumber;
+            int pageNumber,
+            int pageSize,
+            String sortBy,
+            String sortDirection,
+            String searchQuery,
+            String userId,
+            String isUnassigned) {
         Sort sort = MyStringUtils.isNullOrEmpty(sortBy)
                 ? Sort.unsorted()
                 : sortDirection.equalsIgnoreCase("DESC")
                         ? Sort.by(sortBy).descending()
                         : Sort.by(sortBy).ascending();
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        // Thiết lập pageable
+        Pageable pageable = PageRequest.of(--pageNumber, pageSize, sort);
+        Page<Word> wordPage;
 
-        Page<Word> wordPage = MyStringUtils.isNullOrEmpty(searchQuery)
-                ? wordRepository.findAll(pageable)
-                : wordRepository.findByNameContainingIgnoreCase(searchQuery, pageable);
+        if (isUnassigned != null) { // ko có isUnassigned : isUnassigned = null thì lấy tất cả
+            if (MyStringUtils.isNullOrEmpty(searchQuery)) {
+                // Lấy tất cả từ chưa thuộc topic nào, được tạo bởi user
+                wordPage = wordRepository.findWordsWithoutTopicsByCreatedById(userId, pageable);
+            } else {
+                // Lấy từ không thuộc topic và có tên chứa `searchQuery`
+                wordPage = wordRepository.findWordsWithoutTopicsByCreatedByIdAndNameContaining(
+                        userId, searchQuery, pageable);
+            }
+        } else {
+            // Xử lý trường hợp không có `isUnassigned`
+            wordPage = MyStringUtils.isNullOrEmpty(searchQuery)
+                    ? wordRepository.findByCreatedById(userId, pageable)
+                    : wordRepository.findByCreatedByIdAndNameContainingIgnoreCase(userId, searchQuery, pageable);
+        }
 
-        List<WordResponse> wordResponses = wordPage.map(word -> {
-                    try {
-                        List<WordResponse> tmp = dictionaryClient.retrieveEntries(word.getName());
-                        WordResponse wordResponse = tmp.getFirst();
-                        wordResponse.setId(word.getId());
-                        wordResponse.setName(word.getName());
-                        wordResponse.setThumbnailUrl(word.getThumbnailUrl());
-                        wordResponse.setCreatedAt(word.getCreatedAt());
-                        wordResponse.setUpdatedAt(word.getUpdatedAt());
-                        wordResponse.setCreatedById(word.getCreatedById());
-                        wordResponse.setVietnamese(word.getVietnamese());
-                        return wordResponse;
-                    } catch (FeignException e) {
-                        return wordMapper.toWordResponse(word);
-                    }
-                })
-                .toList();
+        // Mapping các từ vựng thành danh sách `WordResponse`
+        List<WordResponse> wordResponses =
+                wordPage.map(wordUtils::getWordDetail).toList();
 
+        // Trả về thông tin phân trang
         return PaginationInfo.<List<WordResponse>>builder()
                 .pagination(Pagination.builder()
                         .pageNumber(++pageNumber)
@@ -161,5 +157,38 @@ public class WordServiceImp implements WordService {
                         .build())
                 .data(wordResponses)
                 .build();
+    }
+
+    @Override
+    public void deleteById(String wordId) {
+        Word word = wordRepository.findById(wordId).orElseThrow(() -> new AppException(ErrorCode.WORD_NOT_EXISTED));
+
+        List<String> topicIds = topicRepository.findTopicIdsByWordId(wordId);
+
+        // Cập nhật các topic để loại bỏ từ này
+        for (String topicId : topicIds) {
+            Topic topic = topicRepository
+                    .findById(topicId)
+                    .orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_EXISTED)); // Xử lý nếu topic không tồn tại
+
+            topic.getWords().remove(word);
+            topicRepository.save(topic);
+        }
+
+        // Cuối cùng xóa từ
+        wordRepository.delete(word);
+        eventPublisher.publishEvent(new WordsChangedEvent(this, topicIds));
+    }
+
+    @Override
+    public WordResponse updateById(String wordId, WordUpdateRequest request) {
+        Word word = wordRepository.findById(wordId).orElseThrow(() -> new AppException(ErrorCode.WORD_NOT_EXISTED));
+        String name = request.getName();
+        String thumbnailUrl = request.getThumbnailUrl();
+
+        if (MyStringUtils.isNotNullAndNotEmpty(name)) word.setName(name);
+        if (MyStringUtils.isNotNullAndNotEmpty(thumbnailUrl)) word.setName(thumbnailUrl);
+
+        return wordUtils.getWordDetail(wordRepository.save(word));
     }
 }

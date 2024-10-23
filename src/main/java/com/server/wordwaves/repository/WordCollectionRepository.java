@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -23,4 +24,11 @@ public interface WordCollectionRepository
     // Lấy toàn bộ các topic theo collectionId
     @Query("SELECT t FROM WordCollection wc JOIN wc.topics t WHERE wc.id = :collectionId")
     Page<Topic> findTopicsById(@Param("collectionId") String collectionId, Pageable pageable);
+
+    @Modifying
+    @Query(value = "DELETE FROM WordCollectionToTopic wct WHERE wct.TopicId = :topicId", nativeQuery = true)
+    void deleteRelationsByTopicId(String topicId);
+
+    @Query("SELECT wc.createdById FROM WordCollection wc WHERE wc.id = :identifierId")
+    String findCreatedByIdById(@Param("identifierId") String identifierId);
 }

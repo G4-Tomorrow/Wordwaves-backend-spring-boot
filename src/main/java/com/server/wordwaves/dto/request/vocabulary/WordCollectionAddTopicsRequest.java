@@ -13,8 +13,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TopicAddWordsRequest {
-    @Schema(example = "[\"hello\", \"an\", \"word\"]")
-    @NotNull(message = "INVALID_WORD_IDS")
-    List<String> wordIds;
+public class WordCollectionAddTopicsRequest {
+    @Schema(example = "[\"Bộ từ vựng 1\", \"Bộ từ vựng 2\", \"Bộ từ vựng 3\"]")
+    @NotNull(message = "INVALID_TOPIC_IDS")
+    List<String> topicIds;
 }

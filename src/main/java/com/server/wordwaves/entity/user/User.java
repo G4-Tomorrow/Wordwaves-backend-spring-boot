@@ -1,5 +1,6 @@
 package com.server.wordwaves.entity.user;
 
+import java.time.Instant;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -39,6 +40,11 @@ public class User extends BaseEntity {
     String provider;
 
     String providerUserId;
+
+    @Builder.Default
+    int streak = 0;
+
+    Instant lastRevision;
 
     @ManyToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     Set<Role> roles;

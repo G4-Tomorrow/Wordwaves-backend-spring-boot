@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
+@MappedSuperclass
 public abstract class BaseEntity {
     @CreationTimestamp
     @Column(updatable = false)

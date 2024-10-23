@@ -2,6 +2,7 @@ package com.server.wordwaves.service.implement;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -11,7 +12,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.server.wordwaves.dto.request.vocabulary.WordCollectionAddTopicsRequest;
 import com.server.wordwaves.dto.request.vocabulary.WordCollectionCreationRequest;
+import com.server.wordwaves.dto.request.vocabulary.WordCollectionUpdateRequest;
 import com.server.wordwaves.dto.response.common.Pagination;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.common.QueryOptions;
@@ -41,33 +44,18 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WordCollectionServiceImp implements WordCollectionService {
+    private final TopicRepository topicRepository;
     private final TopicMapper topicMapper;
     WordCollectionRepository wordCollectionRepository;
     WordCollectionMapper wordCollectionMapper;
     WordCollectionCategoryRepository wordCollectionCategoryRepository;
-    TopicRepository topicRepository;
     UserRepository userRepository;
 
     @Override
     public WordCollectionResponse create(WordCollectionCreationRequest request) {
-        String category = request.getCategory();
         WordCollection wordCollection = wordCollectionMapper.toWordCollection(request);
 
-        // check xem category có null hay ko
-        if (category != null && !category.isEmpty()) {
-            Optional<WordCollectionCategory> wordCollectionCategoryOptional =
-                    wordCollectionCategoryRepository.findByName(category);
-
-            if (wordCollectionCategoryOptional.isPresent()) {
-                // xử lí nếu category đã tồn tại
-                wordCollection.setWordCollectionCategory(wordCollectionCategoryOptional.get());
-            } else {
-                // xử lí nếu category chưa tồn tại
-                WordCollectionCategory wordCollectionCategory = wordCollectionCategoryRepository.save(
-                        WordCollectionCategory.builder().name(category).build());
-                wordCollection.setWordCollectionCategory(wordCollectionCategory);
-            }
-        }
+        wordCollection.setWordCollectionCategory(getWordCollectionCategory(request.getCategory()));
 
         WordCollection createdWordCollection;
         try {
@@ -112,10 +100,22 @@ public class WordCollectionServiceImp implements WordCollectionService {
 
         // gọi database
         Page<WordCollection> wordCollectionsPage = wordCollectionRepository.findAll(spec, pageable);
-        log.info("collection: {}", wordCollectionsPage);
 
         List<WordCollectionResponse> responses = wordCollectionsPage.getContent().stream()
-                .map(wordCollectionMapper::toWordCollectionResponse)
+                .map(wordCollection -> {
+                    WordCollectionResponse response = wordCollectionMapper.toWordCollectionResponse(wordCollection);
+
+                    // Tính tổng số từ vựng trong từng topic
+                    int totalWordsInTopics = wordCollection.getTopics().stream()
+                            .mapToInt(topic -> Optional.ofNullable(topic.getWords())
+                                    .map(Set::size)
+                                    .orElse(0))
+                            .sum();
+
+                    // Set tổng số từ vựng vào response
+                    response.setNumOfTotalWords(totalWordsInTopics);
+                    return response;
+                })
                 .toList();
 
         return PaginationInfo.<List<WordCollectionResponse>>builder()
@@ -173,5 +173,53 @@ public class WordCollectionServiceImp implements WordCollectionService {
                         .build())
                 .data(topicPage.map(topicMapper::toTopicResponse).toList())
                 .build();
+    }
+
+    @Override
+    public WordCollectionResponse updateById(String collectionId, WordCollectionUpdateRequest request) {
+        WordCollection wordCollection = wordCollectionRepository
+                .findById(collectionId)
+                .orElseThrow(() -> new AppException(ErrorCode.WORD_COLLECTION_NOT_EXISTED));
+        String name = request.getName();
+        String thumbnailName = request.getThumbnailName();
+        String category = request.getCategory();
+
+        if (MyStringUtils.isNotNullAndNotEmpty(name)) wordCollection.setName(name);
+        if (MyStringUtils.isNotNullAndNotEmpty(thumbnailName)) wordCollection.setThumbnailName(thumbnailName);
+        if (MyStringUtils.isNotNullAndNotEmpty(category))
+            wordCollection.setWordCollectionCategory(getWordCollectionCategory(category));
+
+        return wordCollectionMapper.toWordCollectionResponse(wordCollectionRepository.save(wordCollection));
+    }
+
+    @Override
+    public void deleteById(String collectionId) {
+        wordCollectionRepository.deleteById(collectionId);
+    }
+
+    @Override
+    public void addTopics(String collectionId, WordCollectionAddTopicsRequest request) {
+        WordCollection wordCollection = wordCollectionRepository
+                .findById(collectionId)
+                .orElseThrow(() -> new AppException(ErrorCode.WORD_COLLECTION_NOT_EXISTED));
+
+        List<Topic> topics = request.getTopicIds().stream()
+                .map(topicRepository::findById)
+                .map(optionalTopic -> optionalTopic.orElseThrow(
+                        () -> new AppException(ErrorCode.TOPIC_NOT_EXISTED))) // Kiểm tra và lấy Topic
+                .toList();
+
+        wordCollection.getTopics().addAll(topics);
+        wordCollectionRepository.save(wordCollection);
+    }
+
+    private WordCollectionCategory getWordCollectionCategory(String category) {
+        if (MyStringUtils.isNullOrEmpty(category)) throw new AppException(ErrorCode.INVALID_WORD_COLLECTION_CATEGORY);
+
+        Optional<WordCollectionCategory> wordCollectionCategoryOptional =
+                wordCollectionCategoryRepository.findByName(category);
+
+        return wordCollectionCategoryOptional.orElseGet(() -> wordCollectionCategoryRepository.save(
+                WordCollectionCategory.builder().name(category).build()));
     }
 }

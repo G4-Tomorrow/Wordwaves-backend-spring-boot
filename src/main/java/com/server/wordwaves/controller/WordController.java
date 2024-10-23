@@ -3,6 +3,7 @@ package com.server.wordwaves.controller;
 import java.util.List;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.server.wordwaves.dto.request.vocabulary.WordCreationRequest;
+import com.server.wordwaves.dto.request.vocabulary.WordUpdateRequest;
 import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.vocabulary.WordResponse;
@@ -48,10 +50,30 @@ public class WordController {
             @RequestParam int pageSize,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
-            @RequestParam(required = false) String searchQuery) {
+            @RequestParam(required = false) String searchQuery,
+            @RequestParam String userId,
+            @RequestParam(required = false) String isUnassigned) { // Thêm tham số mới
+        log.info("assign: {}", isUnassigned);
         return ApiResponse.<PaginationInfo<List<WordResponse>>>builder()
                 .message("Lấy từ vựng")
-                .result(wordService.getWords(pageNumber, pageSize, sortBy, sortDirection, searchQuery))
+                .result(wordService.getWords(
+                        pageNumber, pageSize, sortBy, sortDirection, searchQuery, userId, isUnassigned))
                 .build();
+    }
+
+    @PutMapping("/{wordId}")
+    ApiResponse<WordResponse> updateById(
+            @PathVariable @NotBlank(message = "WORD_ID_IS_REQUIRED") String wordId,
+            @RequestBody WordUpdateRequest request) {
+        return ApiResponse.<WordResponse>builder()
+                .message("Cập nhập từ vựng thành công")
+                .result(wordService.updateById(wordId, request))
+                .build();
+    }
+
+    @DeleteMapping("/{wordId}")
+    ApiResponse<Void> deleteById(@PathVariable @NotBlank(message = "INVALID_WORD_ID") String wordId) {
+        wordService.deleteById(wordId);
+        return ApiResponse.<Void>builder().message("Xóa từ vựng thành công").build();
     }
 }

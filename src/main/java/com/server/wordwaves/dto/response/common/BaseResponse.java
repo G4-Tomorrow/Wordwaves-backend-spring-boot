@@ -14,10 +14,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class BaseResponse {
     Instant createdAt;
-
     Instant updatedAt;
 }
