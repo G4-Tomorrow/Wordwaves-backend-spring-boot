@@ -8,10 +8,11 @@ import com.server.wordwaves.entity.common.BaseEntity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -20,10 +21,13 @@ public class Role extends BaseEntity {
     @Id
     String name;
 
-    @ManyToMany
-    @JoinTable(
-            name = "RoleToPermission",
-            joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"),
-            inverseJoinColumns = @JoinColumn(name = "PermissionName", referencedColumnName = "name"))
+    String description;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "UserToRole", joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"), inverseJoinColumns = @JoinColumn(name = "UserId", referencedColumnName = "id"))
+    Set<User> users;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "RoleToPermission", joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"), inverseJoinColumns = @JoinColumn(name = "PermissionName", referencedColumnName = "name"))
     Set<Permission> permissions;
 }

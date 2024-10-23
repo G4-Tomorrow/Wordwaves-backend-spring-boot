@@ -1,5 +1,6 @@
 package com.server.wordwaves.entity.user;
 
+import java.time.Instant;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -8,10 +9,11 @@ import com.server.wordwaves.entity.common.BaseEntity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -39,10 +41,11 @@ public class User extends BaseEntity {
 
     String providerUserId;
 
-    @ManyToMany
-    @JoinTable(
-            name = "UserToRole",
-            joinColumns = @JoinColumn(name = "UserId", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"))
+    @Builder.Default
+    int streak = 0;
+
+    Instant lastRevision;
+
+    @ManyToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     Set<Role> roles;
 }

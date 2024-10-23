@@ -16,4 +16,7 @@ public class TopicResponse extends BaseAuthorResponse {
     String id;
     String name;
     String thumbnailName;
+    int numOfTotalWords;
+    int numOfLearningWord;
+    int numOfLearnedWord;
 }

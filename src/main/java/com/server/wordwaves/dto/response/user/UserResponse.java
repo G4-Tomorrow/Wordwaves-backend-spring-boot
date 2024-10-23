@@ -1,6 +1,5 @@
 package com.server.wordwaves.dto.response.user;
 
-import java.time.Instant;
 import java.util.Set;
 
 import com.server.wordwaves.dto.response.common.BaseResponse;
@@ -21,7 +20,5 @@ public class UserResponse extends BaseResponse {
     String email;
     String fullName;
     String avatarName;
-    Instant createdAt;
-    Instant updatedAt;
     Set<Role> roles;
 }
