@@ -12,7 +12,9 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 public interface TopicService {
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     TopicResponse create(TopicCreationRequest request);
+
 
     @PreAuthorize("@permissionCheckerFactory.getPermissionChecker(T(com.server.wordwaves.constant.PermissionType).TOPIC).hasAccess(#topicId) || hasRole('ADMIN')")
     PaginationInfo<List<WordResponse>> getWords(
@@ -27,6 +29,8 @@ public interface TopicService {
     @PreAuthorize("@permissionCheckerFactory.getPermissionChecker(T(com.server.wordwaves.constant.PermissionType).TOPIC).hasAccess(#topicId) || hasRole('ADMIN')")
     void deleteById(String topicId);
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     PaginationInfo<List<TopicResponse>> getTopics(
             int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, String userId);
+
 }

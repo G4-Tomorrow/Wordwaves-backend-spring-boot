@@ -49,7 +49,7 @@ public class UserController {
     public ApiResponse<EmailResponse> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
         return ApiResponse.<EmailResponse>builder()
                 .result(userService.forgotPassword(request))
-                .message("Yêu cầu đặt lại mật khẩu thành công.")
+                .message("Yêu cầu đặt lại mật khẩu thành công")
                 .build();
     }
 
@@ -58,7 +58,7 @@ public class UserController {
     public ApiResponse<String> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
         userService.resetPassword(request);
         return ApiResponse.<String>builder()
-                .message("Mật khẩu đã được cập nhật thành công.")
+                .message("Mật khẩu đã được cập nhật thành công")
                 .build();
     }
 

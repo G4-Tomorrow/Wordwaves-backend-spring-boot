@@ -11,11 +11,14 @@ import com.server.wordwaves.dto.request.vocabulary.WordCollectionUpdateRequest;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
 import com.server.wordwaves.dto.response.vocabulary.TopicResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordCollectionResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 public interface WordCollectionService {
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     WordCollectionResponse create(WordCollectionCreationRequest request);
 
-    @PostAuthorize("returnObject.data.first.createdById == authentication.name || hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PostAuthorize("returnObject.data.first.createdById == authentication.name")
     PaginationInfo<List<WordCollectionResponse>> getCollections(
             int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, String userId);
 

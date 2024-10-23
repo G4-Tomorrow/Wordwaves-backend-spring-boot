@@ -55,7 +55,7 @@ public class AuthUtils {
                 .httpOnly(true)
                 .domain(null)
                 .secure(true) // Chỉ dùng trên localhost
-                .sameSite("None")
+                .sameSite("None") // test
                 .path("/")
                 .maxAge(REFRESH_TOKEN_EXPIRATION)
                 .build();

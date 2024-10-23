@@ -46,10 +46,6 @@ public class User extends BaseEntity {
 
     Instant lastRevision;
 
-    @ManyToMany
-    @JoinTable(
-            name = "UserToRole",
-            joinColumns = @JoinColumn(name = "UserId", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"))
+    @ManyToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     Set<Role> roles;
 }

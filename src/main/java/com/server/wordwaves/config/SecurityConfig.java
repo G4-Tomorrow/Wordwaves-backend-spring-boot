@@ -58,7 +58,7 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest()
                         .authenticated())
-                //                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+
                 .oauth2Login(oauth2login -> {
                     oauth2login.defaultSuccessUrl("/auth/oauth2/login-success", true);
                 });
@@ -82,6 +82,7 @@ public class SecurityConfig {
                 "https://localhost:3001",
                 "https://localhost:3000",
                 "https://backend-production-c2cb.up.railway.app"));
+
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
