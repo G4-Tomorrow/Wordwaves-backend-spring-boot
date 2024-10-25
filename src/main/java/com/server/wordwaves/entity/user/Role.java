@@ -2,6 +2,7 @@ package com.server.wordwaves.entity.user;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import com.server.wordwaves.entity.common.BaseEntity;
@@ -25,6 +26,7 @@ public class Role extends BaseEntity {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "UserToRole", joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"), inverseJoinColumns = @JoinColumn(name = "UserId", referencedColumnName = "id"))
+    @JsonIgnore
     Set<User> users;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

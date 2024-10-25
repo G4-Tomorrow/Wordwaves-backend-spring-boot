@@ -1,5 +1,6 @@
 package com.server.wordwaves.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -28,5 +29,6 @@ public class Permission extends BaseEntity {
     String description;
 
     @ManyToMany(mappedBy = "permissions", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JsonIgnore
     Set<Role> roles;
 }

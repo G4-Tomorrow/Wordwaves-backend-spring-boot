@@ -1,6 +1,7 @@
 package com.server.wordwaves.dto.response.role;
 
 import com.server.wordwaves.dto.response.common.BaseResponse;
+import com.server.wordwaves.dto.response.permission.PermissionResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -17,5 +18,5 @@ import java.util.Set;
 public class RoleResponse extends BaseResponse {
     String name;
     String description;
-    Set<Permission> permissions;
+    Set<PermissionResponse> permissions;
 }
