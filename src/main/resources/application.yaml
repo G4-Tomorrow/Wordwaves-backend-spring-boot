@@ -78,6 +78,6 @@ app:
     bucket-name: wordwaves-40814.appspot.com
 
 client:
-  url: http://localhost:3001
+  url: https://localhost:3001
   reset-password-path: reset-password
   verify-email-path:  verify-email
