@@ -1,21 +1,24 @@
 package com.server.wordwaves.dto.response.vocabulary;
 
+import java.time.Instant;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.server.wordwaves.constant.Level;
 import com.server.wordwaves.dto.response.common.BaseAuthorResponse;
-import com.server.wordwaves.dto.response.common.BaseResponse;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-
-import java.time.Instant;
+import net.minidev.json.annotate.JsonIgnore;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WordInLearningResponse extends BaseAuthorResponse {
     Level level;

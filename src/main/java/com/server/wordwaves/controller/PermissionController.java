@@ -48,7 +48,8 @@ public class PermissionController {
 
     @PutMapping("/{name}")
     @Operation(summary = "CẬP NHẬT QUYỀN HẠN")
-    public ApiResponse<PermissionResponse> updatePermission(@PathVariable String name, @RequestBody @Valid PermissionUpdateRequest request) {
+    public ApiResponse<PermissionResponse> updatePermission(
+            @PathVariable String name, @RequestBody @Valid PermissionUpdateRequest request) {
         return ApiResponse.<PermissionResponse>builder()
                 .message("Cập nhật quyền hạn thành công")
                 .result(permissionService.updatePermission(name, request))
@@ -59,9 +60,7 @@ public class PermissionController {
     @Operation(summary = "XÓA QUYỀN HẠN")
     public ApiResponse<Void> deletePermission(@PathVariable String name) {
         permissionService.deletePermission(name);
-        return ApiResponse.<Void>builder()
-                .message("Xóa quyền hạn thành công")
-                .build();
+        return ApiResponse.<Void>builder().message("Xóa quyền hạn thành công").build();
     }
 
     @GetMapping

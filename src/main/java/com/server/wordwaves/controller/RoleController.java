@@ -48,7 +48,8 @@ public class RoleController {
 
     @PutMapping("/{name}")
     @Operation(summary = "CẬP NHẬT VAI TRÒ")
-    public ApiResponse<RoleResponse> updateRole(@PathVariable String name, @RequestBody @Valid RoleUpdateRequest request) {
+    public ApiResponse<RoleResponse> updateRole(
+            @PathVariable String name, @RequestBody @Valid RoleUpdateRequest request) {
         return ApiResponse.<RoleResponse>builder()
                 .message("Cập nhật vai trò thành công")
                 .result(roleService.updateRole(name, request))
@@ -59,9 +60,7 @@ public class RoleController {
     @Operation(summary = "XÓA VAI TRÒ")
     public ApiResponse<Void> deleteRole(@PathVariable String name) {
         roleService.deleteRole(name);
-        return ApiResponse.<Void>builder()
-                .message("Xóa vai trò thành công")
-                .build();
+        return ApiResponse.<Void>builder().message("Xóa vai trò thành công").build();
     }
 
     @GetMapping

@@ -46,6 +46,8 @@ public class User extends BaseEntity {
 
     Instant lastRevision;
 
-    @ManyToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(
+            mappedBy = "users",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     Set<Role> roles;
 }

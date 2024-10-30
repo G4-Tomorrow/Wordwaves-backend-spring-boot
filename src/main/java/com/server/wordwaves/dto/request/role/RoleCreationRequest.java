@@ -1,6 +1,7 @@
 package com.server.wordwaves.dto.request.role;
 
 import jakarta.validation.constraints.NotBlank;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

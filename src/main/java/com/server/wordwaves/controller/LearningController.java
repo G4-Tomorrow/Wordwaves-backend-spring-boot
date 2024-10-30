@@ -1,8 +1,11 @@
 package com.server.wordwaves.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.UUID;
 
+import org.springframework.web.bind.annotation.*;
+
+import com.server.wordwaves.dto.response.common.ApiResponse;
+import com.server.wordwaves.dto.response.vocabulary.VocabularyLearningResponse;
 import com.server.wordwaves.service.WordInLearningService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 public class LearningController {
     WordInLearningService wordInLearningService;
 
-
-
+    @GetMapping("/{collectionId}")
+    ApiResponse<VocabularyLearningResponse> learningWordCollection(
+            @PathVariable("collectionId") String collectionId, @RequestParam int numOfWords) {
+        return ApiResponse.<VocabularyLearningResponse>builder()
+                .message("Học bộ từ vựng")
+                .result(wordInLearningService.learningWordCollection(collectionId, numOfWords))
+                .build();
+    }
 }

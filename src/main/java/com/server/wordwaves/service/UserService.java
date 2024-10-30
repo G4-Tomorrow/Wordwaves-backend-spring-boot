@@ -23,7 +23,8 @@ public interface UserService {
     ResponseEntity<AuthenticationResponse> verify(VerifyEmailRequest request);
 
     @PreAuthorize("hasRole('ADMIN')")
-    PaginationInfo<List<UserResponse>> getUsers(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery);
+    PaginationInfo<List<UserResponse>> getUsers(
+            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery);
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     UserResponse getMyInfo();

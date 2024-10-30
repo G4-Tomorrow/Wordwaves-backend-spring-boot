@@ -1,6 +1,7 @@
 package com.server.wordwaves.dto.response.permission;
 
 import com.server.wordwaves.dto.response.common.BaseResponse;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;

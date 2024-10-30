@@ -12,8 +12,7 @@ public enum Level {
     LEARNING("LEARNING", 2),
     FAMILIAR("FAMILIAR", 3),
     LEARNED("LEARNED", 4),
-    PROFICIENT("PROFICIENT", 5)
-    ;
+    PROFICIENT("PROFICIENT", 5);
     String name;
     int score;
 

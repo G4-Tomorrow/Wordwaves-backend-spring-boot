@@ -2,9 +2,9 @@ package com.server.wordwaves.entity.user;
 
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.server.wordwaves.entity.common.BaseEntity;
 
 import lombok.*;
@@ -25,11 +25,17 @@ public class Role extends BaseEntity {
     String description;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "UserToRole", joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"), inverseJoinColumns = @JoinColumn(name = "UserId", referencedColumnName = "id"))
+    @JoinTable(
+            name = "UserToRole",
+            joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"),
+            inverseJoinColumns = @JoinColumn(name = "UserId", referencedColumnName = "id"))
     @JsonIgnore
     Set<User> users;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "RoleToPermission", joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"), inverseJoinColumns = @JoinColumn(name = "PermissionName", referencedColumnName = "name"))
+    @JoinTable(
+            name = "RoleToPermission",
+            joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"),
+            inverseJoinColumns = @JoinColumn(name = "PermissionName", referencedColumnName = "name"))
     Set<Permission> permissions;
 }

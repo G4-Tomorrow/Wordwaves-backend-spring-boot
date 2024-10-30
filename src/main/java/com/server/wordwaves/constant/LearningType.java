@@ -4,6 +4,5 @@ public enum LearningType {
     TRUE_FALSE,
     MULTIPLE_CHOICE,
     PRONUNCIATION,
-    KEYBOARD_INPUT
-    ;
+    KEYBOARD_INPUT;
 }

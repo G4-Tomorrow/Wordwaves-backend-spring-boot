@@ -58,7 +58,6 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest()
                         .authenticated())
-
                 .oauth2Login(oauth2login -> {
                     oauth2login.defaultSuccessUrl("/auth/oauth2/login-success", true);
                 });

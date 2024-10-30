@@ -3,12 +3,10 @@ package com.server.wordwaves.entity.vocabulary;
 import java.time.Instant;
 import java.util.UUID;
 
-import com.server.wordwaves.entity.common.BaseAuthor;
 import jakarta.persistence.*;
 
 import com.server.wordwaves.constant.Level;
-import com.server.wordwaves.entity.common.BaseEntity;
-import com.server.wordwaves.entity.user.User;
+import com.server.wordwaves.entity.common.BaseAuthor;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

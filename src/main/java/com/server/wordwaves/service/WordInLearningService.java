@@ -1,3 +1,9 @@
 package com.server.wordwaves.service;
 
-public interface WordInLearningService {}
+import java.util.UUID;
+
+import com.server.wordwaves.dto.response.vocabulary.VocabularyLearningResponse;
+
+public interface WordInLearningService {
+    VocabularyLearningResponse learningWordCollection(String collectionId, int numOfWords);
+}
