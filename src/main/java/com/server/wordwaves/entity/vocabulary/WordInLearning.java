@@ -3,6 +3,7 @@ package com.server.wordwaves.entity.vocabulary;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.server.wordwaves.entity.common.BaseAuthor;
 import jakarta.persistence.*;
 
 import com.server.wordwaves.constant.Level;
@@ -20,7 +21,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SuperBuilder
-public class WordInLearning extends BaseEntity {
+public class WordInLearning extends BaseAuthor {
     @Id
     @GeneratedValue
     UUID id;
@@ -41,16 +42,6 @@ public class WordInLearning extends BaseEntity {
     int score = 0;
 
     @ManyToOne
-    @JoinColumn(name = "UserId", referencedColumnName = "id")
-    User user;
-
-    @ManyToOne
     @JoinColumn(name = "WordId", referencedColumnName = "id")
     Word word;
-
-    @PreUpdate
-    void preUpdate() {
-        int tmp = numOfCorrectAnswers - numOfWrongAnswers;
-        this.score = Math.max(tmp, 0);
-    }
 }
