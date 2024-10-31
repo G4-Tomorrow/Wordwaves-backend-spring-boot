@@ -1,7 +1,5 @@
 package com.server.wordwaves.dto.response.vocabulary;
 
-import java.time.Instant;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.server.wordwaves.constant.LearningType;
 import com.server.wordwaves.constant.Level;
@@ -13,7 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import net.minidev.json.annotate.JsonIgnore;
 
 @Getter
 @Setter

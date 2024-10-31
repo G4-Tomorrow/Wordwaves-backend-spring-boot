@@ -9,8 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import com.server.wordwaves.entity.vocabulary.Word;
 
-import java.util.List;
-
 @Repository
 public interface WordRepository extends JpaRepository<Word, String> {
     Page<Word> findByCreatedByIdAndNameContainingIgnoreCase(String createdById, String name, Pageable pageable);
@@ -23,5 +21,4 @@ public interface WordRepository extends JpaRepository<Word, String> {
 
     @Query("SELECT w.createdById FROM Word w WHERE w.id = :identifierId")
     String findCreatedByIdById(@Param("identifierId") String identifierId);
-
 }

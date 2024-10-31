@@ -1,8 +1,8 @@
 package com.server.wordwaves.utils;
 
-import com.server.wordwaves.constant.LearningType;
-
 import java.util.concurrent.ThreadLocalRandom;
+
+import com.server.wordwaves.constant.LearningType;
 
 public class RandomUtils {
     public static LearningType getRandomLearningType() {

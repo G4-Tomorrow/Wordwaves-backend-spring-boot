@@ -1,7 +1,5 @@
 package com.server.wordwaves.controller;
 
-import java.util.UUID;
-
 import org.springframework.web.bind.annotation.*;
 
 import com.server.wordwaves.dto.response.common.ApiResponse;

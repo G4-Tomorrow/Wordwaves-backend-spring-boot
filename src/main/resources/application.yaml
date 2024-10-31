@@ -29,6 +29,9 @@ spring:
         physical-strategy: com.server.wordwaves.config.PascalCaseNamingStrategy
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
   security:
     oauth2:
       client:
