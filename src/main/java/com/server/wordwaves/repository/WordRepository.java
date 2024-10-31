@@ -24,19 +24,4 @@ public interface WordRepository extends JpaRepository<Word, String> {
     @Query("SELECT w.createdById FROM Word w WHERE w.id = :identifierId")
     String findCreatedByIdById(@Param("identifierId") String identifierId);
 
-    @Query("""
-    SELECT w 
-    FROM Topic t 
-    JOIN t.words w 
-    WHERE t.id IN :topicIds 
-    AND w.id NOT IN (
-        SELECT wil.word.id 
-        FROM WordInLearning wil 
-        WHERE wil.createdById = :userId
-    )
-    """)
-    List<Word> findAvailableWordsInTopics(
-            @Param("topicIds") List<String> topicIds,
-            @Param("userId") String userId,
-            Pageable pageable);
 }

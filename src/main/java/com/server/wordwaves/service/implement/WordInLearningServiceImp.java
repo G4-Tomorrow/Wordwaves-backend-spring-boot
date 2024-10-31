@@ -10,6 +10,7 @@ import com.server.wordwaves.dto.response.vocabulary.WordInLearningResponse;
 import com.server.wordwaves.entity.vocabulary.Topic;
 import com.server.wordwaves.entity.vocabulary.Word;
 import com.server.wordwaves.repository.TopicRepository;
+import com.server.wordwaves.utils.RandomUtils;
 import com.server.wordwaves.utils.WordUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,34 +43,30 @@ public class WordInLearningServiceImp implements WordInLearningService {
     WordCollectionRepository wordCollectionRepository;
 
     @Override
+    //4.07
     public VocabularyLearningResponse learningWordCollection(String collectionId, int numOfWords) {
         String currentUserId = UserUtils.getCurrentUserId();
         Pageable pageable = PageRequest.of(0, numOfWords);
 
-        // Lấy collection và danh sách các topic
-        WordCollection wordCollection = wordCollectionRepository
-                .findById(collectionId)
-                .orElseThrow(() -> new AppException(ErrorCode.WORD_COLLECTION_NOT_EXISTED));
-
-        List<String> topicIds = wordCollection.getTopics().stream()
-                .map(Topic::getId)
-                .toList();
 
         // Lấy danh sách các từ chưa học
-        List<Word> words = wordRepository.findAvailableWordsInTopics(topicIds, currentUserId, pageable);
+        List<Object> words = wordInLearningRepository.findAvailableWordsInTopics(collectionId, currentUserId, pageable);
+
+        log.info("{}",words.toArray());
 
         // Chuyển đổi các từ thành đối tượng response
-        List<WordInLearningResponse> wordResponses = words.stream()
-                .map(word -> WordInLearningResponse.builder()
-                        .level(Level.NOT_RETAINED)
-                        .word(wordUtils.getWordDetail(word))
-                        .build()
-                ).collect(Collectors.toList());
+//        List<WordInLearningResponse> wordResponses = words.stream()
+//                .map(word -> WordInLearningResponse.builder()
+//                        .level(Level.NOT_RETAINED)
+//                        .word(wordUtils.getWordDetail(word))
+//                        .learningType(RandomUtils.getRandomLearningType())
+//                        .build()
+//                ).collect(Collectors.toList());
 
         // Trả về kết quả
         return VocabularyLearningResponse.builder()
                 .numOfWords(numOfWords)
-                .words(wordResponses)
+//                .words(wordResponses)
                 .build();
     }
 

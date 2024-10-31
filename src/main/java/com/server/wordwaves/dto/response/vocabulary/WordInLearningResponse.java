@@ -3,6 +3,7 @@ package com.server.wordwaves.dto.response.vocabulary;
 import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.server.wordwaves.constant.LearningType;
 import com.server.wordwaves.constant.Level;
 import com.server.wordwaves.dto.response.common.BaseAuthorResponse;
 
@@ -22,8 +23,8 @@ import net.minidev.json.annotate.JsonIgnore;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WordInLearningResponse extends BaseAuthorResponse {
     Level level;
+    LearningType learningType;
     String customMeaning;
-    Instant nextReviewTiming;
     int numOfWrongAnswers = 0;
     int numOfCorrectAnswers = 0;
     int score = 0;
