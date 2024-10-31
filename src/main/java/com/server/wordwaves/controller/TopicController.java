@@ -37,7 +37,7 @@ public class TopicController {
     TopicService topicService;
 
     @PostMapping
-    @Operation(summary = "CREATE TOPIC")
+    @Operation(summary = "TẠO CHỦ ĐỀ")
     ApiResponse<TopicResponse> create(@RequestBody @Valid TopicCreationRequest request) {
         return ApiResponse.<TopicResponse>builder()
                 .message("Tạo chủ đề mới thành công")
@@ -46,7 +46,7 @@ public class TopicController {
     }
 
     @GetMapping("/{topicId}/words")
-    @Operation(summary = "GET WORDS FROM TOPIC")
+    @Operation(summary = "LẤY TỪ VỰNG BÊN TRONG 1 CHỦ ĐỀ")
     ApiResponse<PaginationInfo<List<WordResponse>>> getWords(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
@@ -61,7 +61,7 @@ public class TopicController {
     }
 
     @GetMapping
-    @Operation(summary = "GET TOPICS")
+    @Operation(summary = "LẤY CÁC CHỦ ĐỀ GẮN VỚI MỘT NGƯỜI DÙNG")
     ApiResponse<PaginationInfo<List<TopicResponse>>> getTopics(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
@@ -76,7 +76,7 @@ public class TopicController {
     }
 
     @PostMapping("/{topicId}/words")
-    @Operation(summary = "ADD WORDS INTO TOPIC")
+    @Operation(summary = "THÊM TỪ VỰNG VÀO CHỦ ĐỀ")
     ApiResponse<List<String>> addWords(
             @RequestBody @Valid TopicAddWordsRequest request,
             @PathVariable @NotBlank(message = "LACK_OF_PARAMETER") String topicId) {
@@ -88,7 +88,7 @@ public class TopicController {
     }
 
     @PutMapping("/{topicId}")
-    @Operation(summary = "UPDATE TOPIC BY ID")
+    @Operation(summary = "CẬP NHẬP CHỦ ĐỀ THÔNG QUA ID")
     ApiResponse<TopicResponse> updateById(
             @PathVariable @NotBlank(message = "TOPIC_ID_IS_REQUIRED") String topicId,
             @RequestBody TopicUpdateRequest request) {
@@ -99,7 +99,7 @@ public class TopicController {
     }
 
     @DeleteMapping("/{topicId}")
-    @Operation(summary = "DELETE TOPIC BY ID")
+    @Operation(summary = "XÓA CHỦ ĐỀ THÔNG QUA ID")
     ApiResponse<Void> deleteById(@PathVariable @NotBlank(message = "TOPIC_ID_IS_REQUIRED") String topicId) {
         topicService.deleteById(topicId);
         return ApiResponse.<Void>builder().message("Xóa chủ đề thành công").build();

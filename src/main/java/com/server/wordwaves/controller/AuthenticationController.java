@@ -35,7 +35,7 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @GetMapping("/oauth2/login-success")
-    @Operation(summary = "OAUTH2 LOGIN")
+    @Operation(summary = "ĐĂNG NHẬP OAUTH2")
     ResponseEntity<ApiResponse<AuthenticationResponse>> oauth2Login(
             OAuth2AuthenticationToken oauth2AuthenticationToken) {
         ResponseEntity<AuthenticationResponse> responseEntity =
@@ -52,7 +52,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "BASIC LOGIN")
+    @Operation(summary = "ĐĂNG NHẬP QUA EMAIL")
     ResponseEntity<ApiResponse<AuthenticationResponse>> login(@RequestBody @Valid AuthenticationRequest request) {
         ResponseEntity<AuthenticationResponse> responseEntity = authenticationService.authenticate(request);
         ApiResponse<AuthenticationResponse> apiResponse = ApiResponse.<AuthenticationResponse>builder()
@@ -66,7 +66,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/introspect")
-    @Operation(summary = "INTROSPECT")
+    @Operation(summary = "KIỂM TRA TÍNH KHẢ THI CỦA TOKEN")
     ApiResponse<IntrospectResponse> introspect(@RequestBody @Valid IntrospectRequest request) {
         return ApiResponse.<IntrospectResponse>builder()
                 .message("Kiểm tra token đã hết hạn hoặc bị logout chưa")
@@ -75,7 +75,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "LOGOUT")
+    @Operation(summary = "ĐĂNG XUẤT")
     ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") LogoutRequest request) {
         ResponseEntity<Void> responseEntity = authenticationService.logout(request);
         ApiResponse<Void> apiResponse =
@@ -87,7 +87,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/refresh")
-    @Operation(summary = "REFRESH TOKEN")
+    @Operation(summary = "LÀM MỚI TOKEN")
     ResponseEntity<ApiResponse<AuthenticationResponse>> refresh(
             @CookieValue(name = "refresh_token") RefreshTokenRequest request) throws ParseException, JOSEException {
         ResponseEntity<AuthenticationResponse> responseEntity = authenticationService.getRefreshToken(request);

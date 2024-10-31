@@ -35,7 +35,7 @@ public class WordController {
     WordService wordService;
 
     @PostMapping
-    @Operation(summary = "CREATE WORD")
+    @Operation(summary = "TẠO TỪ VỰNG")
     ApiResponse<WordResponse> create(@RequestBody @Valid WordCreationRequest request) {
         return ApiResponse.<WordResponse>builder()
                 .message("Tạo từ vựng mới thành công")
@@ -44,7 +44,7 @@ public class WordController {
     }
 
     @GetMapping
-    @Operation(summary = "GET WORDS")
+    @Operation(summary = "LẤY TỪ VỰNG")
     ApiResponse<PaginationInfo<List<WordResponse>>> getWords(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
@@ -62,6 +62,7 @@ public class WordController {
     }
 
     @PutMapping("/{wordId}")
+    @Operation(summary = "CẬP NHẬP TỪ VỰNG QUA ID")
     ApiResponse<WordResponse> updateById(
             @PathVariable @NotBlank(message = "WORD_ID_IS_REQUIRED") String wordId,
             @RequestBody WordUpdateRequest request) {
@@ -72,6 +73,7 @@ public class WordController {
     }
 
     @DeleteMapping("/{wordId}")
+    @Operation(summary = "XÓA TỪ VỰNG QUA ID")
     ApiResponse<Void> deleteById(@PathVariable @NotBlank(message = "INVALID_WORD_ID") String wordId) {
         wordService.deleteById(wordId);
         return ApiResponse.<Void>builder().message("Xóa từ vựng thành công").build();

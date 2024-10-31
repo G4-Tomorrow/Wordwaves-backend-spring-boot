@@ -36,7 +36,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping
-    @Operation(summary = "REGISTER")
+    @Operation(summary = "ĐĂNG KÝ")
     ApiResponse<EmailResponse> register(@RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<EmailResponse>builder()
                 .message("Email xác thực đã được gửi thành công")
@@ -45,7 +45,7 @@ public class UserController {
     }
 
     @PostMapping("/forgot-password")
-    @Operation(summary = "FORGOT PASSWORD")
+    @Operation(summary = "YÊU CẦU ĐỔI MẬT KHẨU")
     public ApiResponse<EmailResponse> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
         return ApiResponse.<EmailResponse>builder()
                 .result(userService.forgotPassword(request))
@@ -54,7 +54,7 @@ public class UserController {
     }
 
     @PutMapping("/reset-password")
-    @Operation(summary = "RESET PASSWORD")
+    @Operation(summary = "ĐỔI MẬT KHẨU")
     public ApiResponse<String> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
         userService.resetPassword(request);
         return ApiResponse.<String>builder()
@@ -63,7 +63,7 @@ public class UserController {
     }
 
     @PostMapping("/verify")
-    @Operation(summary = "VERIFY USER EMAIL")
+    @Operation(summary = "XÁC THƯC EMAIL")
     public ResponseEntity<ApiResponse<AuthenticationResponse>> verify(@RequestBody @Valid VerifyEmailRequest request) {
         ResponseEntity<AuthenticationResponse> responseEntity = userService.verify(request);
 
@@ -75,7 +75,7 @@ public class UserController {
     }
 
     @GetMapping
-    @Operation(summary = "GET USERS")
+    @Operation(summary = "LẤY NGƯỜI DÙNG")
     ApiResponse<PaginationInfo<List<UserResponse>>> getUsers(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
@@ -89,7 +89,7 @@ public class UserController {
     }
 
     @GetMapping("/myinfo")
-    @Operation(summary = "GET USER INFORMATION WHEN F5")
+    @Operation(summary = "LẤY NGƯỜI DÙNG KHI LÀM MỚI TRANG")
     ApiResponse<UserResponse> getMyInfo() {
         return ApiResponse.<UserResponse>builder()
                 .message("Lấy thông tin người dùng")
@@ -98,7 +98,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @Operation(summary = "GET USER BY ID")
+    @Operation(summary = "LẤY THÔNG TIN NGƯỜI DÙNG QUA ID")
     ApiResponse<UserResponse> getUserById(@PathVariable String userId) {
         return ApiResponse.<UserResponse>builder()
                 .message("Lấy thông tin người dùng qua id")
@@ -107,7 +107,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    @Operation(summary = "UPDATE USER BY ID")
+    @Operation(summary = "CẬP NHẬP NGƯỜI DÙNG QUA ID")
     ApiResponse<UserResponse> updateUserById(
             @PathVariable String userId, @RequestBody UserUpdateRequest userUpdateRequest) {
         return ApiResponse.<UserResponse>builder()
@@ -117,7 +117,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    @Operation(summary = "DELETE USER BY ID")
+    @Operation(summary = "XÓA NGƯỜI DÙNG QUA ID")
     ApiResponse<Void> deleteUserById(@PathVariable String userId) {
         userService.deleteUserById(userId);
         return ApiResponse.<Void>builder().message("Xóa người dùng thành công").build();

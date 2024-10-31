@@ -1,5 +1,6 @@
 package com.server.wordwaves.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.*;
 
 import com.server.wordwaves.dto.response.common.ApiResponse;
@@ -22,6 +23,7 @@ public class LearningController {
     WordInLearningService wordInLearningService;
 
     @GetMapping("/{collectionId}")
+    @Operation(summary = "HỌC 1 BỘ TỪ VỰNG")
     ApiResponse<VocabularyLearningResponse> learningWordCollection(
             @PathVariable("collectionId") String collectionId, @RequestParam int numOfWords) {
         return ApiResponse.<VocabularyLearningResponse>builder()
