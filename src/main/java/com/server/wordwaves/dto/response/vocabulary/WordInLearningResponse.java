@@ -22,8 +22,6 @@ public class WordInLearningResponse extends BaseAuthorResponse {
     Level level;
     LearningType learningType;
     String customMeaning;
-    int numOfWrongAnswers = 0;
-    int numOfCorrectAnswers = 0;
     int score = 0;
 
     WordResponse word;
