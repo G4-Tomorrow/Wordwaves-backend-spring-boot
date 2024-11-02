@@ -2,17 +2,15 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
-import com.google.protobuf.Api;
-import com.server.wordwaves.dto.response.vocabulary.VocabularyRevisionResponse;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 
 import org.springframework.web.bind.annotation.*;
 
 import com.server.wordwaves.dto.request.vocabulary.WordProcessUpdateRequest;
 import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.dto.response.vocabulary.VocabularyLearningResponse;
+import com.server.wordwaves.dto.response.vocabulary.VocabularyRevisionResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordProcessUpdateResponse;
 import com.server.wordwaves.service.WordInLearningService;
 

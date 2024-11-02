@@ -1,9 +1,7 @@
 package com.server.wordwaves.service.implement;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import com.server.wordwaves.dto.response.vocabulary.VocabularyRevisionResponse;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.server.wordwaves.constant.Level;
 import com.server.wordwaves.dto.request.vocabulary.WordProcessUpdateRequest;
 import com.server.wordwaves.dto.response.vocabulary.VocabularyLearningResponse;
-import com.server.wordwaves.dto.response.vocabulary.WordInLearningResponse;
+import com.server.wordwaves.dto.response.vocabulary.VocabularyRevisionResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordProcessUpdateResponse;
 import com.server.wordwaves.entity.vocabulary.WordInLearning;
 import com.server.wordwaves.event.WordInLearningChangeEvent;
@@ -20,7 +18,6 @@ import com.server.wordwaves.mapper.LearningMapper;
 import com.server.wordwaves.repository.*;
 import com.server.wordwaves.service.WordInLearningService;
 import com.server.wordwaves.utils.LearningUtils;
-import com.server.wordwaves.utils.RandomUtils;
 import com.server.wordwaves.utils.UserUtils;
 import com.server.wordwaves.utils.WordUtils;
 
@@ -46,7 +43,8 @@ public class WordInLearningServiceImp implements WordInLearningService {
         Pageable pageable = PageRequest.of(0, numOfWords);
 
         // Lấy danh sách các từ chưa học
-        List<String> wordIds = wordInLearningRepository.findAvailableWordsInCollection(collectionId, currentUserId, pageable);
+        List<String> wordIds =
+                wordInLearningRepository.findAvailableWordsInCollection(collectionId, currentUserId, pageable);
 
         // Trả về kết quả
         return VocabularyLearningResponse.builder()
@@ -75,7 +73,8 @@ public class WordInLearningServiceImp implements WordInLearningService {
         String currentUserId = UserUtils.getCurrentUserId();
         Pageable pageable = PageRequest.of(0, numOfWords);
 
-        List<String> wordIds = wordInLearningRepository.findWordsInCollectionWithNextReviewBeforeNow(collectionId, currentUserId, pageable);
+        List<String> wordIds = wordInLearningRepository.findWordsInCollectionWithNextReviewBeforeNow(
+                collectionId, currentUserId, pageable);
 
         return VocabularyRevisionResponse.builder()
                 .numOfWords(numOfWords)

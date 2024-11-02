@@ -1,11 +1,11 @@
 package com.server.wordwaves.utils;
 
-import com.server.wordwaves.constant.Level;
-import com.server.wordwaves.dto.response.vocabulary.WordInLearningResponse;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.server.wordwaves.constant.Level;
+import com.server.wordwaves.dto.response.vocabulary.WordInLearningResponse;
 
 public class LearningUtils {
     public static Instant calculateNextPreviewTiming(int score) {
