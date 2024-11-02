@@ -48,9 +48,6 @@ public class User extends BaseEntity {
 
     Instant lastRevision;
 
-    @OneToMany(mappedBy = "user")
-    List<WordInLearning> wordInLearnings;
-
     @ManyToMany(
             mappedBy = "users",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE})

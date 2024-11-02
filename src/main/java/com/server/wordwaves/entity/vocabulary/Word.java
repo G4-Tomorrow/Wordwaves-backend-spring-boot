@@ -42,9 +42,9 @@ import lombok.experimental.SuperBuilder;
                             WHERE wc.Id = :collectionId
                         )
                         AND w.Id NOT IN (
-                            SELECT wil.CreatedById
+                            SELECT wil.UserId
                             FROM WordInLearning wil
-                            WHERE wil.CreatedById = :currentUserId
+                            WHERE wil.UserId = :currentUserId
                         )
                         """,
         resultSetMapping = "WordMapping")

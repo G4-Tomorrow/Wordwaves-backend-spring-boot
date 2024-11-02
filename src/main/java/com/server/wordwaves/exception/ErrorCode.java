@@ -72,6 +72,8 @@ public enum ErrorCode {
     INVALID_WORD_ID(6204, "Id của từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
     WORD_ID_IS_REQUIRED(6204, "Id của từ vựng không được để trống", HttpStatus.BAD_REQUEST),
 
+    WORD_IN_LEARNING_NOT_EXISTED(6301, "Người dùng chưa học từ vựng này", HttpStatus.INTERNAL_SERVER_ERROR),
+
     // OAUTH2 ERROR CODE
     OAUTH2_USER_EXISTED_WITH_DIFFERENT_PROVIDER(
             7001, "Tài khoản đã được liên kết với nhà cung cấp OAuth2 khác trước đó", HttpStatus.BAD_REQUEST),

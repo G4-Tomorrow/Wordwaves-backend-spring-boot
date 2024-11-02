@@ -1,4 +1,4 @@
-package com.server.wordwaves.dto.request.vocabulary;
+package com.server.wordwaves.dto.response.vocabulary;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class WordProcessUpdateRequest {
+public class WordProcessUpdateResponse {
     String wordId;
     @JsonProperty("isCorrect")
     Boolean isCorrect;

@@ -2,6 +2,8 @@ package com.server.wordwaves.controller;
 
 import com.google.protobuf.Api;
 import com.server.wordwaves.dto.request.vocabulary.WordProcessUpdateRequest;
+import com.server.wordwaves.dto.response.vocabulary.WordInLearningResponse;
+import com.server.wordwaves.dto.response.vocabulary.WordProcessUpdateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,11 +39,11 @@ public class LearningController {
     }
 
     @PatchMapping
-    @Operation(summary = "Cập nhập tiến trình học từ vựng")
-    ApiResponse<List<WordProcessUpdateRequest>> updateProcess(List<WordProcessUpdateRequest> words) {
-        return ApiResponse.<List<WordProcessUpdateRequest>>builder()
+    @Operation(summary = "CẬP NHẬP TIẾN TRÌNH HỌC TỪ VỰNG")
+    ApiResponse<List<WordProcessUpdateResponse>> updateProcess(@RequestBody List<WordProcessUpdateRequest> words) {
+        return ApiResponse.<List<WordProcessUpdateResponse>>builder()
                 .message("Cập nhập tiến độ học từ vựng")
-                .result(wordInLearningService.updateProcess(words))
+                 .result(wordInLearningService.updateProcess(words))
                 .build();
     }
 }

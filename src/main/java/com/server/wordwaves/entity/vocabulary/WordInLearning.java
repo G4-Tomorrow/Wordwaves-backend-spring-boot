@@ -19,10 +19,13 @@ import java.util.UUID;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SuperBuilder
+@Table(name = "WordInLearning", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"UserId", "WordId"})
+})
 public class WordInLearning extends BaseEntity {
     @Id
-    @GeneratedValue
-    UUID id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
 
     @Enumerated(EnumType.STRING)
     Level level;
@@ -33,12 +36,9 @@ public class WordInLearning extends BaseEntity {
     @Builder.Default
     int score = 0;
 
-    @ManyToOne
-    @JoinColumn(name = "UserId", referencedColumnName = "id")
-    @JsonIgnore
-    User user;
+    @Column(nullable = false)
+    String userId;
 
-    @ManyToOne
-    @JoinColumn(name = "WordId", referencedColumnName = "id")
-    Word word;
+    @Column(nullable = false)
+    String wordId;
 }
