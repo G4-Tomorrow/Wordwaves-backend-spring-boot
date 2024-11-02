@@ -30,4 +30,6 @@ public interface WordService {
     @PreAuthorize(
             "@permissionCheckerFactory.getPermissionChecker(T(com.server.wordwaves.constant.PermissionType).WORD).hasAccess(#wordId) || hasRole('ADMIN')")
     WordResponse updateById(String wordId, WordUpdateRequest request);
+
+    WordResponse detail(String name);
 }
