@@ -3,6 +3,7 @@ package com.server.wordwaves.service.implement;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.server.wordwaves.dto.response.vocabulary.VocabularyRevisionResponse;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,6 @@ import com.server.wordwaves.dto.request.vocabulary.WordProcessUpdateRequest;
 import com.server.wordwaves.dto.response.vocabulary.VocabularyLearningResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordInLearningResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordProcessUpdateResponse;
-import com.server.wordwaves.entity.vocabulary.Word;
 import com.server.wordwaves.entity.vocabulary.WordInLearning;
 import com.server.wordwaves.event.WordInLearningChangeEvent;
 import com.server.wordwaves.mapper.LearningMapper;
@@ -46,21 +46,35 @@ public class WordInLearningServiceImp implements WordInLearningService {
         Pageable pageable = PageRequest.of(0, numOfWords);
 
         // Lấy danh sách các từ chưa học
-        List<String> words = wordInLearningRepository.findAvailableWordsInTopics(collectionId, currentUserId, pageable);
-
-        // Chuyển đổi các từ thành đối tượng response
-        List<WordInLearningResponse> wordResponses = words.stream()
-                .map(word -> WordInLearningResponse.builder()
-                        .wordId(word)
-                        .learningType(RandomUtils.getRandomLearningType())
-                        .build())
-                .collect(Collectors.toList());
+        List<String> wordIds = wordInLearningRepository.findAvailableWordsInCollection(collectionId, currentUserId, pageable);
 
         // Trả về kết quả
         return VocabularyLearningResponse.builder()
                 .numOfWords(numOfWords)
-                .words(wordResponses)
+                .numOfNotRetainedWords(wordIds.size())
+                .words(LearningUtils.toWordInLearningResponses(wordIds))
                 .build();
+    }
+
+    @Override
+    public VocabularyLearningResponse learningTopic(String topicId, int numOfWords) {
+        String currentUserId = UserUtils.getCurrentUserId();
+        Pageable pageable = PageRequest.of(0, numOfWords);
+
+        List<String> wordIds = wordInLearningRepository.findNotRetainedWordInTopic(topicId, currentUserId, pageable);
+
+        // Trả về kết quả
+        return VocabularyLearningResponse.builder()
+                .numOfWords(numOfWords)
+                .numOfNotRetainedWords(wordIds.size())
+                .words(LearningUtils.toWordInLearningResponses(wordIds))
+                .build();
+    }
+    }
+
+    @Override
+    public VocabularyRevisionResponse reviewWordCollection(String collectionId, int numOfWords) {
+        return null;
     }
 
     public List<WordProcessUpdateResponse> updateProcess(List<WordProcessUpdateRequest> words) {

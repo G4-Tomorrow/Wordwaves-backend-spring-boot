@@ -194,6 +194,7 @@ public class WordServiceImp implements WordService {
 
     @Override
     public WordResponse detail(String name) {
-        return wordUtils.getWordDetail(wordRepository.findByName(name).orElseThrow(() -> new AppException(ErrorCode.WORD_NOT_EXISTED)));
+        return wordUtils.getWordDetail(
+                wordRepository.findByName(name).orElseThrow(() -> new AppException(ErrorCode.WORD_NOT_EXISTED)));
     }
 }

@@ -1,18 +1,17 @@
 package com.server.wordwaves.dto.response.vocabulary;
 
-import java.util.List;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class VocabularyLearningResponse {
+public class VocabularyRevisionResponse {
     int numOfWords;
-    int numOfNotRetainedWords;
 
     List<WordInLearningResponse> words;
 }

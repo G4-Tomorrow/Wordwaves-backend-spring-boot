@@ -1,34 +1,38 @@
 package com.server.wordwaves.repository;
 
-import com.server.wordwaves.entity.vocabulary.WordInLearning;
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.server.wordwaves.entity.vocabulary.WordInLearning;
 
 @Repository
 public interface WordInLearningRepository extends JpaRepository<WordInLearning, String> {
 
-    @Query(value = """
-              SELECT w.Id
-                                                             FROM Word w
-                                                             JOIN TopicToWord tt ON w.Id = tt.WordId
-                                                             WHERE tt.TopicId IN (
-                                                                 SELECT wctt.TopicId
-                                                                 FROM WordCollection wc
-                                                                 JOIN WordCollectionToTopic wctt ON wc.Id = wctt.WordCollectionId
-                                                                 WHERE wc.Id = :collectionId
-                                                             )
-                                                             AND NOT EXISTS (
-                                                                 SELECT 1
-                                                                 FROM WordInLearning wil
-                                                                 WHERE wil.UserId = :currentUserId AND wil.WordId = w.Id
-                                                             )
-            """, nativeQuery = true)
-    List<String> findAvailableWordsInTopics(
+    @Query(
+            value =
+                    """
+			SELECT w.Id
+															FROM Word w
+															JOIN TopicToWord tt ON w.Id = tt.WordId
+															WHERE tt.TopicId IN (
+																SELECT wctt.TopicId
+																FROM WordCollection wc
+																JOIN WordCollectionToTopic wctt ON wc.Id = wctt.WordCollectionId
+																WHERE wc.Id = :collectionId
+															)
+															AND NOT EXISTS (
+																SELECT 1
+																FROM WordInLearning wil
+																WHERE wil.UserId = :currentUserId AND wil.WordId = w.Id
+															)
+			""",
+            nativeQuery = true)
+    List<String> findAvailableWordsInCollection(
             @Param("collectionId") String collectionId,
             @Param("currentUserId") String currentUserId,
             Pageable pageable);
@@ -37,4 +41,21 @@ public interface WordInLearningRepository extends JpaRepository<WordInLearning, 
     List<String> findIdsByUserId(String currentUserId);
 
     WordInLearning findByUserIdAndWordId(String userId, String wordId);
+
+
+	@Query(value = """
+        SELECT w.id
+        FROM Word w
+        JOIN TopicToWord tt ON w.id = tt.wordId
+        WHERE tt.topicId = :topicId
+        AND NOT EXISTS (
+            SELECT 1
+            FROM WordInLearning wil
+            WHERE wil.wordId = w.id AND wil.userId = :currentUserId
+        )
+        """, nativeQuery = true)
+	List<String> findNotRetainedWordInTopic(
+			@Param("topicId") String topicId,
+			@Param("currentUserId") String currentUserId,
+			Pageable pageable);
 }
