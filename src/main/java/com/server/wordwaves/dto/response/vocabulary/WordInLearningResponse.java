@@ -24,5 +24,5 @@ public class WordInLearningResponse extends BaseAuthorResponse {
     String customMeaning;
     int score = 0;
 
-    WordResponse word;
+    String wordId;
 }

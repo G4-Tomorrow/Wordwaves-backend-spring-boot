@@ -36,8 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 public class WordInLearningServiceImp implements WordInLearningService {
     WordInLearningRepository wordInLearningRepository;
     WordUtils wordUtils;
-    WordRepository wordRepository;
-    UserRepository userRepository;
     LearningMapper learningMapper;
     ApplicationEventPublisher eventPublisher;
 
@@ -48,15 +46,12 @@ public class WordInLearningServiceImp implements WordInLearningService {
         Pageable pageable = PageRequest.of(0, numOfWords);
 
         // Lấy danh sách các từ chưa học
-        List<Word> words = wordInLearningRepository.findAvailableWordsInTopics(collectionId, currentUserId, pageable);
-
-        log.info("{}", words.toArray());
+        List<String> words = wordInLearningRepository.findAvailableWordsInTopics(collectionId, currentUserId, pageable);
 
         // Chuyển đổi các từ thành đối tượng response
         List<WordInLearningResponse> wordResponses = words.stream()
                 .map(word -> WordInLearningResponse.builder()
-                        .level(Level.NOT_RETAINED)
-                        .word(wordUtils.getWordDetail(word))
+                        .wordId(word)
                         .learningType(RandomUtils.getRandomLearningType())
                         .build())
                 .collect(Collectors.toList());
