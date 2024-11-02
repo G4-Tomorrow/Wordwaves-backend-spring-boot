@@ -1,23 +1,21 @@
 package com.server.wordwaves.controller;
 
-import com.google.protobuf.Api;
-import com.server.wordwaves.dto.request.vocabulary.WordProcessUpdateRequest;
-import com.server.wordwaves.dto.response.vocabulary.WordInLearningResponse;
-import com.server.wordwaves.dto.response.vocabulary.WordProcessUpdateResponse;
-import io.swagger.v3.oas.annotations.Operation;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 
+import com.server.wordwaves.dto.request.vocabulary.WordProcessUpdateRequest;
 import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.dto.response.vocabulary.VocabularyLearningResponse;
+import com.server.wordwaves.dto.response.vocabulary.WordProcessUpdateResponse;
 import com.server.wordwaves.service.WordInLearningService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/learning")
@@ -43,7 +41,7 @@ public class LearningController {
     ApiResponse<List<WordProcessUpdateResponse>> updateProcess(@RequestBody List<WordProcessUpdateRequest> words) {
         return ApiResponse.<List<WordProcessUpdateResponse>>builder()
                 .message("Cập nhập tiến độ học từ vựng")
-                 .result(wordInLearningService.updateProcess(words))
+                .result(wordInLearningService.updateProcess(words))
                 .build();
     }
 }

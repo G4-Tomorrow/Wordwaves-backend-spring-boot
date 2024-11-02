@@ -1,10 +1,10 @@
 package com.server.wordwaves.service;
 
+import java.util.List;
+
 import com.server.wordwaves.dto.request.vocabulary.WordProcessUpdateRequest;
 import com.server.wordwaves.dto.response.vocabulary.VocabularyLearningResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordProcessUpdateResponse;
-
-import java.util.List;
 
 public interface WordInLearningService {
     VocabularyLearningResponse learningWordCollection(String collectionId, int numOfWords);

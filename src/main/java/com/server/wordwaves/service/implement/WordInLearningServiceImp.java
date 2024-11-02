@@ -1,16 +1,21 @@
 package com.server.wordwaves.service.implement;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.server.wordwaves.constant.Level;
 import com.server.wordwaves.dto.request.vocabulary.WordProcessUpdateRequest;
 import com.server.wordwaves.dto.response.vocabulary.VocabularyLearningResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordInLearningResponse;
 import com.server.wordwaves.dto.response.vocabulary.WordProcessUpdateResponse;
-import com.server.wordwaves.entity.user.User;
 import com.server.wordwaves.entity.vocabulary.Word;
 import com.server.wordwaves.entity.vocabulary.WordInLearning;
 import com.server.wordwaves.event.WordInLearningChangeEvent;
-import com.server.wordwaves.exception.AppException;
-import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.mapper.LearningMapper;
 import com.server.wordwaves.repository.*;
 import com.server.wordwaves.service.WordInLearningService;
@@ -18,19 +23,11 @@ import com.server.wordwaves.utils.LearningUtils;
 import com.server.wordwaves.utils.RandomUtils;
 import com.server.wordwaves.utils.UserUtils;
 import com.server.wordwaves.utils.WordUtils;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
-
-import java.time.Duration;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -107,6 +104,4 @@ public class WordInLearningServiceImp implements WordInLearningService {
 
         return words.stream().map(learningMapper::toWordProcessUpdateResponse).toList();
     }
-
-
 }

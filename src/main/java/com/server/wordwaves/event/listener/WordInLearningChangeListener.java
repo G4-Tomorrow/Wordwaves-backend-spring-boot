@@ -1,5 +1,13 @@
 package com.server.wordwaves.event.listener;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.context.ApplicationListener;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+
 import com.server.wordwaves.constant.Level;
 import com.server.wordwaves.dto.request.vocabulary.WordProcessUpdateRequest;
 import com.server.wordwaves.entity.vocabulary.WordInLearning;
@@ -8,17 +16,11 @@ import com.server.wordwaves.exception.AppException;
 import com.server.wordwaves.exception.ErrorCode;
 import com.server.wordwaves.repository.WordInLearningRepository;
 import com.server.wordwaves.utils.LearningUtils;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationListener;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
 
 @Component
 @Slf4j
@@ -56,4 +58,3 @@ public class WordInLearningChangeListener implements ApplicationListener<WordInL
         }
     }
 }
-

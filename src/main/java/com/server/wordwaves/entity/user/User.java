@@ -1,10 +1,8 @@
 package com.server.wordwaves.entity.user;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 
-import com.server.wordwaves.entity.vocabulary.WordInLearning;
 import jakarta.persistence.*;
 
 import com.server.wordwaves.entity.common.BaseEntity;

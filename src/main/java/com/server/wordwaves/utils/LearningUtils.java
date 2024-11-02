@@ -1,8 +1,8 @@
 package com.server.wordwaves.utils;
 
-import com.server.wordwaves.constant.Level;
-
 import java.time.Instant;
+
+import com.server.wordwaves.constant.Level;
 
 public class LearningUtils {
     public static Instant calculateNextPreviewTiming(int score) {
@@ -11,7 +11,7 @@ public class LearningUtils {
     }
 
     public static Level getCurrentLevel(int score) {
-        if(score > 5) return Level.PROFICIENT;
+        if (score > 5) return Level.PROFICIENT;
         return Level.values()[score];
     }
 }
