@@ -12,6 +12,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class VocabularyRevisionResponse {
     int numOfWords;
+    int numOfReviewedWords;
 
     List<WordInLearningResponse> words;
 }

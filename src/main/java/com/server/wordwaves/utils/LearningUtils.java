@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class LearningUtils {
     public static Instant calculateNextPreviewTiming(int score) {
         Level level = Level.values()[score];
-        return Instant.now().plus(level.getHours().multipliedBy(score));
+        return Instant.now().plus(level.getHours().multipliedBy(Math.max(score, 1)));
     }
 
     public static Level getCurrentLevel(int score) {

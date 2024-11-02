@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LearningController {
     WordInLearningService wordInLearningService;
 
-    @GetMapping("/collections/{collectionId}")
+    @GetMapping("/collections/{collectionId}/learn")
     @Operation(summary = "HỌC 1 BỘ TỪ VỰNG")
     ApiResponse<VocabularyLearningResponse> learningWordCollection(
             @PathVariable("collectionId") @NotBlank(message = "WORD_COLLECTION_ID_IS_REQUIRED") String collectionId,
@@ -43,7 +43,7 @@ public class LearningController {
                 .build();
     }
 
-    @GetMapping("/topics/{topicId}")
+    @GetMapping("/topics/{topicId}/learn")
     @Operation(summary = "HỌC 1 CHỦ ĐỀ")
     ApiResponse<VocabularyLearningResponse> learningTopic(
             @PathVariable("topicId") @NotBlank(message = "TOPIC_ID_IS_REQUIRED") String topicId,
@@ -54,7 +54,7 @@ public class LearningController {
                 .build();
     }
 
-    @GetMapping("/collections/{collectionId}")
+    @GetMapping("/collections/{collectionId}/review")
     @Operation(summary = "ÔN LUYỆN BỘ TỪ VỰNG")
     ApiResponse<VocabularyRevisionResponse> reviewWordCollection(
             @PathVariable("collectionId") @NotBlank(message = "WORD_COLLECTION_ID_IS_REQUIRED") String collectionId,

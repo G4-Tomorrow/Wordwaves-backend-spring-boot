@@ -17,19 +17,19 @@ public interface WordInLearningRepository extends JpaRepository<WordInLearning, 
             value =
                     """
 			SELECT w.Id
-															FROM Word w
-															JOIN TopicToWord tt ON w.Id = tt.WordId
-															WHERE tt.TopicId IN (
-																SELECT wctt.TopicId
-																FROM WordCollection wc
-																JOIN WordCollectionToTopic wctt ON wc.Id = wctt.WordCollectionId
-																WHERE wc.Id = :collectionId
-															)
-															AND NOT EXISTS (
-																SELECT 1
-																FROM WordInLearning wil
-																WHERE wil.UserId = :currentUserId AND wil.WordId = w.Id
-															)
+			FROM Word w
+			JOIN TopicToWord tt ON w.Id = tt.WordId
+			WHERE tt.TopicId IN (
+				SELECT wctt.TopicId
+				FROM WordCollection wc
+				JOIN WordCollectionToTopic wctt ON wc.Id = wctt.WordCollectionId
+				WHERE wc.Id = :collectionId
+			)
+			AND NOT EXISTS (
+				SELECT 1
+				FROM WordInLearning wil
+				WHERE wil.UserId = :currentUserId AND wil.WordId = w.Id
+			)
 			""",
             nativeQuery = true)
     List<String> findAvailableWordsInCollection(
@@ -58,4 +58,27 @@ public interface WordInLearningRepository extends JpaRepository<WordInLearning, 
 			@Param("topicId") String topicId,
 			@Param("currentUserId") String currentUserId,
 			Pageable pageable);
+
+	@Query(value = """
+    SELECT w.id
+    FROM Word w
+    JOIN TopicToWord tt ON w.id = tt.wordId
+    WHERE tt.topicId IN (
+        SELECT wctt.topicId
+        FROM WordCollection wc
+        JOIN WordCollectionToTopic wctt ON wc.id = wctt.wordCollectionId
+        WHERE wc.id = :collectionId AND wc.createdById = :currentUserId
+    )
+    AND EXISTS (
+        SELECT 1
+        FROM WordInLearning wil
+        WHERE wil.wordId = w.id AND wil.userId = :currentUserId
+        AND wil.nextReviewTiming < CURRENT_TIMESTAMP
+    )
+""", nativeQuery = true)
+	List<String> findWordsInCollectionWithNextReviewBeforeNow(
+			@Param("collectionId") String collectionId,
+			@Param("currentUserId") String currentUserId,
+			Pageable pageable);
+
 }

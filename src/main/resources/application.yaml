@@ -22,7 +22,7 @@ spring:
     name: wordwaves
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://avnadmin:AVNS_NaOkIhMfoLS45jVy0F4@wordwaves-wordwaves.f.aivencloud.com:21917/defaultdb?ssl-mode=REQUIRED
+    url: jdbc:mysql://avnadmin:AVNS_NaOkIhMfoLS45jVy0F4@wordwaves-wordwaves.f.aivencloud.com:21917/defaultdb?ssl-mode=REQUIRED&serverTimezone=Asia/Ho_Chi_Minh
     username: avnadmin
     password: AVNS_NaOkIhMfoLS45jVy0F4
   jpa:
