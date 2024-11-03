@@ -61,12 +61,12 @@ public class WordController {
                 .build();
     }
 
-    @GetMapping("/{wordId}")
+    @GetMapping("/{name}")
     @Operation(summary = "LẤY THÔNG TIN CHI TIẾT CỦA TỪ VỰNG")
-    ApiResponse<WordResponse> detail(@PathVariable("wordId") @NotBlank(message = "WORD_ID_IS_REQUIRED") String wordId) {
+    ApiResponse<WordResponse> detail(@PathVariable("name") @NotBlank(message = "WORD_ID_IS_REQUIRED") String name) {
         return ApiResponse.<WordResponse>builder()
                 .message("Lấy thông tin chi tiết từ vựng")
-                .result(wordService.detail(wordId))
+                .result(wordService.detail(name))
                 .build();
     }
 

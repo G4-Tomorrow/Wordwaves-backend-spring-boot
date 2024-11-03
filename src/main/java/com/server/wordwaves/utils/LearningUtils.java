@@ -18,11 +18,12 @@ public class LearningUtils {
         return Level.values()[score];
     }
 
-    public static List<WordInLearningResponse> toWordInLearningResponses(List<String> wordIds) {
+    public static List<WordInLearningResponse> toWordInLearningResponses(List<Object[]> wordInforms) {
         // Chuyển đổi các từ thành đối tượng response
-        return wordIds.stream()
-                .map(word -> WordInLearningResponse.builder()
-                        .wordId(word)
+        return wordInforms.stream()
+                .map(wordInform -> WordInLearningResponse.builder()
+                        .id((String) wordInform[1])
+                        .word((String) wordInform[0])
                         .learningType(RandomUtils.getRandomLearningType())
                         .build())
                 .collect(Collectors.toList());

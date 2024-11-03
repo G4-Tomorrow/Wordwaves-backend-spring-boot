@@ -2,6 +2,7 @@ package com.server.wordwaves.service.implement;
 
 import java.util.*;
 
+import com.server.wordwaves.dto.model.vocabulary.WordInLearningModel;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,20 +38,19 @@ public class WordInLearningServiceImp implements WordInLearningService {
     ApplicationEventPublisher eventPublisher;
 
     @Override
-    // 4.07
     public VocabularyLearningResponse learningWordCollection(String collectionId, int numOfWords) {
         String currentUserId = UserUtils.getCurrentUserId();
         Pageable pageable = PageRequest.of(0, numOfWords);
 
         // Lấy danh sách các từ chưa học
-        List<String> wordIds =
+        List<Object[]> wordInforms =
                 wordInLearningRepository.findAvailableWordsInCollection(collectionId, currentUserId, pageable);
 
         // Trả về kết quả
         return VocabularyLearningResponse.builder()
                 .numOfWords(numOfWords)
-                .numOfNotRetainedWords(wordIds.size())
-                .words(LearningUtils.toWordInLearningResponses(wordIds))
+                .numOfNotRetainedWords(wordInforms.size())
+                .words(LearningUtils.toWordInLearningResponses(wordInforms))
                 .build();
     }
 
@@ -59,12 +59,12 @@ public class WordInLearningServiceImp implements WordInLearningService {
         String currentUserId = UserUtils.getCurrentUserId();
         Pageable pageable = PageRequest.of(0, numOfWords);
 
-        List<String> wordIds = wordInLearningRepository.findNotRetainedWordInTopic(topicId, currentUserId, pageable);
+        List<Object[]> wordInforms = wordInLearningRepository.findNotRetainedWordInTopic(topicId, currentUserId, pageable);
 
         return VocabularyLearningResponse.builder()
                 .numOfWords(numOfWords)
-                .numOfNotRetainedWords(wordIds.size())
-                .words(LearningUtils.toWordInLearningResponses(wordIds))
+                .numOfNotRetainedWords(wordInforms.size())
+                .words(LearningUtils.toWordInLearningResponses(wordInforms))
                 .build();
     }
 
@@ -73,13 +73,13 @@ public class WordInLearningServiceImp implements WordInLearningService {
         String currentUserId = UserUtils.getCurrentUserId();
         Pageable pageable = PageRequest.of(0, numOfWords);
 
-        List<String> wordIds = wordInLearningRepository.findWordsInCollectionWithNextReviewBeforeNow(
+        List<Object[]> wordInforms = wordInLearningRepository.findWordsInCollectionWithNextReviewBeforeNow(
                 collectionId, currentUserId, pageable);
 
         return VocabularyRevisionResponse.builder()
                 .numOfWords(numOfWords)
-                .numOfReviewedWords(wordIds.size())
-                .words(LearningUtils.toWordInLearningResponses(wordIds))
+                .numOfReviewedWords(wordInforms.size())
+                .words(LearningUtils.toWordInLearningResponses(wordInforms))
                 .build();
     }
 
@@ -88,13 +88,13 @@ public class WordInLearningServiceImp implements WordInLearningService {
         String currentUserId = UserUtils.getCurrentUserId();
         Pageable pageable = PageRequest.of(0, numOfWords);
 
-        List<String> wordIds =
+        List<Object[]> wordInforms =
                 wordInLearningRepository.findWordsInTopicWithNextReviewBeforeNow(topicId, currentUserId, pageable);
 
         return VocabularyRevisionResponse.builder()
                 .numOfWords(numOfWords)
-                .numOfReviewedWords(wordIds.size())
-                .words(LearningUtils.toWordInLearningResponses(wordIds))
+                .numOfReviewedWords(wordInforms.size())
+                .words(LearningUtils.toWordInLearningResponses(wordInforms))
                 .build();
     }
 
@@ -102,7 +102,7 @@ public class WordInLearningServiceImp implements WordInLearningService {
         String currentUserId = UserUtils.getCurrentUserId();
 
         // Lấy danh sách wordId đã tồn tại trong word_in_learning của người dùng hiện tại
-        Set<String> existingWordIds = new HashSet<>(wordInLearningRepository.findIdsByUserId(currentUserId));
+        Set<String> existingWordIds = new HashSet<>(wordInLearningRepository.findWordNamesByUserId(currentUserId));
 
         // Phân loại các từ đã có và chưa có
         List<WordProcessUpdateRequest> toUpdate = new ArrayList<>();

@@ -31,5 +31,5 @@ public interface WordService {
             "@permissionCheckerFactory.getPermissionChecker(T(com.server.wordwaves.constant.PermissionType).WORD).hasAccess(#wordId) || hasRole('ADMIN')")
     WordResponse updateById(String wordId, WordUpdateRequest request);
 
-    WordResponse detail(String wordId);
+    WordResponse detail(String name);
 }
