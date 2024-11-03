@@ -1,4 +1,4 @@
-package com.server.wordwaves.security.factory;
+package com.server.wordwaves.factory;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -6,10 +6,10 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.server.wordwaves.constant.PermissionType;
-import com.server.wordwaves.security.checker.PermissionChecker;
-import com.server.wordwaves.security.checker.implement.TopicPermissionChecker;
-import com.server.wordwaves.security.checker.implement.WordCollectionPermissionChecker;
-import com.server.wordwaves.security.checker.implement.WordPermissionChecker;
+import com.server.wordwaves.strategy.checker.PermissionChecker;
+import com.server.wordwaves.strategy.checker.implement.TopicPermissionChecker;
+import com.server.wordwaves.strategy.checker.implement.WordCollectionPermissionChecker;
+import com.server.wordwaves.strategy.checker.implement.WordPermissionChecker;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;

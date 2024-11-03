@@ -27,7 +27,7 @@ public class FileUploadController {
     FirebaseStorageService firebaseStorageService;
 
     @PostMapping
-    @Operation(summary = "UPLOAD IMAGE")
+    @Operation(summary = "LƯU 1 FILE")
     ApiResponse<FileUploadResponse> upload(@ModelAttribute FileUploadRequest request) {
         return ApiResponse.<FileUploadResponse>builder()
                 .message("Upload ảnh thành công")

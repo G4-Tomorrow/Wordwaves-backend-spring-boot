@@ -21,16 +21,20 @@ public interface WordCollectionService {
     PaginationInfo<List<WordCollectionResponse>> getCollections(
             int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, String userId);
 
-    @PreAuthorize("@permissionCheckerFactory.getPermissionChecker(T(com.server.wordwaves.constant.PermissionType).COLLECTION).hasAccess(#collectionId) || hasRole('ADMIN')")
+    @PreAuthorize(
+            "@permissionCheckerFactory.getPermissionChecker(T(com.server.wordwaves.constant.PermissionType).COLLECTION).hasAccess(#collectionId) || hasRole('ADMIN')")
     PaginationInfo<List<TopicResponse>> getTopics(
             int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, String collectionId);
 
-    @PreAuthorize("@permissionCheckerFactory.getPermissionChecker(T(com.server.wordwaves.constant.PermissionType).COLLECTION).hasAccess(#collectionId) || hasRole('ADMIN')")
+    @PreAuthorize(
+            "@permissionCheckerFactory.getPermissionChecker(T(com.server.wordwaves.constant.PermissionType).COLLECTION).hasAccess(#collectionId) || hasRole('ADMIN')")
     WordCollectionResponse updateById(String collectionId, WordCollectionUpdateRequest request);
 
-    @PreAuthorize("@permissionCheckerFactory.getPermissionChecker(T(com.server.wordwaves.constant.PermissionType).COLLECTION).hasAccess(#collectionId) || hasRole('ADMIN')")
+    @PreAuthorize(
+            "@permissionCheckerFactory.getPermissionChecker(T(com.server.wordwaves.constant.PermissionType).COLLECTION).hasAccess(#collectionId) || hasRole('ADMIN')")
     void deleteById(String collectionId);
 
-    @PreAuthorize("@permissionCheckerFactory.getPermissionChecker(T(com.server.wordwaves.constant.PermissionType).COLLECTION).hasAccess(#collectionId) || hasRole('ADMIN')")
+    @PreAuthorize(
+            "@permissionCheckerFactory.getPermissionChecker(T(com.server.wordwaves.constant.PermissionType).COLLECTION).hasAccess(#collectionId) || hasRole('ADMIN')")
     void addTopics(String collectionId, WordCollectionAddTopicsRequest request);
 }

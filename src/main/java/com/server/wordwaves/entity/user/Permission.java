@@ -1,19 +1,18 @@
 package com.server.wordwaves.entity.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Set;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.server.wordwaves.entity.common.BaseEntity;
 
-import jakarta.persistence.ManyToMany;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-
-import java.util.Set;
-
 
 @Getter
 @Setter
@@ -28,7 +27,9 @@ public class Permission extends BaseEntity {
 
     String description;
 
-    @ManyToMany(mappedBy = "permissions", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(
+            mappedBy = "permissions",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonIgnore
     Set<Role> roles;
 }

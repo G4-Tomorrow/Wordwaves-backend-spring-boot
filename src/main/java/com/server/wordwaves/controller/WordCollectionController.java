@@ -33,7 +33,7 @@ public class WordCollectionController {
     WordCollectionService wordCollectionService;
 
     @PostMapping
-    @Operation(summary = "CREATE WORD COLLECTION")
+    @Operation(summary = "TẠO BỘ TỪ VỰNG")
     ApiResponse<WordCollectionResponse> create(@RequestBody @Valid WordCollectionCreationRequest request) {
         return ApiResponse.<WordCollectionResponse>builder()
                 .message("Tạo bộ từ vựng thành công")
@@ -42,7 +42,7 @@ public class WordCollectionController {
     }
 
     @GetMapping
-    @Operation(summary = "GET COLLECTIONS")
+    @Operation(summary = "LẤY BỘ TỪ VỰNG CỦA 1 NGƯỜI DÙNG")
     ApiResponse<PaginationInfo<List<WordCollectionResponse>>> getCollections(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
@@ -58,7 +58,7 @@ public class WordCollectionController {
     }
 
     @GetMapping("/{collectionId}/topics")
-    @Operation(summary = "GET TOPICS FROM WORD COLLECTION")
+    @Operation(summary = "LẤY CÁC CHỦ ĐỀ CỦA BỘ TỪ VỰNG")
     ApiResponse<PaginationInfo<List<TopicResponse>>> getTopics(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
@@ -74,6 +74,7 @@ public class WordCollectionController {
     }
 
     @PostMapping("/{collectionId}/topics")
+    @Operation(summary = "THÊM CHỦ ĐỀ VÀO BỘ TỪ VỰNG")
     ApiResponse<List<String>> addTopics(
             @PathVariable @NotBlank(message = "WORD_COLLECTION_ID_IS_REQUIRED") String collectionId,
             @RequestBody @Valid WordCollectionAddTopicsRequest request) {
@@ -85,7 +86,7 @@ public class WordCollectionController {
     }
 
     @PutMapping("/{collectionId}")
-    @Operation(summary = "UPDATE WORD COLLECTION BY ID")
+    @Operation(summary = "CẬP NHẬP BỘ TỪ VỰNG QUA ID")
     ApiResponse<WordCollectionResponse> updateById(
             @PathVariable @NotBlank(message = "WORD_COLLECTION_ID_IS_REQUIRED") String collectionId,
             @RequestBody WordCollectionUpdateRequest request) {
@@ -96,7 +97,7 @@ public class WordCollectionController {
     }
 
     @DeleteMapping("/{collectionId}")
-    @Operation(summary = "DELETE WORD COLLECTION BY ID")
+    @Operation(summary = "XÓA BỘ TỪ VỰNG QUA ID")
     ApiResponse<Void> deleteById(
             @PathVariable @NotBlank(message = "WORD_COLLECTION_ID_IS_REQUIRED") String collectionId) {
         wordCollectionService.deleteById(collectionId);

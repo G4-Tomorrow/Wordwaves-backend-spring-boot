@@ -1,11 +1,11 @@
-package com.server.wordwaves.security.checker.implement;
+package com.server.wordwaves.strategy.checker.implement;
 
 import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 
 import com.server.wordwaves.repository.WordCollectionRepository;
-import com.server.wordwaves.security.checker.PermissionChecker;
+import com.server.wordwaves.strategy.checker.PermissionChecker;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

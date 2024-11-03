@@ -20,8 +20,12 @@ import lombok.experimental.SuperBuilder;
 public abstract class BaseEntity {
     @CreationTimestamp
     @Column(updatable = false)
+    //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX", timezone =
+    // "Asia/Ho_Chi_Minh")
     Instant createdAt;
 
     @UpdateTimestamp
+    //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX", timezone =
+    // "Asia/Ho_Chi_Minh")
     Instant updatedAt;
 }
