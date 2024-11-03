@@ -17,7 +17,10 @@ public enum ErrorCode {
     INVALID_EMAIL(1001, "Email không hợp lệ", HttpStatus.BAD_REQUEST),
     EMAIL_IS_REQUIRED(1002, "Email không được để trống", HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD(1003, "Mật khẩu phải có ít nhất {min}", HttpStatus.BAD_REQUEST),
-    WRONG_FORMAT_PASSWORD(1004, "Mật khẩu phải có tối thiểu 1 chữ số, 1 chữ cái, 1 chữ cái in hoa và 1 kí tự đặc biệt", HttpStatus.BAD_REQUEST),
+    WRONG_FORMAT_PASSWORD(
+            1004,
+            "Mật khẩu phải có tối thiểu 1 chữ số, 1 chữ cái, 1 chữ cái in hoa và 1 kí tự đặc biệt",
+            HttpStatus.BAD_REQUEST),
     UNAUTHENTICATED(1005, "Vui lòng đăng nhập để sử dụng tính năng này", HttpStatus.UNAUTHORIZED),
     EMAIL_EXISTED(1006, "Email đã được sử dụng", HttpStatus.BAD_REQUEST),
     UNAUTHORIZED(1007, "Bạn không thể truy cập tính năng này", HttpStatus.FORBIDDEN),
@@ -69,6 +72,8 @@ public enum ErrorCode {
     INVALID_WORD_ID(6204, "Id của từ vựng không hợp lệ", HttpStatus.BAD_REQUEST),
     WORD_ID_IS_REQUIRED(6204, "Id của từ vựng không được để trống", HttpStatus.BAD_REQUEST),
 
+    WORD_IN_LEARNING_NOT_EXISTED(6301, "Người dùng chưa học từ vựng này", HttpStatus.INTERNAL_SERVER_ERROR),
+
     // OAUTH2 ERROR CODE
     OAUTH2_USER_EXISTED_WITH_DIFFERENT_PROVIDER(
             7001, "Tài khoản đã được liên kết với nhà cung cấp OAuth2 khác trước đó", HttpStatus.BAD_REQUEST),
@@ -86,8 +91,7 @@ public enum ErrorCode {
     INVALID_PAGE_NUMBER(9001, "Số trang phải lớn hơn hoặc bằng 1", HttpStatus.BAD_REQUEST),
     INVALID_PAGE_SIZE(9002, "Kích thước trang phải lớn hơn hoặc bằng 1", HttpStatus.BAD_REQUEST),
     INVALID_SORT_DIRECTION(9003, "Hướng sắp xếp không hợp lệ", HttpStatus.BAD_REQUEST),
-    INVALID_SORT_BY(9004, "Trường sắp xếp không hợp lệ", HttpStatus.BAD_REQUEST)
-    ;
+    INVALID_SORT_BY(9004, "Trường sắp xếp không hợp lệ", HttpStatus.BAD_REQUEST);
     int code;
     String message;
     HttpStatusCode statusCode;

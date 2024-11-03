@@ -1,10 +1,11 @@
 package com.server.wordwaves.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
 import com.server.wordwaves.dto.request.permission.PermissionCreationRequest;
 import com.server.wordwaves.dto.response.permission.PermissionResponse;
 import com.server.wordwaves.entity.user.Permission;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface PermissionMapper {

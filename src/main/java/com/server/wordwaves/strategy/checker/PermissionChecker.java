@@ -1,4 +1,4 @@
-package com.server.wordwaves.security.checker;
+package com.server.wordwaves.strategy.checker;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -15,6 +15,10 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SuperBuilder
+// @Table(
+//        name = "Word",
+//        indexes = @Index(name = "idx_word_name", columnList = "Name")
+// )
 public class Word extends BaseAuthor {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

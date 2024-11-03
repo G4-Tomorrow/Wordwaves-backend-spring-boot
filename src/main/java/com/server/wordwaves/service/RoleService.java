@@ -2,11 +2,12 @@ package com.server.wordwaves.service;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.server.wordwaves.dto.request.role.RoleCreationRequest;
 import com.server.wordwaves.dto.request.role.RoleUpdateRequest;
-import com.server.wordwaves.dto.response.role.RoleResponse;
 import com.server.wordwaves.dto.response.common.PaginationInfo;
-import org.springframework.security.access.prepost.PreAuthorize;
+import com.server.wordwaves.dto.response.role.RoleResponse;
 
 public interface RoleService {
     @PreAuthorize("hasRole('ADMIN')")
@@ -22,5 +23,6 @@ public interface RoleService {
     void deleteRole(String name);
 
     @PreAuthorize("hasRole('ADMIN')")
-    PaginationInfo<List<RoleResponse>> getRoles(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery);
+    PaginationInfo<List<RoleResponse>> getRoles(
+            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery);
 }

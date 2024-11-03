@@ -1,13 +1,11 @@
 package com.server.wordwaves.entity.vocabulary;
 
 import java.time.Instant;
-import java.util.UUID;
 
 import jakarta.persistence.*;
 
 import com.server.wordwaves.constant.Level;
 import com.server.wordwaves.entity.common.BaseEntity;
-import com.server.wordwaves.entity.user.User;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -20,10 +18,13 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SuperBuilder
+@Table(
+        name = "WordInLearning",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"UserId", "WordId"})})
 public class WordInLearning extends BaseEntity {
     @Id
-    @GeneratedValue
-    UUID id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
 
     @Enumerated(EnumType.STRING)
     Level level;
@@ -32,25 +33,11 @@ public class WordInLearning extends BaseEntity {
     Instant nextReviewTiming;
 
     @Builder.Default
-    int numOfWrongAnswers = 0;
-
-    @Builder.Default
-    int numOfCorrectAnswers = 0;
-
-    @Builder.Default
     int score = 0;
 
-    @ManyToOne
-    @JoinColumn(name = "UserId", referencedColumnName = "id")
-    User user;
+    @Column(nullable = false)
+    String userId;
 
-    @ManyToOne
-    @JoinColumn(name = "WordId", referencedColumnName = "id")
-    Word word;
-
-    @PreUpdate
-    void preUpdate() {
-        int tmp = numOfCorrectAnswers - numOfWrongAnswers;
-        this.score = Math.max(tmp, 0);
-    }
+    @Column(nullable = false)
+    String wordId;
 }

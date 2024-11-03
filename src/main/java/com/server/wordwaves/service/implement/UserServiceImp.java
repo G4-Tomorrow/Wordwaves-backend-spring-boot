@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.server.wordwaves.utils.PaginationUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +32,7 @@ import com.server.wordwaves.service.TokenService;
 import com.server.wordwaves.service.UserService;
 import com.server.wordwaves.utils.AuthUtils;
 import com.server.wordwaves.utils.MyStringUtils;
+import com.server.wordwaves.utils.PaginationUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -127,16 +127,24 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public PaginationInfo<List<UserResponse>> getUsers(int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
+    public PaginationInfo<List<UserResponse>> getUsers(
+            int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery) {
         List<String> validSortByFields = Arrays.asList("fullName", "email", "createdAt");
 
-        return PaginationUtils.getAllEntities(pageNumber, pageSize, sortBy, sortDirection, searchQuery, validSortByFields,
+        return PaginationUtils.getAllEntities(
+                pageNumber,
+                pageSize,
+                sortBy,
+                sortDirection,
+                searchQuery,
+                validSortByFields,
                 pageable -> {
-                    if (MyStringUtils.isNotNullAndNotEmpty(searchQuery)) return userRepository.findByFullNameContainingOrEmailContaining(searchQuery, searchQuery, pageable);
+                    if (MyStringUtils.isNotNullAndNotEmpty(searchQuery))
+                        return userRepository.findByFullNameContainingOrEmailContaining(
+                                searchQuery, searchQuery, pageable);
                     else return userRepository.findAll(pageable);
                 },
-                userMapper::toUserResponse
-        );
+                userMapper::toUserResponse);
     }
 
     @Override

@@ -1,10 +1,11 @@
 package com.server.wordwaves.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
 import com.server.wordwaves.dto.request.role.RoleCreationRequest;
 import com.server.wordwaves.dto.response.role.RoleResponse;
 import com.server.wordwaves.entity.user.Role;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface RoleMapper {
