@@ -15,4 +15,6 @@ public interface WordInLearningService {
     VocabularyLearningResponse learningTopic(String topicId, int numOfWords);
 
     VocabularyRevisionResponse reviewWordCollection(String collectionId, int numOfWords);
+
+    VocabularyRevisionResponse reviewTopic(String topicId, int numOfWords);
 }

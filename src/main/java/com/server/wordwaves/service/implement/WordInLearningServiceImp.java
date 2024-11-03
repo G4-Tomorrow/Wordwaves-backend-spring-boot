@@ -83,6 +83,21 @@ public class WordInLearningServiceImp implements WordInLearningService {
                 .build();
     }
 
+    @Override
+    public VocabularyRevisionResponse reviewTopic(String topicId, int numOfWords) {
+        String currentUserId = UserUtils.getCurrentUserId();
+        Pageable pageable = PageRequest.of(0, numOfWords);
+
+        List<String> wordIds =
+                wordInLearningRepository.findWordsInTopicWithNextReviewBeforeNow(topicId, currentUserId, pageable);
+
+        return VocabularyRevisionResponse.builder()
+                .numOfWords(numOfWords)
+                .numOfReviewedWords(wordIds.size())
+                .words(LearningUtils.toWordInLearningResponses(wordIds))
+                .build();
+    }
+
     public List<WordProcessUpdateResponse> updateProcess(List<WordProcessUpdateRequest> words) {
         String currentUserId = UserUtils.getCurrentUserId();
 

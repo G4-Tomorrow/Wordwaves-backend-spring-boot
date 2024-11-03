@@ -63,6 +63,17 @@ public class LearningController {
                 .build();
     }
 
+    @GetMapping("/topics/{topicId}/review")
+    @Operation(summary = "ÔN LUYỆN BỘ TỪ VỰNG")
+    ApiResponse<VocabularyRevisionResponse> reviewTopic(
+            @PathVariable("topicId") @NotBlank(message = "TOPIC_ID_IS_REQUIRED") String topicId,
+            @RequestParam @Min(value = 1) int numOfWords) {
+        return ApiResponse.<VocabularyRevisionResponse>builder()
+                .message("Ôn luyện chủ đề")
+                .result(wordInLearningService.reviewTopic(topicId, numOfWords))
+                .build();
+    }
+
     @PatchMapping
     @Operation(summary = "CẬP NHẬP TIẾN TRÌNH HỌC TỪ VỰNG")
     ApiResponse<List<WordProcessUpdateResponse>> updateProcess(@RequestBody List<WordProcessUpdateRequest> words) {

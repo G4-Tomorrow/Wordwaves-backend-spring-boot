@@ -83,4 +83,21 @@ public interface WordInLearningRepository extends JpaRepository<WordInLearning, 
             @Param("collectionId") String collectionId,
             @Param("currentUserId") String currentUserId,
             Pageable pageable);
+
+    @Query(
+            value =
+                    """
+		SELECT w.id
+		FROM Word w
+		JOIN TopicToWord tt ON w.id = tt.wordId
+		WHERE tt.topicId = :topicId
+		AND EXISTS (
+			SELECT 1
+			FROM WordInLearning wil
+			WHERE wil.wordId = w.id AND wil.userId = :currentUserId
+			AND wil.nextReviewTiming < CURRENT_TIMESTAMP
+		)
+		""",
+            nativeQuery = true)
+    List<String> findWordsInTopicWithNextReviewBeforeNow(String topicId, String currentUserId, Pageable pageable);
 }
