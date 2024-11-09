@@ -14,7 +14,7 @@ public class LearningUtils {
     }
 
     public static Level getCurrentLevel(int score) {
-        if (score > 5) return Level.PROFICIENT;
+        if (score > 6) return Level.MASTER;
         return Level.values()[score];
     }
 

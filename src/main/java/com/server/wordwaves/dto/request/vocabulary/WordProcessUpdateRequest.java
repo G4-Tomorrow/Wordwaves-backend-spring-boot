@@ -15,4 +15,7 @@ public class WordProcessUpdateRequest {
 
     @JsonProperty("isCorrect")
     Boolean isCorrect;
+
+    @JsonProperty("isAlreadyKnow")
+    Boolean isAlreadyKnow;
 }

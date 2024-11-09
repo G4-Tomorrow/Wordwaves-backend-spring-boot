@@ -113,6 +113,7 @@ public class WordInLearningServiceImp implements WordInLearningService {
                 toUpdate.add(req);
             } else {
                 int score = req.getIsCorrect() ? 1 : 0;
+                score = req.getIsAlreadyKnow() ? 6 : score;
                 WordInLearning newWord = WordInLearning.builder()
                         .wordId(req.getWordId())
                         .score(score)
