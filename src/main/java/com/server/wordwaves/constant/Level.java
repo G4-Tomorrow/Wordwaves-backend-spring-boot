@@ -14,7 +14,8 @@ public enum Level {
     LEARNING("LEARNING", 2, Duration.ofHours(6)),
     FAMILIAR("FAMILIAR", 3, Duration.ofHours(8)),
     LEARNED("LEARNED", 4, Duration.ofHours(10)),
-    PROFICIENT("PROFICIENT", 5, Duration.ofHours(12));
+    PROFICIENT("PROFICIENT", 5, Duration.ofHours(12)),
+    MASTER("MASTER", 6, Duration.ofHours(24));
 
     String name;
     int score;
