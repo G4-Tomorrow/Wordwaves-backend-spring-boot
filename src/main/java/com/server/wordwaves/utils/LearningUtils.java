@@ -2,6 +2,7 @@ package com.server.wordwaves.utils;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.server.wordwaves.constant.Level;
@@ -21,11 +22,18 @@ public class LearningUtils {
     public static List<WordInLearningResponse> toWordInLearningResponses(List<Object[]> wordInforms) {
         // Chuyển đổi các từ thành đối tượng response
         return wordInforms.stream()
-                .map(wordInform -> WordInLearningResponse.builder()
-                        .id((String) wordInform[1])
-                        .word((String) wordInform[0])
-                        .learningType(RandomUtils.getRandomLearningType())
-                        .build())
+                .map(wordInform -> {
+                    int score = (wordInform.length > 2 && wordInform[2] != null)
+                            ? Integer.parseInt(wordInform[2].toString())
+                            : 0;
+                    return WordInLearningResponse.builder()
+                            .id((String) wordInform[1])
+                            .word((String) wordInform[0])
+                            .score(score)
+                            .level(getCurrentLevel(score))
+                            .learningType(RandomUtils.getRandomLearningType())
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 }
