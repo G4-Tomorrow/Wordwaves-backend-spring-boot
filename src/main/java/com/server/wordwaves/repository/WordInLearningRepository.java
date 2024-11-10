@@ -57,9 +57,10 @@ public interface WordInLearningRepository extends JpaRepository<WordInLearning, 
     @Query(
             value =
                     """
-				SELECT w.Name, w.Id
+				SELECT w.Name, w.Id, will.Score
 				FROM Word w
 				JOIN TopicToWord tt ON w.id = tt.wordId
+				join WordInLearning will ON will.WordId = w.id
 				WHERE tt.topicId IN (
 					SELECT wctt.topicId
 					FROM WordCollection wc
@@ -82,16 +83,17 @@ public interface WordInLearningRepository extends JpaRepository<WordInLearning, 
     @Query(
             value =
                     """
-		SELECT w.Name, w.Id
-		FROM Word w
-		JOIN TopicToWord tt ON w.id = tt.wordId
-		WHERE tt.topicId = :topicId
-		AND EXISTS (
-			SELECT 1
-			FROM WordInLearning wil
-			WHERE wil.wordId = w.id AND wil.userId = :currentUserId
-			AND wil.nextReviewTiming < CURRENT_TIMESTAMP
-		)
+		SELECT w.Name, w.Id, will.Score
+  		FROM Word w
+  		JOIN TopicToWord tt ON w.id = tt.wordId
+          join WordInLearning will ON will.WordId = w.id
+  		WHERE tt.topicId = :topicId
+  		AND EXISTS (
+  			SELECT 1
+  			FROM WordInLearning wil
+  			WHERE wil.wordId = w.id AND wil.userId = :currentUserId
+  			AND wil.nextReviewTiming < CURRENT_TIMESTAMP
+  		)
 		""",
             nativeQuery = true)
     List<Object[]> findWordsInTopicWithNextReviewBeforeNow(String topicId, String currentUserId, Pageable pageable);
