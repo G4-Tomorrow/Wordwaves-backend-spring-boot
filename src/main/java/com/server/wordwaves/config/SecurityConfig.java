@@ -80,7 +80,7 @@ public class SecurityConfig {
                 "http://localhost:3001",
                 "https://localhost:3001",
                 "https://localhost:3000",
-                "https://backend-production-c2cb.up.railway.app"));
+                "https://backend-production-7ea7.up.railway.app"));
 
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
