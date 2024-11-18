@@ -24,18 +24,12 @@ public class Role extends BaseEntity {
 
     String description;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "UserToRole",
-            joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"),
-            inverseJoinColumns = @JoinColumn(name = "UserId", referencedColumnName = "id"))
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JoinTable(name = "UserToRole", joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"), inverseJoinColumns = @JoinColumn(name = "UserId", referencedColumnName = "id"))
     @JsonIgnore
     Set<User> users;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "RoleToPermission",
-            joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"),
-            inverseJoinColumns = @JoinColumn(name = "PermissionName", referencedColumnName = "name"))
+    @JoinTable(name = "RoleToPermission", joinColumns = @JoinColumn(name = "RoleName", referencedColumnName = "name"), inverseJoinColumns = @JoinColumn(name = "PermissionName", referencedColumnName = "name"))
     Set<Permission> permissions;
 }

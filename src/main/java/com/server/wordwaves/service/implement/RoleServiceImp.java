@@ -93,9 +93,9 @@ public class RoleServiceImp implements RoleService {
 
     @Override
     public void deleteRole(String name) {
+        if ("ADMIN".equals(name) || "USER".equals(name)) throw new AppException(ErrorCode.CANNOT_DELETE_BASIC_ROLE, "Không thể xóa vai trò cơ bản: " + name);
         Role role = roleRepository.findById(name).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
-        for (Permission permission : role.getPermissions())
-            permission.getRoles().remove(role);
+        for (Permission permission : role.getPermissions()) permission.getRoles().remove(role);
         for (User user : role.getUsers()) user.getRoles().remove(role);
         role.getPermissions().clear();
         role.getUsers().clear();

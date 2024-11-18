@@ -2,16 +2,13 @@ package com.server.wordwaves.controller;
 
 import java.util.List;
 
+import com.server.wordwaves.dto.request.user.*;
+import com.server.wordwaves.dto.response.user.ChangeUserRoleResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.server.wordwaves.dto.request.user.ForgotPasswordRequest;
-import com.server.wordwaves.dto.request.user.ResetPasswordRequest;
-import com.server.wordwaves.dto.request.user.UserCreationRequest;
-import com.server.wordwaves.dto.request.user.UserUpdateRequest;
-import com.server.wordwaves.dto.request.user.VerifyEmailRequest;
 import com.server.wordwaves.dto.response.auth.AuthenticationResponse;
 import com.server.wordwaves.dto.response.common.ApiResponse;
 import com.server.wordwaves.dto.response.common.EmailResponse;
@@ -57,63 +54,45 @@ public class UserController {
     @Operation(summary = "ĐỔI MẬT KHẨU")
     public ApiResponse<String> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
         userService.resetPassword(request);
-        return ApiResponse.<String>builder()
-                .message("Mật khẩu đã được cập nhật thành công")
-                .build();
+        return ApiResponse.<String>builder().message("Mật khẩu đã được cập nhật thành công").build();
     }
 
     @PostMapping("/verify")
     @Operation(summary = "XÁC THƯC EMAIL")
     public ResponseEntity<ApiResponse<AuthenticationResponse>> verify(@RequestBody @Valid VerifyEmailRequest request) {
         ResponseEntity<AuthenticationResponse> responseEntity = userService.verify(request);
-
-        return ResponseEntity.status(responseEntity.getStatusCode())
-                .headers(responseEntity.getHeaders())
-                .body(ApiResponse.<AuthenticationResponse>builder()
-                        .result(responseEntity.getBody())
-                        .build());
+        return ResponseEntity.status(responseEntity.getStatusCode()).headers(responseEntity.getHeaders()).body(ApiResponse.<AuthenticationResponse>builder().result(responseEntity.getBody()).build());
     }
 
     @GetMapping
     @Operation(summary = "LẤY NGƯỜI DÙNG")
-    ApiResponse<PaginationInfo<List<UserResponse>>> getUsers(
-            @RequestParam int pageNumber,
-            @RequestParam int pageSize,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false, defaultValue = "DESC") String sortDirection,
-            @RequestParam(required = false) String searchQuery) {
-        return ApiResponse.<PaginationInfo<List<UserResponse>>>builder()
-                .message("Lấy nhiều người dùng")
-                .result(userService.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchQuery))
-                .build();
+    ApiResponse<PaginationInfo<List<UserResponse>>> getUsers(@RequestParam int pageNumber, @RequestParam int pageSize, @RequestParam(required = false) String sortBy, @RequestParam(required = false, defaultValue = "DESC") String sortDirection, @RequestParam(required = false) String searchQuery) {
+        return ApiResponse.<PaginationInfo<List<UserResponse>>>builder().message("Lấy nhiều người dùng").result(userService.getUsers(pageNumber, pageSize, sortBy, sortDirection, searchQuery)).build();
     }
 
     @GetMapping("/myinfo")
     @Operation(summary = "LẤY NGƯỜI DÙNG KHI LÀM MỚI TRANG")
     ApiResponse<UserResponse> getMyInfo() {
-        return ApiResponse.<UserResponse>builder()
-                .message("Lấy thông tin người dùng")
-                .result(userService.getMyInfo())
-                .build();
+        return ApiResponse.<UserResponse>builder().message("Lấy thông tin người dùng").result(userService.getMyInfo()).build();
     }
 
     @GetMapping("/{userId}")
     @Operation(summary = "LẤY THÔNG TIN NGƯỜI DÙNG QUA ID")
     ApiResponse<UserResponse> getUserById(@PathVariable String userId) {
-        return ApiResponse.<UserResponse>builder()
-                .message("Lấy thông tin người dùng qua id")
-                .result(userService.getUserById(userId))
-                .build();
+        return ApiResponse.<UserResponse>builder().message("Lấy thông tin người dùng qua id").result(userService.getUserById(userId)).build();
+    }
+
+    @PutMapping("/{userId}/roles")
+    @Operation(summary = "THAY ĐỔI VAI TRÒ CỦA NGƯỜI DÙNG")
+    public ApiResponse<ChangeUserRoleResponse> changeUserRole(@PathVariable String userId, @RequestBody @Valid ChangeUserRoleRequest request) {
+        ChangeUserRoleResponse response = userService.changeRoleForUser(userId, request);
+        return ApiResponse.<ChangeUserRoleResponse>builder().message("Thay đổi vai trò người dùng thành công").result(response).build();
     }
 
     @PutMapping("/{userId}")
     @Operation(summary = "CẬP NHẬP NGƯỜI DÙNG QUA ID")
-    ApiResponse<UserResponse> updateUserById(
-            @PathVariable String userId, @RequestBody UserUpdateRequest userUpdateRequest) {
-        return ApiResponse.<UserResponse>builder()
-                .message("Cập nhập thông tin thành công")
-                .result(userService.updateUserById(userId, userUpdateRequest))
-                .build();
+    ApiResponse<UserResponse> updateUserById(@PathVariable String userId, @RequestBody UserUpdateRequest userUpdateRequest) {
+        return ApiResponse.<UserResponse>builder().message("Cập nhập thông tin thành công").result(userService.updateUserById(userId, userUpdateRequest)).build();
     }
 
     @DeleteMapping("/{userId}")
