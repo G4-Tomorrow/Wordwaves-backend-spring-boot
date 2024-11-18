@@ -197,4 +197,11 @@ public class WordServiceImp implements WordService {
         return wordUtils.getWordDetail(
                 wordRepository.findByName(name).orElseThrow(() -> new AppException(ErrorCode.WORD_NOT_EXISTED)));
     }
+
+    @Override
+    public List<WordResponse> search(String query) {
+        List<Word> words = wordRepository.findByNameContainingIgnoreCase(query);
+
+        return words.stream().map(wordMapper::toWordResponse).toList();
+    }
 }
