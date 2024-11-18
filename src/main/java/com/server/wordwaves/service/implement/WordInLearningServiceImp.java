@@ -2,7 +2,6 @@ package com.server.wordwaves.service.implement;
 
 import java.util.*;
 
-import com.server.wordwaves.dto.model.vocabulary.WordInLearningModel;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -59,7 +58,8 @@ public class WordInLearningServiceImp implements WordInLearningService {
         String currentUserId = UserUtils.getCurrentUserId();
         Pageable pageable = PageRequest.of(0, numOfWords);
 
-        List<Object[]> wordInforms = wordInLearningRepository.findNotRetainedWordInTopic(topicId, currentUserId, pageable);
+        List<Object[]> wordInforms =
+                wordInLearningRepository.findNotRetainedWordInTopic(topicId, currentUserId, pageable);
 
         return VocabularyLearningResponse.builder()
                 .numOfWords(numOfWords)

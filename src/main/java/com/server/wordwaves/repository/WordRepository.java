@@ -1,5 +1,6 @@
 package com.server.wordwaves.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -27,4 +28,6 @@ public interface WordRepository extends JpaRepository<Word, String> {
     //    @Query("SELECT new com.server.wordwaves.entity.vocabulary.Word(w.id, w.name, w.vietnamese, w.thumbnailUrl)
     // FROM Word w WHERE w.name = :name")
     Optional<Word> findByName(String name);
+
+    List<Word> findByNameContainingIgnoreCase(String query);
 }

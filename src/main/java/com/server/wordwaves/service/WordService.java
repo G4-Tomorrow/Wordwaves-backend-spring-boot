@@ -32,4 +32,6 @@ public interface WordService {
     WordResponse updateById(String wordId, WordUpdateRequest request);
 
     WordResponse detail(String name);
+
+    List<WordResponse> search(String query);
 }
