@@ -61,6 +61,15 @@ public class WordController {
                 .build();
     }
 
+    @GetMapping("/search/{query}")
+    @Operation(summary = "TÌM KIẾM TỪ VỰNG")
+    ApiResponse<List<WordResponse>> search(@PathVariable String query) {
+        return ApiResponse.<List<WordResponse>>builder()
+                .message("Tìm kiếm từ vựng " + query)
+                .result(wordService.search(query))
+                .build();
+    }
+
     @GetMapping("/{name}")
     @Operation(summary = "LẤY THÔNG TIN CHI TIẾT CỦA TỪ VỰNG")
     ApiResponse<WordResponse> detail(@PathVariable("name") @NotBlank(message = "WORD_ID_IS_REQUIRED") String name) {
