@@ -28,6 +28,7 @@ public class WordResponse extends BaseAuthorResponse {
     public static class PhoneticModel {
         String text;
         String audio;
+        String accent; // US - UK
     }
 
     @Data
@@ -47,8 +48,12 @@ public class WordResponse extends BaseAuthorResponse {
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class DefinitionModel {
         String definition;
+        String definitionMeaning;
+
         List<String> synonyms;
         List<String> antonyms;
         String example;
+        //
+        String exampleMeaning;
     }
 }

@@ -84,37 +84,37 @@ public interface WordInLearningRepository extends JpaRepository<WordInLearning, 
             value =
                     """
 		SELECT w.Name, w.Id, will.Score
-  		FROM Word w
-  		JOIN TopicToWord tt ON w.id = tt.wordId
-          join WordInLearning will ON will.WordId = w.id
-  		WHERE tt.topicId = :topicId
-  		AND EXISTS (
-  			SELECT 1
-  			FROM WordInLearning wil
-  			WHERE wil.wordId = w.id AND wil.userId = :currentUserId
-  			AND wil.nextReviewTiming < CURRENT_TIMESTAMP
-  		)
+		FROM Word w
+		JOIN TopicToWord tt ON w.id = tt.wordId
+		join WordInLearning will ON will.WordId = w.id
+		WHERE tt.topicId = :topicId
+		AND EXISTS (
+			SELECT 1
+			FROM WordInLearning wil
+			WHERE wil.wordId = w.id AND wil.userId = :currentUserId
+			AND wil.nextReviewTiming < CURRENT_TIMESTAMP
+		)
 		""",
             nativeQuery = true)
     List<Object[]> findWordsInTopicWithNextReviewBeforeNow(String topicId, String currentUserId, Pageable pageable);
 
-	@Query(
-			value =
-					"""
-                    SELECT w.id
-                    FROM Word w
-                    JOIN WordInLearning wil ON w.id = wil.wordId
-                    WHERE wil.userId = :currentUserId
-                    """)
-	List<String> findWordNamesByUserId(@Param("currentUserId") String currentUserId);
+    @Query(
+            value =
+                    """
+					SELECT w.id
+					FROM Word w
+					JOIN WordInLearning wil ON w.id = wil.wordId
+					WHERE wil.userId = :currentUserId
+					""")
+    List<String> findWordNamesByUserId(@Param("currentUserId") String currentUserId);
 
     @Query(
             value =
                     """
-			SELECT wil 
-			FROM WordInLearning wil 
-			JOIN Word w ON wil.wordId = w.id 
-			WHERE w.id = :wordId 
+			SELECT wil
+			FROM WordInLearning wil
+			JOIN Word w ON wil.wordId = w.id
+			WHERE w.id = :wordId
 			AND wil.userId = :userId
 			""")
     WordInLearning findByUserIdAndWordId(@Param("userId") String userId, @Param("wordId") String wordId);
