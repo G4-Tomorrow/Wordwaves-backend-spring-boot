@@ -81,7 +81,8 @@ public class SecurityConfig {
                 "http://localhost:3001",
                 "https://localhost:3001",
                 "https://localhost:3000",
-                "https://backend-production-7ea7.up.railway.app"));
+                "https://backend-production-7ea7.up.railway.app",
+                "https://wordwaves.vercel.app"));
 
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
