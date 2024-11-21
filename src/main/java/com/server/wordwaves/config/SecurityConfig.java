@@ -44,7 +44,7 @@ public class SecurityConfig {
         "/v3/api-docs/**",
         "/swagger-resources/**",
         "/swagger-resources",
-            "/words/search/**"
+        "/words/search/**"
     };
 
     @Bean

@@ -81,7 +81,7 @@ app:
     apikey: FQfOWjWjZ3hi9i1Y3KT1yngoYRYnwO7FoivYa9JmDU06u8a7OUOXkEU7
   translate-client:
     url: https://api-b2b.backenster.com/b1/api/v3/translate
-    apikey: a_53IFsOBah49S1m23RG60YzCozYHx4PzKyxdg6SSB6M856grF1eYb7V8DHe8ytjPhh86gBIpMNgI5nuky
+    apikey: a_gv6X8wZ8aSfHRn4bUop7mHW0ekmLhyYIal7XStpn9eVfgkwrSvvFxJ0BL6v0KvUlKTHY0MS4rABs600v
   firebase:
     bucket-name: wordwaves-40814.appspot.com
 
