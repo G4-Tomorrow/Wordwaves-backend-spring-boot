@@ -5,7 +5,6 @@ import java.text.ParseException;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import com.nimbusds.jose.JOSEException;
@@ -34,22 +33,22 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthenticationController {
     AuthenticationService authenticationService;
 
-    @GetMapping("/oauth2/login-success")
-    @Operation(summary = "ĐĂNG NHẬP OAUTH2")
-    ResponseEntity<ApiResponse<AuthenticationResponse>> oauth2Login(
-            OAuth2AuthenticationToken oauth2AuthenticationToken) {
-        ResponseEntity<AuthenticationResponse> responseEntity =
-                authenticationService.oauth2Authenticate(oauth2AuthenticationToken);
-
-        ApiResponse<AuthenticationResponse> apiResponse = ApiResponse.<AuthenticationResponse>builder()
-                .message("Đăng nhập qua OAuth2")
-                .result(responseEntity.getBody())
-                .build();
-
-        return ResponseEntity.status(responseEntity.getStatusCode())
-                .headers(responseEntity.getHeaders())
-                .body(apiResponse);
-    }
+//    @GetMapping("/oauth2/login-success")
+//    @Operation(summary = "ĐĂNG NHẬP OAUTH2")
+//    ResponseEntity<ApiResponse<AuthenticationResponse>> oauth2Login(
+//            OAuth2AuthenticationToken oauth2AuthenticationToken) {
+//        ResponseEntity<AuthenticationResponse> responseEntity =
+//                authenticationService.oauth2Authenticate(oauth2AuthenticationToken);
+//
+//        ApiResponse<AuthenticationResponse> apiResponse = ApiResponse.<AuthenticationResponse>builder()
+//                .message("Đăng nhập qua OAuth2")
+//                .result(responseEntity.getBody())
+//                .build();
+//
+//        return ResponseEntity.status(responseEntity.getStatusCode())
+//                .headers(responseEntity.getHeaders())
+//                .body(apiResponse);
+//    }
 
     @PostMapping("/login")
     @Operation(summary = "ĐĂNG NHẬP QUA EMAIL")

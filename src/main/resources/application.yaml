@@ -34,16 +34,16 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: "233350138347-bmdnbcmrurg2vsbtfv1m1m1ug5ls7tnp.apps.googleusercontent.com"
-            client-secret: "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"
-          facebook:
-            client-id: "1462073664414959"
-            client-secret: "e3bab52757bac528b4cb35977c57acbd"
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id: "233350138347-bmdnbcmrurg2vsbtfv1m1m1ug5ls7tnp.apps.googleusercontent.com"
+#            client-secret: "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"
+#          facebook:
+#            client-id: "1462073664414959"
+#            client-secret: "e3bab52757bac528b4cb35977c57acbd"
 
 springdoc:
   swagger-ui:
@@ -56,7 +56,7 @@ openapi:
     api-docs: api-service
     server:
       local: http://localhost:8080/wordwaves
-      dev: https://backend-production-c2cb.up.railway.app/wordwaves
+      dev: https://backend-production-7ea7.up.railway.app/wordwaves
     title: API Service Documentation
     version: 1.0.0
 

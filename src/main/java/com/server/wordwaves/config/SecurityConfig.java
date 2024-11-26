@@ -38,7 +38,7 @@ public class SecurityConfig {
         "/auth/login",
         "/auth/refresh",
         "/auth/introspect",
-        "/oauth2/**",
+//        "/oauth2/**",
         "/api-documentation",
         "/swagger-ui/*",
         "/v3/api-docs/**",
@@ -58,15 +58,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINTS)
                         .permitAll()
                         .anyRequest()
-                        .authenticated())
-                .oauth2Login(oauth2login -> {
-                    oauth2login.defaultSuccessUrl("/auth/oauth2/login-success", true);
-                });
+                        .authenticated());
+//                .oauth2Login(oauth2login -> {
+//                    oauth2login.defaultSuccessUrl("/auth/oauth2/login-success", true);
+//                });
 
-        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
-                        .decoder(customJwtDecoder)
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
+//        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
+//                        .decoder(customJwtDecoder)
+//                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+//                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
