@@ -16,8 +16,8 @@ public interface WordCollectionService {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     WordCollectionResponse create(WordCollectionCreationRequest request);
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @PostAuthorize("returnObject.data.first.createdById == authentication.name")
+//    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+//    @PostAuthorize("returnObject.data.first.createdById == authentication.name")
     PaginationInfo<List<WordCollectionResponse>> getCollections(
             int pageNumber, int pageSize, String sortBy, String sortDirection, String searchQuery, String userId);
 
